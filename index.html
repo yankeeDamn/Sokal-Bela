@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sokal Bela - Premium Local Vegetables</title>
+    <meta name="description" content="Fresh local vegetables delivered to your doorstep in Rampurhat. Premium quality potatoes, tomatoes, onions and more.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-messaging.js"></script>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>🥬 Sokal Bela</h2>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#" class="nav-link" data-page="home">Home</a></li>
+                <li><a href="#" class="nav-link" data-page="products">Products</a></li>
+                <li><a href="#" class="nav-link" data-page="cart">Cart <span class="cart-count" id="cart-count">0</span></a></li>
+                <li><a href="#" class="nav-link" data-page="admin">Admin</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        
+        <!-- Home Page -->
+        <section id="home-page" class="page active">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h1>Fresh Local Vegetables</h1>
+                        <p>Delivering farm-fresh vegetables directly to your doorstep in Kolkata. Quality guaranteed, locally sourced.</p>
+                        <button class="btn btn--primary btn--lg" onclick="showPage('products')">Shop Now</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured Products -->
+            <section class="featured-products">
+                <div class="container">
+                    <h2>Featured Vegetables</h2>
+                    <div class="featured-grid" id="featured-grid">
+                        <!-- Featured products will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Info -->
+            <section class="contact-info">
+                <div class="container">
+                    <div class="contact-grid">
+                        <div class="contact-item">
+                            <h3>📍 Visit Us</h3>
+                            <p>Main Market, Salt Lake<br>Kolkata - 700064</p>
+                        </div>
+                        <div class="contact-item">
+                            <h3>📞 Call Us</h3>
+                            <p>+91 98765 43210</p>
+                        </div>
+                        <div class="contact-item">
+                            <h3>⏰ Store Hours</h3>
+                            <p>Monday-Sunday<br>7:00 AM - 9:00 PM</p>
+                        </div>
+                        <div class="contact-item">
+                            <h3>🚚 Delivery</h3>
+                            <p>Free delivery within 5km<br>Minimum order ₹200</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Products Page -->
+        <section id="products-page" class="page">
+            <div class="container">
+                <div class="products-header">
+                    <h1>Our Fresh Vegetables</h1>
+                    
+                    <!-- Search and Filter -->
+                    <div class="products-controls">
+                        <input type="text" id="search-input" class="form-control" placeholder="Search vegetables...">
+                        <div class="category-filters" id="category-filters">
+                            <!-- Category buttons will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="products-grid" id="products-grid">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart Page -->
+        <section id="cart-page" class="page">
+            <div class="container">
+                <h1>Shopping Cart</h1>
+                
+                <div class="cart-content">
+                    <!-- Cart Items -->
+                    <div class="cart-items" id="cart-items">
+                        <!-- Cart items will be loaded here -->
+                    </div>
+
+                    <!-- Empty Cart Message -->
+                    <div class="empty-cart" id="empty-cart" style="display: none;">
+                        <h3>Your cart is empty</h3>
+                        <p>Add some fresh vegetables to get started!</p>
+                        <button class="btn btn--primary" onclick="showPage('products')">Shop Now</button>
+                    </div>
+
+                    <!-- Cart Summary and Checkout -->
+                    <div class="cart-summary" id="cart-summary" style="display: none;">
+                        <div class="summary-card">
+                            <h3>Order Summary</h3>
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="cart-subtotal">₹0</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="cart-total">₹0</span>
+                            </div>
+                        </div>
+
+                        <!-- Customer Information Form -->
+                        <form class="checkout-form" id="checkout-form">
+                            <h3>Customer Information</h3>
+                            <div class="form-group">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" id="customer-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="tel" id="customer-phone" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delivery Address *</label>
+                                <textarea id="customer-address" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn--primary btn--full-width">Place Order</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Page -->
+        <section id="admin-page" class="page">
+            <div class="container">
+                <!-- Admin Login Form -->
+                <div class="admin-login" id="admin-login">
+                    <div class="login-form-container">
+                        <h1>Admin Login</h1>
+                        <form class="login-form" id="login-form">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" id="admin-username" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" id="admin-password" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+                        </form>
+                        <div class="login-error" id="login-error" style="display: none;">
+                            <p class="status status--error">Invalid credentials. Please try again.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Dashboard -->
+                <div class="admin-dashboard" id="admin-dashboard" style="display: none;">
+                    <div class="dashboard-header">
+                        <h1>Admin Dashboard</h1>
+                        <button class="btn btn--outline" id="logout-btn">Logout</button>
+                    </div>
+
+                    <!-- Dashboard Stats -->
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <h3 id="total-orders">0</h3>
+                            <p>Total Orders</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="total-revenue">₹0</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="total-products">0</h3>
+                            <p>Products</p>
+                        </div>
+                    </div>
+
+                    <!-- Orders Management -->
+                    <div class="admin-section">
+                        <h2>Orders Management</h2>
+                        <div class="orders-table-container">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Phone</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orders-table-body">
+                                    <!-- Orders will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Management -->
+                    <div class="admin-section">
+                        <h2>Inventory Management</h2>
+                        <button class="btn btn--primary mb-16" id="add-product-btn">Add New Product</button>
+                        <div class="inventory-grid" id="inventory-grid">
+                            <!-- Inventory items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Sokal Bela</h3>
+                    <p>Your trusted local vegetable store delivering fresh produce across Rampurhat.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>📧 freshveggies@example.com</p>
+                    <p>📞 +91 7551858583</p>
+                    <p>📍 Cho Funko Main Market, Rampurhat</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Hours</h4>
+                    <p>Monday - Sunday</p>
+                    <p>7:00 AM - 9:00 PM</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Sokal Bela. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Success Message Modal -->
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <h3>Order Placed Successfully!</h3>
+            <p>Thank you for your order. We'll contact you soon for delivery confirmation.</p>
+            <button class="btn btn--primary" onclick="closeModal('success-modal')">Continue Shopping</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
