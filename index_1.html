@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Veggies Bengal - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header__content">
+                <div class="logo">
+                    <h1>Fresh Veggies Bengal Admin</h1>
+                </div>
+                <nav class="nav" id="main-nav" style="display: none;">
+                    <ul class="nav__list">
+                        <li><a href="#" class="nav__link active" data-section="dashboard">Dashboard</a></li>
+                        <li><a href="#" class="nav__link" data-section="orders">Orders</a></li>
+                        <li><a href="#" class="nav__link" data-section="products">Products</a></li>
+                        <li><a href="#" class="nav__link" data-section="inventory">Inventory</a></li>
+                        <li><a href="#" class="nav__link" data-section="customers">Customers</a></li>
+                        <li><a href="#" class="nav__link" data-section="settings">Settings</a></li>
+                    </ul>
+                </nav>
+                <div class="admin-actions" id="admin-actions" style="display: none;">
+                    <button class="btn btn--outline" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login Page -->
+    <main id="login-page" class="page active">
+        <div class="container">
+            <div class="login-container">
+                <div class="card">
+                    <div class="card__body">
+                        <h2>Admin Login</h2>
+                        <form id="login-form">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" required autocomplete="username">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" required autocomplete="current-password">
+                            </div>
+                            <div id="login-error" class="error-message" style="display: none;"></div>
+                            <button type="submit" class="btn btn--primary btn--full-width" id="login-btn">
+                                <span id="login-btn-text">Login</span>
+                            </button>
+                        </form>
+                        <div class="login-info">
+                            <p><strong>Demo Credentials:</strong></p>
+                            <p>Username: <code>admin</code></p>
+                            <p>Password: <code>admin123</code></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Dashboard Page -->
+    <main id="dashboard-page" class="page">
+        <div class="container py-16">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p>Welcome to the Fresh Veggies Bengal Admin Panel</p>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="dashboard-stats">
+                <div class="stat-card card">
+                    <div class="card__body">
+                        <div class="stat-icon">📦</div>
+                        <h3>Total Orders</h3>
+                        <div class="stat-value" id="total-orders">3</div>
+                        <div class="stat-change positive">+12% from last month</div>
+                    </div>
+                </div>
+                <div class="stat-card card">
+                    <div class="card__body">
+                        <div class="stat-icon">💰</div>
+                        <h3>Total Revenue</h3>
+                        <div class="stat-value" id="total-revenue">₹375</div>
+                        <div class="stat-change positive">+18% from last month</div>
+                    </div>
+                </div>
+                <div class="stat-card card">
+                    <div class="card__body">
+                        <div class="stat-icon">👥</div>
+                        <h3>Total Customers</h3>
+                        <div class="stat-value" id="total-customers">3</div>
+                        <div class="stat-change positive">+3 new customers</div>
+                    </div>
+                </div>
+                <div class="stat-card card">
+                    <div class="card__body">
+                        <div class="stat-icon">📈</div>
+                        <h3>Avg Order Value</h3>
+                        <div class="stat-value" id="avg-order-value">₹125</div>
+                        <div class="stat-change negative">-5% from last month</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Sales Overview</h3>
+                        <div class="chart-container" style="position: relative; height: 400px;">
+                            <canvas id="sales-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="recent-orders">
+                <div class="card">
+                    <div class="card__body">
+                        <div class="section-header">
+                            <h3>Recent Orders</h3>
+                            <button class="btn btn--primary" onclick="showSection('orders')">View All</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-orders-table">
+                                    <!-- Recent orders will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Orders Page -->
+    <main id="orders-page" class="page">
+        <div class="container py-16">
+            <div class="page-header">
+                <h1>Orders Management</h1>
+                <div class="filters">
+                    <select class="form-control" id="status-filter">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card__body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table">
+                                <!-- Orders will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Products Page -->
+    <main id="products-page" class="page">
+        <div class="container py-16">
+            <div class="page-header">
+                <h1>Products Management</h1>
+                <button class="btn btn--primary" id="add-product-btn">Add New Product</button>
+            </div>
+
+            <div class="card">
+                <div class="card__body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-table">
+                                <!-- Products will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Inventory Page -->
+    <main id="inventory-page" class="page">
+        <div class="container py-16">
+            <div class="page-header">
+                <h1>Inventory Management</h1>
+                <div class="filters">
+                    <select class="form-control" id="category-filter">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card__body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Current Stock</th>
+                                    <th>Min Stock</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table">
+                                <!-- Inventory will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Customers Page -->
+    <main id="customers-page" class="page">
+        <div class="container py-16">
+            <div class="page-header">
+                <h1>Customers Management</h1>
+            </div>
+
+            <div class="card">
+                <div class="card__body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Total Orders</th>
+                                    <th>Total Spent</th>
+                                    <th>Last Order</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-table">
+                                <!-- Customers will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Settings Page -->
+    <main id="settings-page" class="page">
+        <div class="container py-16">
+            <div class="page-header">
+                <h1>Settings</h1>
+            </div>
+
+            <div class="settings-grid">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Store Information</h3>
+                        <form id="store-settings-form">
+                            <div class="form-group">
+                                <label class="form-label">Store Name</label>
+                                <input type="text" class="form-control" value="Fresh Veggies Bengal">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" value="+91 98765 43210">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" rows="3">Main Market, Salt Lake, Kolkata - 700064</textarea>
+                            </div>
+                            <button type="submit" class="btn btn--primary">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Delivery Settings</h3>
+                        <form id="delivery-settings-form">
+                            <div class="form-group">
+                                <label class="form-label">Delivery Radius (km)</label>
+                                <input type="number" class="form-control" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Minimum Order (₹)</label>
+                                <input type="number" class="form-control" value="200">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delivery Charge (₹)</label>
+                                <input type="number" class="form-control" value="30">
+                            </div>
+                            <button type="submit" class="btn btn--primary">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Product Modal -->
+    <div class="modal hidden" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Add New Product</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="product-form">
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price (₹)</label>
+                        <input type="number" class="form-control" id="product-price" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select class="form-control" id="product-unit">
+                            <option value="kg">kg</option>
+                            <option value="piece">piece</option>
+                            <option value="bunch">bunch</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-control" id="product-category" required>
+                            <option value="Root Vegetables">Root Vegetables</option>
+                            <option value="Leafy Greens">Leafy Greens</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Cruciferous">Cruciferous</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="product-description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Current Stock</label>
+                        <input type="number" class="form-control" id="current-stock" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Min Stock Level</label>
+                        <input type="number" class="form-control" id="min-stock" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="product-featured"> Featured Product
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Save Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast hidden" id="toast">
+        <div class="toast-content">
+            <span id="toast-message">Success!</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <p>&copy; 2025 Fresh Veggies Bengal Admin Panel. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
