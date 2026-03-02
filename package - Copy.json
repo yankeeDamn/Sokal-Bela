@@ -1,0 +1,14 @@
+{
+  "name": "sokal-bela",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node local-server.js",
+    "dev": "npx nodemon local-server.js",
+    "func:start": "cd backend/functions && npm run start"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

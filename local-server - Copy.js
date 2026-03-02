@@ -1,0 +1,432 @@
+// Local Development Server for Sokal Bela
+// This runs the API locally for testing without Firebase emulator
+
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '.')));
+
+// Mock database in memory
+let products = [
+  {
+    id: '1',
+    name: 'Fresh Tomatoes',
+    category: 'vegetables',
+    unit: 'kg',
+    base_price: 40,
+    stock: 50,
+    images: ['tomato.jpg'],
+    description: 'Fresh red tomatoes',
+    rating: 4.5,
+    reviews: 12
+  },
+  {
+    id: '2',
+    name: 'Organic Milk',
+    category: 'dairy',
+    unit: 'liter',
+    base_price: 60,
+    stock: 100,
+    images: ['milk.jpg'],
+    description: '1L pack of pure milk',
+    rating: 4.8,
+    reviews: 45
+  },
+  {
+    id: '3',
+    name: 'Whole Wheat Bread',
+    category: 'bakery',
+    unit: 'piece',
+    base_price: 40,
+    stock: 30,
+    images: ['bread.jpg'],
+    description: 'Fresh baked bread',
+    rating: 4.3,
+    reviews: 28
+  },
+  {
+    id: '4',
+    name: 'Bananas',
+    category: 'fruits',
+    unit: 'dozen',
+    base_price: 60,
+    stock: 60,
+    images: ['banana.jpg'],
+    description: 'Fresh yellow bananas',
+    rating: 4.6,
+    reviews: 34
+  },
+  {
+    id: '5',
+    name: 'Chicken Breast',
+    category: 'meat',
+    unit: 'kg',
+    base_price: 250,
+    stock: 25,
+    images: ['chicken.jpg'],
+    description: 'Fresh chicken breast',
+    rating: 4.7,
+    reviews: 52
+  }
+];
+
+let orders = [];
+let orderCounter = 100;
+
+// ===== AUTH ENDPOINTS =====
+app.post('/api/auth/signup', (req, res) => {
+  try {
+    const { email, password, displayName } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, error: 'Missing email or password' });
+    }
+    const user = {
+      uid: 'user_' + Date.now(),
+      email,
+      displayName: displayName || 'User',
+      phone: '',
+      addresses: [],
+      createdAt: new Date().toISOString()
+    };
+    res.json({ success: true, user, message: 'Signup successful' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/auth/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, error: 'Missing email or password' });
+    }
+    // Mock login
+    if (email === 'admin@sokal.com' && password === 'admin123') {
+      return res.json({ 
+        success: true, 
+        user: { 
+          uid: 'admin', 
+          email: 'admin@sokal.com', 
+          displayName: 'Admin',
+          isAdmin: true 
+        },
+        message: 'Login successful'
+      });
+    }
+    res.json({ 
+      success: true, 
+      user: { 
+        uid: 'user_' + Date.now(), 
+        email, 
+        displayName: email.split('@')[0],
+        isAdmin: false 
+      },
+      message: 'Login successful' 
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===== PRODUCT ENDPOINTS =====
+app.get('/api/products', (req, res) => {
+  try {
+    let filtered = products;
+    if (req.query.category) {
+      filtered = products.filter(p => p.category === req.query.category);
+    }
+    if (req.query.search) {
+      const search = req.query.search.toLowerCase();
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
+    }
+    res.json({ success: true, products: filtered });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/products/:id', (req, res) => {
+  try {
+    const product = products.find(p => p.id === req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+    res.json({ success: true, product });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===== ORDER ENDPOINTS =====
+app.post('/api/orders', (req, res) => {
+  try {
+    const { customerSnapshot, items, delivery_fee = 0, tax = 0, couponCode = '', notes = '' } = req.body;
+    
+    if (!customerSnapshot || !items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, error: 'Invalid payload' });
+    }
+
+    // Calculate subtotal
+    let subtotal = 0;
+    const orderItems = [];
+    
+    for (const item of items) {
+      const product = products.find(p => p.id === item.productId);
+      if (!product) {
+        return res.status(400).json({ success: false, error: `Product ${item.productId} not found` });
+      }
+      if (product.stock < item.qty) {
+        return res.status(400).json({ success: false, error: `Insufficient stock for ${product.name}` });
+      }
+      
+      const itemTotal = product.base_price * item.qty;
+      subtotal += itemTotal;
+      orderItems.push({
+        productId: item.productId,
+        productName: product.name,
+        qty: item.qty,
+        price: product.base_price,
+        total: itemTotal
+      });
+      
+      // Deduct stock
+      product.stock -= item.qty;
+    }
+
+    // Calculate discount
+    let discount = 0;
+    if (couponCode === 'SAVE10') discount = subtotal * 0.10;
+    else if (couponCode === 'SAVE50') discount = 50;
+    else if (couponCode === 'WELCOME20') discount = subtotal * 0.20;
+
+    const total = subtotal + delivery_fee + tax - discount;
+    
+    const order = {
+      id: 'ORD' + (++orderCounter),
+      customerId: customerSnapshot.uid || 'guest',
+      customerSnapshot,
+      items: orderItems,
+      subtotal,
+      delivery_fee,
+      tax,
+      discount,
+      total,
+      status: 'Pending',
+      paymentStatus: 'Pending',
+      notes,
+      couponCode: couponCode || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    orders.push(order);
+    res.json({ success: true, order, message: 'Order created successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/orders/:userId', (req, res) => {
+  try {
+    const userOrders = orders.filter(o => o.customerId === req.params.userId);
+    res.json({ success: true, orders: userOrders });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/orders', (req, res) => {
+  try {
+    res.json({ success: true, orders, count: orders.length });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.patch('/api/admin/orders/:orderId', (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = orders.find(o => o.id === req.params.orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+    
+    const validStatuses = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid status' });
+    }
+
+    order.status = status;
+    order.updatedAt = new Date().toISOString();
+    res.json({ success: true, order, message: `Order status updated to ${status}` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===== REVIEW ENDPOINTS =====
+app.post('/api/products/:productId/reviews', (req, res) => {
+  try {
+    const { userId, userName, rating, comment } = req.body;
+    const product = products.find(p => p.id === req.params.productId);
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+
+    const review = {
+      userId,
+      userName,
+      rating: parseInt(rating),
+      comment,
+      createdAt: new Date().toISOString()
+    };
+
+    if (!product.reviews) product.reviews = [];
+    product.reviews = (product.reviews || 0) + 1;
+    
+    res.json({ success: true, review, message: 'Review added successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/products/:productId/reviews', (req, res) => {
+  try {
+    const product = products.find(p => p.id === req.params.productId);
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+    res.json({ success: true, reviews: [], count: product.reviews || 0 });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===== NOTIFICATION ENDPOINTS =====
+app.post('/api/notify/email', (req, res) => {
+  try {
+    const { to, subject, message } = req.body;
+    console.log(`📧 Email sent to ${to}: ${subject}`);
+    res.json({ success: true, message: 'Email notification sent' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/notify/sms', (req, res) => {
+  try {
+    const { phone, message } = req.body;
+    console.log(`📱 SMS sent to ${phone}: ${message}`);
+    res.json({ success: true, message: 'SMS notification sent' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===== PAYMENT ENDPOINTS =====
+app.post('/api/create-payment-order', (req, res) => {
+  try {
+    const { orderId, amount } = req.body;
+    const razorpayOrderId = 'order_' + Math.random().toString(36).substr(2, 9);
+    res.json({ 
+      success: true, 
+      razorpayOrderId,
+      amount,
+      message: 'Payment order created'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/verify-payment', (req, res) => {
+  try {
+    const { orderId, paymentId } = req.body;
+    res.json({ 
+      success: true, 
+      message: 'Payment verified successfully',
+      paymentId
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===== BULK REQUEST ENDPOINT =====
+app.post('/api/bulk-requests', (req, res) => {
+  try {
+    const { contact, event_type, event_date, guest_count, items } = req.body;
+    const bulkRequest = {
+      id: 'BULK' + Date.now(),
+      contact,
+      event_type,
+      event_date,
+      guest_count,
+      itemsRequested: items,
+      status: 'Pending',
+      createdAt: new Date().toISOString()
+    };
+    res.json({ success: true, bulkRequest, message: 'Bulk request submitted' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===== HEALTH CHECK =====
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    success: true, 
+    status: 'Server is running',
+    timestamp: new Date().toISOString(),
+    endpoints: [
+      'POST /api/auth/signup',
+      'POST /api/auth/login',
+      'GET /api/products',
+      'GET /api/products/:id',
+      'POST /api/orders',
+      'GET /api/orders/:userId',
+      'GET /api/admin/orders',
+      'PATCH /api/admin/orders/:orderId',
+      'POST /api/products/:productId/reviews',
+      'GET /api/products/:productId/reviews',
+      'POST /api/notify/email',
+      'POST /api/notify/sms',
+      'POST /api/create-payment-order',
+      'POST /api/verify-payment',
+      'POST /api/bulk-requests'
+    ]
+  });
+});
+
+// Serve HTML file
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index-enhanced.html'));
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`
+╔════════════════════════════════════════════════════════╗
+║     🚀 Sokal Bela Development Server Started           ║
+╠════════════════════════════════════════════════════════╣
+║ Server: http://localhost:${PORT}                        ║
+║ API Health: http://localhost:${PORT}/api/health         ║
+║ Frontend: http://localhost:${PORT}                      ║
+╠════════════════════════════════════════════════════════╣
+║ Sample Credentials:                                    ║
+║ - Email: admin@sokal.com                               ║
+║ - Password: admin123                                    ║
+║                                                        ║
+║ Sample Coupons:                                        ║
+║ - SAVE10 (10% off)                                      ║
+║ - SAVE50 (₹50 off)                                      ║
+║ - WELCOME20 (20% off)                                   ║
+╚════════════════════════════════════════════════════════╝
+  `);
+});

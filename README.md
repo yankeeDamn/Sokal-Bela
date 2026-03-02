@@ -31,9 +31,8 @@ A modern web application for local vegetable delivery service in Kolkata, featur
 ```
 Sokal Bela/
 ├── index.html          # Main HTML file
-├── app.js             # Main application logic
-├── app_1.js           # Additional app logic (backup)
-├── app_2.js           # Additional app logic (backup)
+├── app.js             # Main application logic (active)
+├── (no legacy copies) # `app.js` is the canonical frontend; legacy files removed (preserved in git history)
 ├── style.css          # Styling and responsive design
 ├── firebase-config.js # Firebase configuration
 ├── db-operations.js   # Database operations
@@ -46,14 +45,15 @@ Sokal Bela/
 
 - Web browser (Chrome, Firefox, Safari, Edge)
 - Python 3.x (for local development server) or any HTTP server
+- Node.js & npm (for Firebase CLI and functions emulator)
 - Firebase account (for database functionality)
 
 ### Installation
 
 1. Clone the repository:
-```bash
+```powershell
 git clone <repository-url>
-cd "Sokal Bela Project VibeCoding week"
+cd "Sokal-Bela-main"
 ```
 
 2. Set up Firebase:
@@ -65,11 +65,52 @@ cd "Sokal Bela Project VibeCoding week"
 ### Running the Application
 
 #### Option 1: Python HTTP Server
-```bash
-cd "Sokal Bela"
+```powershell
+cd "Sokal-Bela-main"
 python -m http.server 8080
 ```
-Then open http://localhost:8080 in your browser.
+Then open `http://localhost:8080` in your browser.
+
+### Running with Firebase emulators (recommended for development)
+
+1. Install Firebase CLI and dependencies:
+
+```powershell
+npm install -g firebase-tools
+cd backend/functions
+npm install
+```
+
+2. Start the Functions emulator and seed sample products (recommended):
+
+```powershell
+# In the functions folder: starts the Functions emulator
+npm run start
+
+# In another terminal (also in backend/functions):
+npm run seed
+```
+
+3. Serve the frontend and open the site:
+
+```powershell
+# from repo root
+python -m http.server 8080
+# open http://localhost:8080
+```
+
+The frontend will call the Functions emulator at `http://localhost:5001/...` by default when you run the emulators.
+
+## 🔜 Next Steps
+
+- **Set up Firebase project**: Create a Firebase project, enable Firestore and Auth, and paste your config into `firebase-config.js`.
+- **Run emulators locally**: Use the `backend/functions` scripts (`npm run start` and `npm run seed`) to test functions without deploying.
+- **Secure admin**: Replace the placeholder admin credentials with Firebase Auth and protect admin routes.
+- **Add environment config**: Consider using an environment-based configuration approach (example: `config.example.js`) to avoid committing secrets.
+- **Testing & CI**: Add unit tests for `db-operations.js` and setup a CI pipeline to run lint/tests on PRs.
+- **Accessibility & performance**: Run Lighthouse, optimize images, and ensure mobile accessibility.
+
+If you want, I can implement one of these next steps (for example: add `config.example.js`, wire Firebase Auth for admin, or add a small CI workflow). Tell me which you'd like me to do next.
 
 #### Option 2: VS Code Live Server
 1. Install the Live Server extension in VS Code
