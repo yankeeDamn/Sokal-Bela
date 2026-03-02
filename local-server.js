@@ -4,9 +4,14 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = 3000;
+
+// Rate limiting
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
+app.use(limiter);
 
 app.use(cors());
 app.use(express.json());
@@ -406,7 +411,7 @@ app.get('/api/health', (req, res) => {
 
 // Serve HTML file
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index-enhanced.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start server
