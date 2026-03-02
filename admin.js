@@ -1,4 +1,4 @@
-// Fresh Veggies Bengal Admin Panel
+// Sokal Bela Admin Panel
 // Comprehensive admin system with working authentication
 
 class AdminPanel {
@@ -467,6 +467,10 @@ class AdminPanel {
     loadSalesChart() {
         const ctx = document.getElementById('sales-chart');
         if (!ctx) return;
+        if (typeof Chart === 'undefined') {
+            ctx.parentElement && (ctx.parentElement.innerHTML = '<p style="padding:16px;color:#888;">Chart unavailable (Chart.js not loaded)</p>');
+            return;
+        }
 
         // Sample data for the chart
         const chartData = {

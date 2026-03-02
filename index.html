@@ -23,12 +23,31 @@
     measurementId: "G-QH41QC1D8X"
   };
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-
-  // Initialize services
-  const db = firebase.firestore();
-  const auth = firebase.auth();
+  // Initialize Firebase (gracefully handle CDN unavailability)
+  var db = null;
+  var auth = null;
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    auth = firebase.auth();
+  } catch (e) {
+    console.warn('Firebase unavailable, using local API fallback:', e.message);
+  }
+</script>
+<!-- Functions base URL (for local emulator use localhost). Update when deployed. -->
+<script>
+    // Default to local emulator URL for Cloud Functions
+    // Determine API base dynamically:
+    // - If running on the dev server (port 3000) use relative /api endpoints.
+    // - Otherwise fall back to the emulator URL or deployed functions URL.
+    if (!window.FUNCTIONS_BASE) {
+        const loc = window.location;
+        if (loc.hostname === 'localhost' && (loc.port === '3000' || loc.port === '')) {
+            window.FUNCTIONS_BASE = '/api';
+        } else {
+            window.FUNCTIONS_BASE = 'http://localhost:5001/sokal-bela-store/us-central1/api';
+        }
+    }
 </script>
 </head>
 <body>
@@ -41,6 +60,7 @@
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="#" class="nav-link" data-page="home">Home</a></li>
                 <li><a href="#" class="nav-link" data-page="products">Products</a></li>
+                <li><a href="#" class="nav-link" data-page="bulk">Bulk Orders</a></li>
                 <li><a href="#" class="nav-link" data-page="cart">Cart <span class="cart-count" id="cart-count">0</span></a></li>
                 <li><a href="#" class="nav-link" data-page="admin">Admin</a></li>
             </ul>
@@ -61,9 +81,12 @@
             <section class="hero">
                 <div class="container">
                     <div class="hero-content">
-                        <h1>Fresh Local Vegetables</h1>
-                        <p>Delivering farm-fresh vegetables directly to your doorstep in Rampurhat. Quality guaranteed, locally sourced.</p>
-                        <button class="btn btn--primary btn--lg" onclick="showPage('products')">Shop Now</button>
+                                    <h1>Fresh Local Vegetables — Delivered Fast</h1>
+                                    <p>Farm-to-doorstep produce for households and large events. Bulk pricing, reliable delivery.</p>
+                                    <div class="hero-ctas">
+                                        <button class="btn btn--primary btn--lg" onclick="showPage('products')">Shop Now</button>
+                                        <button class="btn btn--outline btn--lg" onclick="showPage('products');document.getElementById('search-input').value='bulk';">Bulk Orders</button>
+                                    </div>
                     </div>
                 </div>
             </section>
@@ -125,6 +148,66 @@
             </div>
         </section>
 
+        <!-- Bulk Orders Page -->
+        <section id="bulk-page" class="page">
+            <div class="container">
+                <h1>Bulk / Event Orders</h1>
+                <p>Request a quote for weddings, parties or large events. We'll prepare a custom estimate and contact you.</p>
+
+                <form id="bulk-form" class="card" style="padding:16px; max-width:800px;">
+                    <div class="form-group">
+                        <label class="form-label">Contact Name *</label>
+                        <input id="bulk-name" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone *</label>
+                        <input id="bulk-phone" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email (optional)</label>
+                        <input id="bulk-email" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Event Type</label>
+                        <select id="bulk-event-type" class="form-control">
+                            <option value="wedding">Wedding</option>
+                            <option value="birthday">Birthday</option>
+                            <option value="corporate">Corporate</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="display:flex;gap:12px;">
+                        <div style="flex:1">
+                            <label class="form-label">Event Date</label>
+                            <input id="bulk-event-date" type="date" class="form-control" />
+                        </div>
+                        <div style="width:160px">
+                            <label class="form-label">Guest Count</label>
+                            <input id="bulk-guest-count" type="number" min="1" value="50" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Items (optional)</label>
+                        <div id="bulk-items" style="display:flex;flex-direction:column;gap:8px"></div>
+                        <button type="button" class="btn btn--outline" id="add-bulk-item-btn">Add item</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Menu preferences / notes</label>
+                        <textarea id="bulk-notes" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div style="display:flex;gap:12px;align-items:center">
+                        <button type="submit" class="btn btn--primary">Request Quote</button>
+                        <div id="bulk-result" style="color:var(--color-text-secondary)"></div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
         <!-- Cart Page -->
         <section id="cart-page" class="page">
             <div class="container">
@@ -171,6 +254,9 @@
                             <div class="form-group">
                                 <label class="form-label">Delivery Address *</label>
                                 <textarea id="customer-address" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><input type="checkbox" id="pay-now"> Pay now (online)</label>
                             </div>
                             <button type="submit" class="btn btn--primary btn--full-width">Place Order</button>
                         </form>
@@ -304,5 +390,26 @@
     </div>
 
     <script src="app.js"></script>
+    <script src="razorpay-integration.js"></script>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="auth-modal" style="display:none;">
+        <div class="modal-content" style="max-width:400px; padding:20px;">
+            <h3 id="auth-modal-title">Login</h3>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="auth-email" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="auth-password" class="form-control" required />
+                </div>
+                <button type="submit" id="auth-submit-btn" class="btn btn--primary btn--full-width">Login</button>
+            </form>
+            <p id="auth-toggle-text" style="margin-top:8px;font-size:14px;">Don't have an account? <a href="#" id="auth-toggle-link">Sign up</a></p>
+            <button class="btn btn--secondary" onclick="closeModal('auth-modal')">Close</button>
+        </div>
+    </div>
 </body>
 </html>
