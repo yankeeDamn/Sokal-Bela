@@ -1519,3 +1519,126 @@ select.form-control {
 .btn--success:hover {
   opacity: 0.9;
 }
+
+/* Social media buttons */
+.btn--whatsapp {
+  background: #25d366;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: background var(--duration-fast) var(--ease-standard);
+  margin: var(--space-4) var(--space-4) 0 0;
+}
+.btn--whatsapp:hover { background: #1ebe5d; color: #fff; }
+
+.btn--facebook {
+  background: #1877f2;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: background var(--duration-fast) var(--ease-standard);
+  margin: var(--space-4) var(--space-4) 0 0;
+}
+.btn--facebook:hover { background: #1464d8; color: #fff; }
+
+.social-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Footer social row */
+.footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+/* Floating WhatsApp button */
+.whatsapp-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background: #25d366;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  z-index: 1500;
+  transition: background var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+  text-decoration: none;
+}
+.whatsapp-float:hover {
+  background: #1ebe5d;
+  transform: scale(1.08);
+}
+.whatsapp-float svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* Toast notifications */
+#toast-container {
+  position: fixed;
+  bottom: 88px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  z-index: 4000;
+  pointer-events: none;
+}
+
+.toast {
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  max-width: 320px;
+  word-break: break-word;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity var(--duration-normal) var(--ease-standard),
+    transform var(--duration-normal) var(--ease-standard);
+  pointer-events: auto;
+  box-shadow: var(--shadow-md);
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast--success {
+  background: var(--color-success);
+  color: #fff;
+}
+
+.toast--error {
+  background: var(--color-error);
+  color: #fff;
+}
+
+.toast--info {
+  background: var(--color-charcoal-700);
+  color: var(--color-gray-200);
+  white-space: pre-line;
+}

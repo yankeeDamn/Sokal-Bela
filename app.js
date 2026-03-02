@@ -240,12 +240,13 @@ async function handleOrderSubmission(e) {
         };
 
         const result = await saveOrderToBackend(payload);
+        const orderId = result.orderId || (result.order && result.order.id);
 
         // if payNow remained true but no real payment was processed, mark order paid
-        if (payNow && result && result.orderId) {
+        if (payNow && orderId) {
             try {
-                await fetch(`${FUNCTIONS_BASE}/admin/orders/${result.orderId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentStatus: 'Paid', paymentMethod: 'mock' }) });
-                await fetch(`${FUNCTIONS_BASE}/notify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'Order Paid', body: `Order ${result.orderId} paid (mock)`, orderId: result.orderId }) });
+                await fetch(`${FUNCTIONS_BASE}/admin/orders/${orderId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentStatus: 'Paid', paymentMethod: 'mock' }) });
+                await fetch(`${FUNCTIONS_BASE}/notify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'Order Paid', body: `Order ${orderId} paid (mock)`, orderId }) });
             } catch (err) {
                 console.error('Payment/notify failed', err);
             }
@@ -293,7 +294,7 @@ function setupEventListeners() {
 
     // Hamburger for mobile
     const ham = document.getElementById('hamburger');
-    if (ham) ham.addEventListener('click', () => document.getElementById('nav-menu')?.classList.toggle('open'));
+    if (ham) ham.addEventListener('click', () => document.getElementById('nav-menu')?.classList.toggle('show'));
 
     // Search input
     const searchInput = document.getElementById('search-input');
@@ -556,8 +557,22 @@ async function updateOrderStatus(orderId, status) {
 }
 
 async function fetchOrderDetails(orderId) {
-    // simple modal or console output for now
-    alert('Open order details in admin UI (id: ' + orderId + ')');
+    try {
+        const res = await fetch(`${FUNCTIONS_BASE}/admin/orders/${orderId}`);
+        const data = await res.json();
+        const o = (data && (data.order || (data.orders && data.orders[0]))) || {};
+        const msg = [
+            `Order ID: ${orderId}`,
+            `Customer: ${o.customerSnapshot?.displayName || o.customerName || 'N/A'}`,
+            `Phone: ${o.customerSnapshot?.phone || o.phone || 'N/A'}`,
+            `Total: ₹${o.total || 0}`,
+            `Status: ${o.status || 'N/A'}`,
+            `Payment: ${o.paymentStatus || 'N/A'}`
+        ].join('\n');
+        showToast(msg, 'info');
+    } catch (err) {
+        showToast(`Order ID: ${orderId}`, 'info');
+    }
 }
 
 /* ------------------ Setup form listeners for bulk & admin ------------------ */
@@ -863,12 +878,31 @@ function hideLoading() {
 }
 
 function showError(msg) {
-    alert(msg);
+    showToast(msg, 'error');
 }
 
 function showToast(msg, type = 'success') {
-    // simple toast using alert for now - can be enhanced
-    console.log('TOAST', type, msg);
+    const container = document.getElementById('toast-container') || createToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    toast.textContent = msg;
+    container.appendChild(toast);
+    // Animate in
+    requestAnimationFrame(() => toast.classList.add('toast--visible'));
+    setTimeout(() => {
+        toast.classList.remove('toast--visible');
+        const removeEl = () => { if (toast.parentNode) toast.remove(); };
+        toast.addEventListener('transitionend', removeEl, { once: true });
+        // Fallback in case transitionend doesn't fire
+        setTimeout(removeEl, 400);
+    }, 4000);
+}
+
+function createToastContainer() {
+    const el = document.createElement('div');
+    el.id = 'toast-container';
+    document.body.appendChild(el);
+    return el;
 }
 
 function escapeHtml(s) {
