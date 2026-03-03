@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Products: public read, admin write only
+    match /products/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+    }
+
+    // Orders: public create (customers placing orders), admin read/write
+    match /orders/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+    }
+
+    // Bulk Orders: public create, admin read/write
+    match /bulkOrders/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+    }
+  }
+}
