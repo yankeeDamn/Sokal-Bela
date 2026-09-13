@@ -12,6 +12,18 @@ service cloud.firestore {
     match /orders/{id} {
       allow create: if true;
       allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+
+      // Order items: public create alongside the order, admin read
+      match /items/{itemId} {
+        allow create: if true;
+        allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+      }
+    }
+
+    // Admin notifications: public create (order alerts), admin read/write
+    match /adminNotifications/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
     }
 
     // Bulk Orders: public create, admin read/write
