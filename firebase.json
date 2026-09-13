@@ -1,8 +1,16 @@
 {
   "functions": { "source": "backend/functions" },
+  "hosting": {
+    "public": ".",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "backend/**"],
+    "rewrites": [
+      { "source": "/api/**", "function": { "functionId": "api", "region": "asia-south1" } }
+    ]
+  },
   "emulators": {
     "functions": { "port": 5001 },
     "firestore": { "port": 8081 },
+    "hosting": { "port": 5000 },
     "ui": { "enabled": true, "port": 4000 }
   }
 }

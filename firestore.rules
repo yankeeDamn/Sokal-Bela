@@ -31,5 +31,12 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
     }
+
+    // Payments: written only by the backend (Admin SDK bypasses rules after
+    // server-side signature verification). Admin can read for reconciliation.
+    match /payments/{id} {
+      allow read: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+      allow write: if false;
+    }
   }
 }
