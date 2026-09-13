@@ -30,13 +30,21 @@ A modern web application for local vegetable delivery service in Kolkata, featur
 
 ```
 Sokal Bela/
-├── index.html          # Main HTML file
-├── app.js             # Main application logic (active)
-├── (no legacy copies) # `app.js` is the canonical frontend; legacy files removed (preserved in git history)
-├── style.css          # Styling and responsive design
-├── firebase-config.js # Firebase configuration
-├── db-operations.js   # Database operations
-└── notifications.js   # Push notification handling
+├── index.html              # Main customer-facing HTML file
+├── admin.html              # Admin dashboard HTML
+├── app.js                  # Main customer application logic
+├── admin.js                # Admin dashboard logic
+├── style.css               # Styling and responsive design
+├── firebase-config.js      # Firebase configuration
+├── db-operations.js        # Database operations
+├── notifications.js        # Push notification handling
+├── razorpay-integration.js # Razorpay payment integration
+├── local-server.js         # Local Express development server
+├── .env.example            # Environment variables template
+├── package.json            # Project dependencies and npm scripts
+├── firebase.json           # Firebase configuration
+├── firestore.rules         # Firestore security rules
+└── .firebaserc             # Firebase project configuration
 ```
 
 ## 🚀 Getting Started
@@ -51,77 +59,75 @@ Sokal Bela/
 ### Installation
 
 1. Clone the repository:
-```powershell
+```bash
 git clone <repository-url>
-cd "Sokal-Bela-main"
+cd Sokal-Bela
 ```
 
-2. Set up Firebase:
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+   - Copy `.env.example` to `.env` (or configure as needed)
+   - Update with your Firebase project credentials if using Firebase directly
+
+4. Set up Firebase:
    - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
    - Enable Firestore Database
    - Enable Authentication
    - Update `firebase-config.js` with your Firebase configuration
+   - (Optional) For Cloud Messaging notifications, set up Firebase Cloud Messaging in your project
 
 ### Running the Application
 
-#### Option 1: Python HTTP Server
-```powershell
-cd "Sokal-Bela-main"
+#### Option 1: Local Development Server (Recommended)
+
+The project includes a local Express server for development:
+
+```bash
+# Start the local development server
+npm start
+
+# Or with auto-reload on file changes
+npm run dev
+```
+
+Then open `http://localhost:3000` in your browser.
+
+The server provides:
+- CORS-enabled API for testing
+- Static file serving for the frontend
+- Mock in-memory database for local development
+- Rate limiting for API endpoints
+
+#### Option 2: Python HTTP Server
+
+```bash
 python -m http.server 8080
 ```
+
 Then open `http://localhost:8080` in your browser.
 
-### Running with Firebase emulators (recommended for development)
-
-1. Install Firebase CLI and dependencies:
-
-```powershell
-npm install -g firebase-tools
-cd backend/functions
-npm install
-```
-
-2. Start the Functions emulator and seed sample products (recommended):
-
-```powershell
-# In the functions folder: starts the Functions emulator
-npm run start
-
-# In another terminal (also in backend/functions):
-npm run seed
-```
-
-3. Serve the frontend and open the site:
-
-```powershell
-# from repo root
-python -m http.server 8080
-# open http://localhost:8080
-```
-
-The frontend will call the Functions emulator at `http://localhost:5001/...` by default when you run the emulators.
-
-## 🔜 Next Steps
-
-- **Set up Firebase project**: Create a Firebase project, enable Firestore and Auth, and paste your config into `firebase-config.js`.
-- **Run emulators locally**: Use the `backend/functions` scripts (`npm run start` and `npm run seed`) to test functions without deploying.
-- **Secure admin**: Replace the placeholder admin credentials with Firebase Auth and protect admin routes.
-- **Add environment config**: Consider using an environment-based configuration approach (example: `config.example.js`) to avoid committing secrets.
-- **Testing & CI**: Add unit tests for `db-operations.js` and setup a CI pipeline to run lint/tests on PRs.
-- **Accessibility & performance**: Run Lighthouse, optimize images, and ensure mobile accessibility.
-
-If you want, I can implement one of these next steps (for example: add `config.example.js`, wire Firebase Auth for admin, or add a small CI workflow). Tell me which you'd like me to do next.
-
-#### Option 2: VS Code Live Server
+#### Option 3: VS Code Live Server
 1. Install the Live Server extension in VS Code
-2. Right-click on `index.html`
+2. Right-click on `index.html` or `admin.html`
 3. Select "Open with Live Server"
 
-#### Option 3: Any Static Server
+#### Option 4: Any Static Server
 You can use any static file server like:
 - Node.js `http-server`
 - PHP built-in server
 - Apache/Nginx
+
+### npm Scripts
+
+The following npm scripts are available:
+
+- `npm start` - Start the local Express development server on port 3000
+- `npm run dev` - Start the development server with auto-reload using nodemon
+- `npm run func:start` - Start Firebase Cloud Functions emulator (if backend/functions exists)
 
 ## 🔐 Admin Access
 
@@ -163,7 +169,7 @@ To access the admin dashboard:
 
 ### Firebase Hosting
 1. Install Firebase CLI: `npm install -g firebase-tools`
-2. Initialize Firebase: `firebase init`
+2. Initialize Firebase: `firebase init hosting`
 3. Deploy: `firebase deploy`
 
 ### Other Hosting Options
@@ -171,6 +177,17 @@ To access the admin dashboard:
 - Vercel
 - GitHub Pages
 - Any static hosting service
+
+## 🔜 Next Steps & Improvements
+
+Recommended enhancements for production:
+
+- **Secure admin**: Replace the placeholder admin credentials (`admin`/`admin123`) with Firebase Authentication
+- **Environment config**: Use proper environment variable management instead of hardcoded Firebase credentials
+- **Testing & CI**: Add unit tests for core functions and setup CI pipeline (currently using npm-publish-github-packages workflow)
+- **Accessibility & performance**: Run Lighthouse, optimize images, and ensure mobile accessibility
+- **Backend API**: Consider deploying actual backend/functions for scalable payment processing
+- **Error handling**: Add comprehensive error logging and user feedback for failed operations
 
 ## 📞 Contact Information
 
