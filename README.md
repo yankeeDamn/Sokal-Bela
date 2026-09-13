@@ -24,13 +24,14 @@ A modern web application for local vegetable delivery service in Kolkata, featur
 - **Database**: Firebase Firestore
 - **Authentication**: Firebase Auth
 - **Notifications**: Firebase Cloud Messaging
+- **Payments**: Razorpay (UPI, credit/debit cards, net banking, wallets) via Firebase Cloud Functions
 - **Hosting**: Can be deployed to Firebase Hosting or any static hosting service
 
 ## 📁 Project Structure
 
 ```
 Sokal Bela/
-├── index.html              # Main customer-facing HTML file
+├── index.html              # Main customer-facing HTML (incl. payment success/failure pages)
 ├── admin.html              # Admin dashboard HTML
 ├── app.js                  # Main customer application logic
 ├── admin.js                # Admin dashboard logic
@@ -38,12 +39,16 @@ Sokal Bela/
 ├── firebase-config.js      # Firebase configuration
 ├── db-operations.js        # Database operations
 ├── notifications.js        # Push notification handling
-├── razorpay-integration.js # Razorpay payment integration
+├── razorpay-integration.js # Razorpay checkout module (frontend)
 ├── local-server.js         # Local Express development server
+├── backend/
+│   └── functions/          # Firebase Cloud Functions (Razorpay payment APIs)
+│       ├── index.js        #   create-payment-order / verify-payment / webhook
+│       └── package.json
 ├── .env.example            # Environment variables template
 ├── package.json            # Project dependencies and npm scripts
-├── firebase.json           # Firebase configuration
-├── firestore.rules         # Firestore security rules
+├── firebase.json           # Firebase configuration (incl. /api/** → functions rewrite)
+├── firestore.rules         # Firestore security rules (incl. payments collection)
 └── .firebaserc             # Firebase project configuration
 ```
 
@@ -128,6 +133,42 @@ The following npm scripts are available:
 - `npm start` - Start the local Express development server on port 3000
 - `npm run dev` - Start the development server with auto-reload using nodemon
 - `npm run func:start` - Start Firebase Cloud Functions emulator (if backend/functions exists)
+
+## 💳 Razorpay Payment Gateway
+
+Online payments (UPI, credit/debit cards, net banking, wallets) are handled by Razorpay with a Firebase Cloud Functions backend. Payment methods are enabled/disabled in the [Razorpay Dashboard](https://dashboard.razorpay.com/) → Settings → Payment Methods; Checkout shows them automatically.
+
+### Flow
+
+1. Customer places an order → saved to Firestore with `paymentStatus: "pending"`.
+2. Frontend calls `POST /api/create-payment-order` → backend creates a Razorpay order.
+3. Razorpay Checkout popup opens (UPI / cards / net banking / wallets).
+4. On payment, the signature is verified server-side via `POST /api/verify-payment` (HMAC-SHA256) and the payment is stored in the Firestore **`payments`** collection (`paymentId`, `orderId`, `amount`, `customer`, `status`, `method`).
+5. A `POST /api/razorpay-webhook` endpoint handles `payment.captured` / `payment.failed` as the authoritative async fallback.
+6. The customer lands on the **Payment Success** or **Payment Failure** page (with retry).
+
+### Setup (production)
+
+```bash
+cd backend/functions && npm install
+
+# Set secrets (recommended)
+firebase functions:secrets:set RAZORPAY_KEY_ID
+firebase functions:secrets:set RAZORPAY_KEY_SECRET
+firebase functions:secrets:set RAZORPAY_WEBHOOK_SECRET
+
+firebase deploy --only functions,hosting,firestore:rules
+```
+
+In the Razorpay Dashboard, add a webhook pointing to
+`https://<region>-<project>.cloudfunctions.net/api/razorpay-webhook`
+with the same `RAZORPAY_WEBHOOK_SECRET`, subscribing to `payment.captured` and `payment.failed`.
+
+Set your **publishable** key ID in `index.html` (`RZP_KEY`) — it's used as a fallback when the backend is unreachable. The key **secret** must never appear in frontend code.
+
+### Local development
+
+Copy `.env.example` to `.env`, fill in your `rzp_test_*` keys, then `npm start`. The local server uses the real Razorpay API when keys are present and falls back to mock payments otherwise.
 
 ## 🔐 Admin Access
 

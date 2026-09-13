@@ -17,8 +17,10 @@ const admin = require('firebase-admin');
 const { onRequest } = require('firebase-functions/v2/https');
 const { defineString } = require('firebase-functions/params');
 
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
+
 admin.initializeApp();
-const db = admin.firestore();
+const db = getFirestore();
 
 // Razorpay credentials — configure with:
 //   firebase functions:secrets:set RAZORPAY_KEY_ID   (recommended), or
@@ -74,7 +76,7 @@ async function recordPayment({ paymentId, razorpayOrderId, orderId, amountRupees
     customer: customer || null,
     status, // 'captured' | 'failed'
     method: method || null, // upi | card | netbanking | wallet | ...
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
     ...(raw ? { gateway: raw } : {}),
   }, { merge: true });
 
@@ -85,7 +87,7 @@ async function recordPayment({ paymentId, razorpayOrderId, orderId, amountRupees
         paymentId,
         razorpayOrderId,
         paymentMethod: method || 'online',
-        paymentUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        paymentUpdatedAt: FieldValue.serverTimestamp(),
       });
     } catch (e) {
       // Order doc may not exist in Firestore — payment record is still stored.
@@ -144,7 +146,7 @@ app.post('/create-payment-order', async (req, res) => {
       currency,
       customer: customer || null,
       status: 'created',
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     }, { merge: true });
 
     return res.json({

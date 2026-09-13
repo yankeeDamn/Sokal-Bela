@@ -4,10 +4,25 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = 3000;
+
+// Optional: real Razorpay integration for local development.
+// Set RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET in your environment or .env to enable;
+// otherwise the payment endpoints return mock data.
+try { require('dotenv').config(); } catch { /* dotenv not installed — use real env vars */ }
+let razorpay = null;
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+  const Razorpay = require('razorpay');
+  razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
+  console.log('💳 Razorpay enabled (key: ' + process.env.RAZORPAY_KEY_ID.slice(0, 8) + '…)');
+}
 
 // Rate limiting
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
@@ -335,32 +350,117 @@ app.post('/api/notify/sms', (req, res) => {
 });
 
 // ===== PAYMENT ENDPOINTS =====
-app.post('/api/create-payment-order', (req, res) => {
+// In-memory payment records for local dev (Firestore is used in production).
+let payments = [];
+
+app.post('/api/create-payment-order', async (req, res) => {
   try {
-    const { orderId, amount } = req.body;
-    const razorpayOrderId = 'order_' + Math.random().toString(36).substr(2, 9);
-    res.json({ 
-      success: true, 
-      razorpayOrderId,
-      amount,
-      message: 'Payment order created'
+    const { orderId, amount, customer } = req.body || {};
+    if (!orderId || !Number.isFinite(Number(amount)) || Number(amount) < 1) {
+      return res.status(400).json({ success: false, error: 'orderId and a valid amount are required' });
+    }
+    if (Number(amount) < 200) {
+      return res.status(400).json({ success: false, error: 'Minimum order amount is ₹200' });
+    }
+    const paise = Math.round(Number(amount) * 100);
+
+    if (razorpay) {
+      const rzpOrder = await razorpay.orders.create({
+        amount: paise,
+        currency: 'INR',
+        receipt: String(orderId).slice(0, 40),
+        notes: { orderId: String(orderId), customerName: customer?.name || '' },
+      });
+      payments.push({
+        orderId: String(orderId), razorpayOrderId: rzpOrder.id, amount: Number(amount),
+        currency: 'INR', customer: customer || null, status: 'created',
+        createdAt: new Date().toISOString(),
+      });
+      return res.json({
+        success: true, razorpayOrderId: rzpOrder.id, amount: rzpOrder.amount,
+        currency: rzpOrder.currency, keyId: process.env.RAZORPAY_KEY_ID,
+      });
+    }
+
+    // Mock mode (no Razorpay keys configured)
+    const razorpayOrderId = 'order_mock' + Math.random().toString(36).slice(2, 11);
+    payments.push({
+      orderId: String(orderId), razorpayOrderId, amount: Number(amount),
+      currency: 'INR', customer: customer || null, status: 'created',
+      createdAt: new Date().toISOString(),
+    });
+    res.json({
+      success: true, razorpayOrderId, amount: paise, currency: 'INR',
+      keyId: '', message: 'Payment order created (mock)',
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('create-payment-order failed:', err.message);
+    res.status(500).json({ success: false, error: 'Could not create payment order' });
   }
 });
 
-app.post('/api/verify-payment', (req, res) => {
+app.post('/api/verify-payment', async (req, res) => {
   try {
-    const { orderId, paymentId } = req.body;
-    res.json({ 
-      success: true, 
-      message: 'Payment verified successfully',
-      paymentId
+    const {
+      orderId,
+      razorpay_order_id: rzpOrderId,
+      razorpay_payment_id: paymentId,
+      razorpay_signature: signature,
+      customer,
+    } = req.body || {};
+
+    if (!rzpOrderId || !paymentId || !signature) {
+      return res.status(400).json({ success: false, error: 'Missing payment verification fields' });
+    }
+
+    if (razorpay) {
+      const expected = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(`${rzpOrderId}|${paymentId}`)
+        .digest('hex');
+      const a = Buffer.from(expected, 'utf8');
+      const b = Buffer.from(String(signature), 'utf8');
+      if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+        payments.push({
+          paymentId, orderId: orderId || null, razorpayOrderId: rzpOrderId,
+          amount: Number(req.body.amount) || null, currency: 'INR',
+          customer: customer || null, status: 'failed',
+          createdAt: new Date().toISOString(),
+        });
+        return res.status(400).json({ success: false, error: 'Invalid payment signature' });
+      }
+      const payment = await razorpay.payments.fetch(paymentId);
+      payments.push({
+        paymentId, orderId: orderId || null, razorpayOrderId: rzpOrderId,
+        amount: payment.amount / 100, currency: 'INR', customer: customer || null,
+        status: payment.status, method: payment.method,
+        createdAt: new Date().toISOString(),
+      });
+      const captured = payment.status === 'captured' || payment.status === 'authorized';
+      return res.status(captured ? 200 : 400).json({
+        success: captured, paymentId, orderId: orderId || null,
+        amount: payment.amount / 100, method: payment.method,
+        message: captured ? 'Payment verified successfully' : `Payment status: ${payment.status}`,
+      });
+    }
+
+    // Mock mode: signature check skipped
+    payments.push({
+      paymentId, orderId: orderId || null, razorpayOrderId: rzpOrderId,
+      amount: Number(req.body.amount) || null, currency: 'INR',
+      customer: customer || null, status: 'captured', method: 'mock',
+      createdAt: new Date().toISOString(),
     });
+    res.json({ success: true, paymentId, orderId: orderId || null, method: 'mock', message: 'Payment verified (mock)' });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('verify-payment failed:', err.message);
+    res.status(500).json({ success: false, error: 'Payment verification failed' });
   }
+});
+
+// List stored payment records (local dev inspection only)
+app.get('/api/payments', (req, res) => {
+  res.json({ success: true, payments, count: payments.length });
 });
 
 // ===== BULK REQUEST ENDPOINT =====
@@ -404,6 +504,7 @@ app.get('/api/health', (req, res) => {
       'POST /api/notify/sms',
       'POST /api/create-payment-order',
       'POST /api/verify-payment',
+      'GET /api/payments',
       'POST /api/bulk-requests'
     ]
   });
