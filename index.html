@@ -18,6 +18,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <!-- Razorpay -->
   <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
+  <script src="razorpay-integration.js" defer></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -457,6 +458,44 @@
   </div>
 </section>
 
+<!-- ====== PAYMENT SUCCESS PAGE ====== -->
+<section id="payment-success-page" class="page">
+  <div class="section">
+    <div class="container" style="max-width:620px">
+      <div class="card card-body" style="text-align:center">
+        <div style="font-size:56px;margin-bottom:8px">✅</div>
+        <h2 class="sec-title" style="margin-bottom:4px">Payment Successful!</h2>
+        <p style="color:var(--text2)">Your payment was received and your order is confirmed.</p>
+        <div id="payment-success-body" style="text-align:left;margin-top:18px"></div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="showPage('home')">Continue Shopping</button>
+          <button class="btn btn-outline" onclick="showPage('products')">Browse Products</button>
+        </div>
+        <p style="font-size:13px;color:var(--text2);margin-top:14px">Queries: <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== PAYMENT FAILURE PAGE ====== -->
+<section id="payment-failure-page" class="page">
+  <div class="section">
+    <div class="container" style="max-width:620px">
+      <div class="card card-body" style="text-align:center">
+        <div style="font-size:56px;margin-bottom:8px">❌</div>
+        <h2 class="sec-title" style="margin-bottom:4px">Payment Failed</h2>
+        <p style="color:var(--text2)" id="payment-failure-msg">We couldn't complete your payment. No money was deducted.</p>
+        <div id="payment-failure-body" style="text-align:left;margin-top:18px"></div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="retryPayment()">🔁 Retry Payment</button>
+          <button class="btn btn-outline" onclick="showPage('cart')">Back to Cart</button>
+        </div>
+        <p style="font-size:13px;color:var(--text2);margin-top:14px">Amount deducted but shown as failed? It's auto-refunded in 5–7 working days. Call <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ====== BULK ORDERS PAGE ====== -->
 <section id="bulk-page" class="page">
   <div class="section">
@@ -718,6 +757,9 @@ try {
 } catch (e) {
   console.warn("Firebase init failed:", e.message);
 }
+// Expose for razorpay-integration.js (used only in the no-backend fallback path)
+window.db = db;
+window.RZP_KEY = RZP_KEY;
 
 /* ========== STATE ========== */
 let products = [];
@@ -1014,21 +1056,88 @@ async function placeCOD(cust, total) {
   onOrderOK(order);
 }
 
+/* Last pending online payment — used by the failure page's Retry button. */
+let lastPaymentCtx = null;
+
 async function handleRzp(cust, total) {
-  if (!RZP_KEY) { showToast("Online payment not configured yet. Please use Cash on Delivery.","info"); return; }
-  if (typeof Razorpay==="undefined") { showToast("Payment gateway unavailable. Try COD.","error"); return; }
+  if (!window.SokalPayments) { showToast("Payment gateway unavailable. Try Cash on Delivery.","error"); return; }
+  // Save the order first with payment pending, then take payment for it.
   const order = await saveOrderFS({...cust, total, paymentMethod:"Online", paymentStatus:"pending"});
-  setCheckoutBusy(false); // release the button while the payment modal is open
-  new Razorpay({
-    key:RZP_KEY, amount:total*100, currency:"INR",
-    name:"Sokal Bela", description:"Fresh Vegetables",
-    prefill:{name:cust.name, contact:cust.phone, email:cust.email}, theme:{color:"#2d7a3a"},
-    handler: async resp => {
-      try { if(fbOk&&db) await db.collection("orders").doc(order.id).update({paymentStatus:"paid",razorpayId:resp.razorpay_payment_id}); order.paymentStatus = "paid"; } catch (e) { console.error("Payment status update failed:", e); }
-      onOrderOK(order);
-    },
-    modal:{ondismiss:()=>showToast("Payment cancelled. Order "+order.orderNumber+" saved as pending.","info")}
-  }).open();
+  setCheckoutBusy(false); // release the button while the payment popup is open
+  startPaymentFlow(order, cust);
+}
+
+function startPaymentFlow(order, cust) {
+  lastPaymentCtx = { order, cust };
+  window.SokalPayments.startPayment({
+    order,
+    customer: cust,
+    onSuccess: (result) => onPaymentOK(order, result),
+    onFailure: ({ reason }) => onPaymentFailed(order, reason),
+    onDismiss: () => showToast(`Payment not completed. Order ${order.orderNumber} is saved — you can retry from this page.`,"info"),
+  });
+}
+
+function retryPayment() {
+  if (lastPaymentCtx) startPaymentFlow(lastPaymentCtx.order, lastPaymentCtx.cust);
+  else showPage("cart");
+}
+
+const PAYMENT_METHOD_LABELS = { upi:"UPI", card:"Card", netbanking:"Net Banking", wallet:"Wallet", emi:"EMI", paylater:"Pay Later" };
+
+function onPaymentOK(order, result) {
+  order.paymentStatus = result.verified ? "paid" : "paid-unverified";
+  order.paymentId = result.paymentId;
+  lastPaymentCtx = null;
+  cart=[]; saveCartStorage(); renderCartCount();
+  document.getElementById("checkout-form").reset(); selectPay("cod");
+  renderPaymentSuccess(order, result);
+  showPage("payment-success");
+  showToast("🎉 Payment successful! Order confirmed.","success");
+  notifyAdmin(order);
+}
+
+function onPaymentFailed(order, reason) {
+  console.warn("Payment failed:", reason, "order:", order.orderNumber);
+  renderPaymentFailure(order, reason);
+  showPage("payment-failure");
+  showToast("Payment failed. Your order is saved as pending — you can retry.","error");
+}
+
+function renderPaymentSuccess(o, result) {
+  const method = PAYMENT_METHOD_LABELS[result.method] || "Online";
+  document.getElementById("payment-success-body").innerHTML = `
+    <div style="background:var(--green-light);border:1px solid var(--green);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--text2)">Order Number</div>
+      <div style="font-size:20px;font-weight:700;color:var(--green)">${esc(o.orderNumber)}</div>
+    </div>
+    <div class="summary-box" style="box-shadow:none;border:1px solid var(--border)">
+      <div class="sum-row"><span>Amount Paid</span><span>₹${o.total}</span></div>
+      <div class="sum-row"><span>Payment Method</span><span>${esc(method)}</span></div>
+      ${result.paymentId?`<div class="sum-row"><span>Payment ID</span><span style="font-size:12px">${esc(result.paymentId)}</span></div>`:""}
+      <div class="sum-row total"><span>Status</span><span>${result.verified?"✅ Verified":"⚠️ Paid (verification pending)"}</span></div>
+    </div>
+    <div style="margin-top:14px;font-size:14px;line-height:1.7">
+      <strong>${esc(o.customerName)}</strong><br>
+      📞 ${esc(o.phone)}${o.email?` &nbsp;✉️ ${esc(o.email)}`:""}<br>
+      📍 ${esc(o.address)}${o.pincode?` — ${esc(o.pincode)}`:""}
+    </div>`;
+}
+
+function renderPaymentFailure(o, reason) {
+  const msgs = {
+    "not-configured": "Online payments aren't configured yet. Please use Cash on Delivery.",
+    "gateway-unavailable": "The payment gateway couldn't load. Check your connection and retry.",
+    "verification-failed": "Payment completed but couldn't be verified. If money was deducted it's auto-refunded in 5–7 working days.",
+  };
+  document.getElementById("payment-failure-msg").textContent = msgs[reason] || "We couldn't complete your payment. No money was deducted.";
+  document.getElementById("payment-failure-body").innerHTML = `
+    <div class="summary-box" style="box-shadow:none;border:1px solid var(--border)">
+      <div class="sum-row"><span>Order Number</span><span style="font-weight:700">${esc(o.orderNumber)}</span></div>
+      <div class="sum-row"><span>Amount</span><span>₹${o.total}</span></div>
+      <div class="sum-row total"><span>Order Status</span><span>Saved (payment pending)</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-top:10px">Your cart has been kept — retry the payment or place a Cash on Delivery order instead.</p>`;
 }
 
 /* Human-readable, unique order number: SB-YYYYMMDD-XXXX */
@@ -1068,7 +1177,8 @@ async function saveOrderFS(d) {
   return { id: "LOCAL-"+Date.now(), orderNumber, items, ...payload, timestamp: new Date() };
 }
 
-/* Notify the admin: Firestore notification doc + WhatsApp alert. */
+/* Notify the admin: Firestore notification doc + optional WhatsApp alert. */
+const WA_NOTIFY_ENABLED = false; // set true to open a WhatsApp alert to the owner after each order
 async function notifyAdmin(order) {
   const items = order.items.map(i=>`${i.name} x${i.qty}`).join(", ")||"—";
   if (fbOk && db) {
@@ -1081,7 +1191,7 @@ async function notifyAdmin(order) {
       });
     } catch (e) { console.error("Admin notification failed:", e); }
   }
-  setTimeout(()=>{ window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(`🛒 New Order ${order.orderNumber}!\nCustomer: ${order.customerName}\nPhone: ${order.phone}\nEmail: ${order.email||"—"}\nItems: ${items}\nTotal: ₹${order.total}\nPayment: ${order.paymentMethod}\nAddress: ${order.address}`)}`, "_blank"); }, 500);
+  if (WA_NOTIFY_ENABLED) setTimeout(()=>{ window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(`🛒 New Order ${order.orderNumber}!\nCustomer: ${order.customerName}\nPhone: ${order.phone}\nEmail: ${order.email||"—"}\nItems: ${items}\nTotal: ₹${order.total}\nPayment: ${order.paymentMethod}\nAddress: ${order.address}`)}`, "_blank"); }, 500);
 }
 
 function onOrderOK(order) {
