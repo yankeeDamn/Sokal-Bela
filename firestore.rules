@@ -2,40 +2,259 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Products: public read, admin write only
-    match /products/{id} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // Orders: public create (customers placing orders), admin read/write
-    match /orders/{id} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+    function userDocPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
 
-      // Order items: public create alongside the order, admin read
+    function tokenRole(role) {
+      return signedIn() && request.auth.token.role == role;
+    }
+
+    function profileRole(role) {
+      return signedIn() && exists(userDocPath(request.auth.uid)) &&
+        get(userDocPath(request.auth.uid)).data.role == role;
+    }
+
+    function isAdmin() {
+      return tokenRole("Admin") || profileRole("Admin");
+    }
+
+    function isSeller() {
+      return tokenRole("Seller") || profileRole("Seller");
+    }
+
+    function isCustomer() {
+      return tokenRole("Customer") || profileRole("Customer");
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function validProductStatus(status) {
+      return status in ["active", "inactive", "out_of_stock", "archived"];
+    }
+
+    function validOrderStatus(status) {
+      return status in ["Pending", "Confirmed", "Packed", "OutForDelivery", "Delivered", "Cancelled", "ReturnRequested", "Returned"];
+    }
+
+    function validPaymentStatus(status) {
+      return status in ["Pending", "Paid", "Failed", "Cancelled", "Timeout", "PaidUnverified"];
+    }
+
+    function validProductCreateSchema(data, productId) {
+      return data.keys().hasAll(["productId", "name", "description", "category", "price", "stock", "imageUrl", "sellerId", "status", "createdAt", "updatedAt"]) &&
+        data.productId == productId &&
+        data.name is string &&
+        data.description is string &&
+        data.category is string &&
+        data.price is number && data.price >= 0 &&
+        data.stock is int && data.stock >= 0 &&
+        data.imageUrl is string &&
+        data.sellerId is string &&
+        data.status is string && validProductStatus(data.status) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function validProductUpdateSchema(data, productId) {
+      return data.productId == productId &&
+        data.stock is int && data.stock >= 0 &&
+        data.status is string && validProductStatus(data.status) &&
+        (
+          !data.keys().hasAny(["name"]) ||
+          data.name is string
+        ) &&
+        (
+          !data.keys().hasAny(["category"]) ||
+          data.category is string
+        ) &&
+        (
+          !data.keys().hasAny(["price"]) ||
+          (data.price is number && data.price >= 0)
+        ) &&
+        (
+          !data.keys().hasAny(["description"]) ||
+          data.description is string
+        ) &&
+        (
+          !data.keys().hasAny(["imageUrl"]) ||
+          data.imageUrl is string
+        ) &&
+        (
+          !data.keys().hasAny(["sellerId"]) ||
+          data.sellerId is string
+        ) &&
+        data.updatedAt is timestamp;
+    }
+
+    function validOrderCreateSchema(data, orderId) {
+      return data.keys().hasAll(["orderId", "orderNumber", "customerId", "customerRole", "customerName", "phone", "email", "address", "pincode", "itemsSummary", "itemCount", "subtotal", "total", "paymentMethod", "paymentStatus", "orderStatus", "status", "createdAt", "updatedAt"]) &&
+        data.orderId == orderId &&
+        data.orderNumber is string &&
+        data.customerId is string &&
+        data.customerRole in ["Customer", "Seller", "Admin"] &&
+        data.customerName is string && data.customerName.size() >= 2 &&
+        data.phone is string && data.phone.matches('^[6-9][0-9]{9}$') &&
+        data.email is string && data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$') &&
+        data.address is string && data.address.size() >= 10 &&
+        data.pincode is string && data.pincode.matches('^[0-9]{6}$') &&
+        data.itemsSummary is string &&
+        data.itemCount is int && data.itemCount > 0 &&
+        data.subtotal is number && data.subtotal >= 200 &&
+        data.total is number && data.total >= 200 &&
+        data.paymentMethod in ["COD", "Online"] &&
+        data.paymentStatus is string && validPaymentStatus(data.paymentStatus) &&
+        data.orderStatus is string && validOrderStatus(data.orderStatus) &&
+        data.status == data.orderStatus &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function ownerCanUpdateOrder() {
+      let changed = request.resource.data.diff(resource.data).changedKeys();
+      return isOwner(resource.data.customerId) &&
+        resource.data.paymentStatus != "Paid" &&
+        request.resource.data.customerId == resource.data.customerId &&
+        request.resource.data.orderId == resource.data.orderId &&
+        request.resource.data.orderNumber == resource.data.orderNumber &&
+        request.resource.data.total == resource.data.total &&
+        request.resource.data.orderStatus == resource.data.orderStatus &&
+        request.resource.data.status == resource.data.status &&
+        request.resource.data.paymentStatus in ["Pending", "Failed", "Cancelled", "Timeout", "PaidUnverified"] &&
+        changed.hasOnly(["paymentStatus", "paymentFailureReason", "updatedAt", "paymentId"]);
+    }
+
+    function adminCanUpdateOrder() {
+      return isAdmin() &&
+        request.resource.data.orderId == resource.data.orderId &&
+        request.resource.data.customerId == resource.data.customerId &&
+        request.resource.data.orderStatus is string &&
+        validOrderStatus(request.resource.data.orderStatus) &&
+        request.resource.data.status == request.resource.data.orderStatus &&
+        request.resource.data.paymentStatus is string &&
+        validPaymentStatus(request.resource.data.paymentStatus) &&
+        request.resource.data.updatedAt is timestamp;
+    }
+
+    function validOrderItemSchema(data) {
+      return data.keys().hasAll(["productId", "name", "description", "category", "price", "unit", "qty", "subtotal", "sellerId"]) &&
+        data.productId is string &&
+        data.name is string &&
+        data.description is string &&
+        data.category is string &&
+        data.price is number && data.price >= 0 &&
+        data.unit is string &&
+        data.qty is int && data.qty > 0 &&
+        data.subtotal is number && data.subtotal >= 0 &&
+        data.sellerId is string;
+    }
+
+    function adminNotificationCreateAllowed() {
+      return signedIn() &&
+        request.resource.data.keys().hasAll(["type", "orderId", "orderNumber", "message", "customerId", "createdAt"]) &&
+        request.resource.data.type == "new-order" &&
+        request.resource.data.orderId is string &&
+        request.resource.data.orderNumber is string &&
+        request.resource.data.message is string &&
+        request.resource.data.customerId == request.auth.uid &&
+        request.resource.data.createdAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow create: if isOwner(userId) &&
+        request.resource.data.keys().hasAll(["uid", "email", "displayName", "role", "createdAt", "updatedAt", "lastLoginAt"]) &&
+        request.resource.data.uid == userId &&
+        request.resource.data.email is string &&
+        request.resource.data.displayName is string &&
+        request.resource.data.role in ["Customer", "Seller", "Admin"] &&
+        (
+          request.resource.data.role == "Customer" ||
+          request.auth.token.email == "yankeecpp90@gmail.com" ||
+          tokenRole("Admin")
+        ) &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp &&
+        request.resource.data.lastLoginAt is timestamp;
+      allow read: if isOwner(userId) || isAdmin();
+      allow update: if
+        (
+          isOwner(userId) &&
+          request.resource.data.uid == resource.data.uid &&
+          request.resource.data.role == resource.data.role &&
+          request.resource.data.email == resource.data.email
+        ) || isAdmin();
+      allow delete: if false;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isAdmin() && validProductCreateSchema(request.resource.data, productId);
+      allow update: if isAdmin() &&
+        validProductUpdateSchema(request.resource.data, productId);
+      allow delete: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow create: if signedIn() &&
+        request.resource.data.customerId == request.auth.uid &&
+        validOrderCreateSchema(request.resource.data, orderId);
+      allow read: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
+      allow update: if ownerCanUpdateOrder() || adminCanUpdateOrder();
+      allow delete: if false;
+
       match /items/{itemId} {
-        allow create: if true;
-        allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+        allow create: if signedIn() &&
+          exists(/databases/$(database)/documents/orders/$(orderId)) &&
+          (
+            isAdmin() ||
+            get(/databases/$(database)/documents/orders/$(orderId)).data.customerId == request.auth.uid
+          ) &&
+          validOrderItemSchema(request.resource.data);
+        allow read: if isAdmin() ||
+          (
+            signedIn() &&
+            exists(/databases/$(database)/documents/orders/$(orderId)) &&
+            get(/databases/$(database)/documents/orders/$(orderId)).data.customerId == request.auth.uid
+          );
+        allow update, delete: if isAdmin();
       }
     }
 
-    // Admin notifications: public create (order alerts), admin read/write
-    match /adminNotifications/{id} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
-    }
-
-    // Bulk Orders: public create, admin read/write
     match /bulkOrders/{id} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+      allow create: if signedIn() &&
+        request.resource.data.keys().hasAll(["customerId", "customerRole", "contactName", "phone", "email", "eventType", "eventDate", "guestCount", "notes", "items", "status", "createdAt", "updatedAt"]) &&
+        request.resource.data.customerId == request.auth.uid &&
+        request.resource.data.customerRole in ["Customer", "Seller", "Admin"] &&
+        request.resource.data.contactName is string &&
+        request.resource.data.phone is string &&
+        request.resource.data.phone.matches('^[6-9][0-9]{9}$') &&
+        request.resource.data.email is string &&
+        request.resource.data.eventType is string &&
+        request.resource.data.eventDate is string &&
+        request.resource.data.guestCount is int &&
+        request.resource.data.notes is string &&
+        request.resource.data.items is list &&
+        request.resource.data.status is string &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp;
+      allow read: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
-    // Payments: written only by the backend (Admin SDK bypasses rules after
-    // server-side signature verification). Admin can read for reconciliation.
+    match /adminNotifications/{id} {
+      allow create: if adminNotificationCreateAllowed();
+      allow read, update, delete: if isAdmin();
+    }
+
     match /payments/{id} {
-      allow read: if request.auth != null && request.auth.token.email == "yankeecpp90@gmail.com";
+      allow read: if isAdmin();
       allow write: if false;
     }
   }

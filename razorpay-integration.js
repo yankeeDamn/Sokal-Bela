@@ -44,9 +44,20 @@
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 20000);
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      try {
+        const currentUser = window.firebase?.auth ? window.firebase.auth().currentUser : null;
+        if (currentUser) {
+          const token = await currentUser.getIdToken();
+          if (token) headers.Authorization = 'Bearer ' + token;
+        }
+      } catch (e) {
+        // Token retrieval is best-effort; backend may still accept unauthenticated
+        // requests in non-production environments.
+      }
       const res = await fetch(`${API_BASE}${path}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(body),
         signal: controller.signal,
       });
@@ -68,10 +79,17 @@
    * @param {Function} [opts.onDismiss] () => {} — user closed the popup
    */
   async function startPayment({ order, customer, onSuccess, onFailure, onDismiss }) {
+    let settled = false;
+    const once = (fn, payload) => {
+      if (settled) return;
+      settled = true;
+      if (typeof fn === 'function') fn(payload);
+    };
+
     try {
       await loadRazorpayScript();
     } catch (e) {
-      onFailure({ reason: 'gateway-unavailable' });
+      once(onFailure, { reason: 'gateway-unavailable' });
       return;
     }
 
@@ -104,7 +122,7 @@
       console.warn('Payments backend unreachable — falling back to unverified client checkout');
     }
     if (!keyId) {
-      onFailure({ reason: 'not-configured' });
+      once(onFailure, { reason: 'not-configured' });
       return;
     }
 
@@ -118,7 +136,7 @@
       description: `Order ${order.orderNumber || order.id}`,
       ...(rzpOrderId ? { order_id: rzpOrderId } : {}),
       prefill: { name: customer.name || '', email: customer.email || '', contact: customer.phone || '' },
-      notes: { orderId: order.id },
+      notes: { orderId: order.id, customerId: customer.customerId || customer.uid || '' },
       theme: { color: '#2d7a3a' },
 
       // Step 3 — payment completed: verify signature on the server.
@@ -128,12 +146,12 @@
           try {
             if (window.db) {
               await window.db.collection('orders').doc(order.id).update({
-                paymentStatus: 'paid-unverified',
+                paymentStatus: 'PaidUnverified',
                 razorpayId: response.razorpay_payment_id,
               });
             }
           } catch (e) { console.error('Order update failed:', e); }
-          onSuccess({ paymentId: response.razorpay_payment_id, method: null, verified: false });
+          once(onSuccess, { paymentId: response.razorpay_payment_id, method: null, verified: false });
           return;
         }
         try {
@@ -146,23 +164,33 @@
             amount: order.total,
           });
           if (ok && data.success) {
-            onSuccess({ paymentId: data.paymentId, method: data.method, verified: true });
+            once(onSuccess, { paymentId: data.paymentId, method: data.method, verified: true });
           } else {
-            onFailure({ reason: 'verification-failed', paymentId: response.razorpay_payment_id });
+            once(onFailure, { reason: 'verification-failed', paymentId: response.razorpay_payment_id });
           }
         } catch (e) {
-          onFailure({ reason: 'verification-failed', paymentId: response.razorpay_payment_id });
+          once(onFailure, { reason: 'verification-failed', paymentId: response.razorpay_payment_id });
         }
       },
 
-      modal: { ondismiss: () => { if (onDismiss) onDismiss(); } },
+      modal: {
+        ondismiss: () => {
+          if (settled) return;
+          settled = true;
+          if (typeof onDismiss === 'function') onDismiss();
+        },
+      },
     });
 
     // Gateway-reported payment failure (bad card, UPI timeout, etc.)
     rzp.on('payment.failed', (resp) => {
       const err = resp && resp.error ? resp.error : {};
       console.warn('Razorpay payment failed:', err.code, err.description);
-      if (onDismiss) onDismiss(); // popup closes itself; let caller keep order pending
+      const combined = `${err.code || ''} ${err.description || ''}`.toLowerCase();
+      const reason = combined.includes('timeout') ? 'timeout'
+        : combined.includes('cancel') ? 'cancelled'
+          : 'failed';
+      once(onFailure, { reason, paymentId: err.metadata?.payment_id || null });
     });
 
     rzp.open();

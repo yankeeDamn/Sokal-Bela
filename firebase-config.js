@@ -1,4 +1,4 @@
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Shared Firebase config for optional modular usage in non-inline scripts.
 const firebaseConfig = {
   apiKey: "AIzaSyBKqJH8EWddXthZZao7lpFZhU2d5Z65Mbw",
   authDomain: "sokal-bela-store.firebaseapp.com",
@@ -9,11 +9,15 @@ const firebaseConfig = {
   measurementId: "G-QH41QC1D8X"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+let app = null;
+let db = null;
+let auth = null;
 
-// Initialize Firestore
-const db = firebase.firestore();
+if (typeof firebase !== "undefined") {
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  app = firebase.app();
+  if (firebase.firestore) db = firebase.firestore();
+  if (firebase.auth) auth = firebase.auth();
+}
 
-// Export the db for use in other files
-export { db };
+export { firebaseConfig, app, db, auth };

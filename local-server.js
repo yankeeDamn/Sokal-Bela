@@ -458,6 +458,47 @@ app.post('/api/verify-payment', async (req, res) => {
   }
 });
 
+app.post('/api/payment-status', (req, res) => {
+  try {
+    const {
+      orderId,
+      paymentStatus = 'Pending',
+      paymentMethod = 'Online',
+      paymentId = null,
+      amount = null,
+      customerId = null,
+      reason = '',
+    } = req.body || {};
+
+    if (!orderId) {
+      return res.status(400).json({ success: false, error: 'orderId is required' });
+    }
+
+    const normalized = String(paymentStatus || 'Pending');
+    payments.push({
+      paymentId: paymentId || `manual-${orderId}`,
+      orderId,
+      amount: Number.isFinite(Number(amount)) ? Number(amount) : null,
+      customerId: customerId || null,
+      paymentStatus: normalized,
+      paymentMethod,
+      reason,
+      createdAt: new Date().toISOString(),
+    });
+
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      order.paymentStatus = normalized;
+      order.paymentMethod = paymentMethod;
+      order.updatedAt = new Date().toISOString();
+    }
+
+    res.json({ success: true, orderId, paymentStatus: normalized });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // List stored payment records (local dev inspection only)
 app.get('/api/payments', (req, res) => {
   res.json({ success: true, payments, count: payments.length });
@@ -504,6 +545,7 @@ app.get('/api/health', (req, res) => {
       'POST /api/notify/sms',
       'POST /api/create-payment-order',
       'POST /api/verify-payment',
+      'POST /api/payment-status',
       'GET /api/payments',
       'POST /api/bulk-requests'
     ]

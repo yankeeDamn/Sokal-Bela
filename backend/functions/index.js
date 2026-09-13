@@ -42,6 +42,39 @@ function getAllowedOrigins() {
 const MIN_ORDER_RUPEES = 200;
 const ORDER_COLLECTION = 'orders';
 const PAYMENTS_COLLECTION = 'payments';
+const VALID_PAYMENT_STATUSES = new Set(['Pending', 'Paid', 'Failed', 'Cancelled', 'Timeout', 'PaidUnverified']);
+
+function normalizePaymentStatus(status) {
+  const key = String(status || '').trim().toLowerCase();
+  if (!key || key === 'created' || key === 'pending') return 'Pending';
+  if (key === 'captured' || key === 'authorized' || key === 'paid') return 'Paid';
+  if (key === 'failed') return 'Failed';
+  if (key === 'cancelled' || key === 'canceled') return 'Cancelled';
+  if (key === 'timeout') return 'Timeout';
+  if (key === 'paidunverified' || key === 'paid_unverified' || key === 'paid-unverified') return 'PaidUnverified';
+  return null;
+}
+
+function normalizePaymentMethod(method) {
+  const key = String(method || '').trim().toLowerCase();
+  if (!key) return 'Online';
+  const methodMap = {
+    upi: 'UPI',
+    card: 'Card',
+    netbanking: 'NetBanking',
+    wallet: 'Wallet',
+    emi: 'EMI',
+    paylater: 'PayLater',
+    cod: 'COD',
+    online: 'Online',
+  };
+  return methodMap[key] || 'Online';
+}
+
+function resolveCustomerId(customer) {
+  if (!customer || typeof customer !== 'object') return null;
+  return customer.customerId || customer.uid || null;
+}
 
 function getRazorpay() {
   const keyId = RAZORPAY_KEY_ID.value();
@@ -50,6 +83,23 @@ function getRazorpay() {
     throw new Error('Razorpay credentials are not configured on the server');
   }
   return new Razorpay({ key_id: keyId, key_secret: keySecret });
+}
+
+async function getVerifiedUser(req) {
+  const header = req.get('authorization') || '';
+  if (!header.startsWith('Bearer ')) return null;
+  const token = header.slice(7).trim();
+  if (!token) return null;
+  try {
+    return await admin.auth().verifyIdToken(token);
+  } catch (err) {
+    console.warn('Invalid auth token:', err.message);
+    return null;
+  }
+}
+
+function isAdminUser(user) {
+  return !!user && (user.role === 'Admin' || user.email === 'yankeecpp90@gmail.com');
 }
 
 // Razorpay checkout signature: HMAC_SHA256(order_id + "|" + payment_id, secret)
@@ -75,30 +125,41 @@ function verifyWebhookSignature(rawBody, signature) {
 }
 
 // Persist a payment record (doc ID = paymentId → idempotent) and update the order.
-async function recordPayment({ paymentId, razorpayOrderId, orderId, amountRupees, customer, status, method, raw }) {
-  const paymentRef = db.collection(PAYMENTS_COLLECTION).doc(paymentId);
-  await paymentRef.set({
-    paymentId,
+async function recordPayment({ paymentId, razorpayOrderId, orderId, amountRupees, customer, status, method, raw, source = 'gateway' }) {
+  const normalizedStatus = normalizePaymentStatus(status) || 'Pending';
+  const normalizedMethod = normalizePaymentMethod(method);
+  const customerId = resolveCustomerId(customer);
+  const docId = String(paymentId || razorpayOrderId || `payment-${Date.now()}`);
+  const paymentRef = db.collection(PAYMENTS_COLLECTION).doc(docId);
+  const existing = await paymentRef.get();
+
+  const payload = {
+    paymentId: paymentId || null,
     orderId: orderId || null,
-    razorpayOrderId,
-    amount: amountRupees,
-    currency: 'INR',
-    customer: customer || null,
-    status, // 'captured' | 'failed'
-    method: method || null, // upi | card | netbanking | wallet | ...
+    razorpayOrderId: razorpayOrderId || null,
+    amount: Number.isFinite(Number(amountRupees)) ? Number(amountRupees) : null,
+    customerId: customerId || null,
+    paymentStatus: normalizedStatus,
+    paymentMethod: normalizedMethod,
     updatedAt: FieldValue.serverTimestamp(),
+    source,
     ...(raw ? { gateway: raw } : {}),
-  }, { merge: true });
+  };
+  if (!existing.exists) {
+    payload.createdAt = FieldValue.serverTimestamp();
+  }
+
+  await paymentRef.set(payload, { merge: true });
 
   if (orderId) {
     try {
-      await db.collection(ORDER_COLLECTION).doc(orderId).update({
-        paymentStatus: status === 'captured' ? 'paid' : 'failed',
-        paymentId,
-        razorpayOrderId,
-        paymentMethod: method || 'online',
-        paymentUpdatedAt: FieldValue.serverTimestamp(),
-      });
+      await db.collection(ORDER_COLLECTION).doc(orderId).set({
+        paymentStatus: normalizedStatus,
+        paymentId: paymentId || null,
+        razorpayOrderId: razorpayOrderId || null,
+        paymentMethod: normalizedMethod,
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
     } catch (e) {
       // Order doc may not exist in Firestore — payment record is still stored.
       console.warn(`Order ${orderId} update failed: ${e.message}`);
@@ -125,7 +186,7 @@ app.use(cors({
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
 const paymentLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false });
 app.use(apiLimiter);
-app.use(['/create-payment-order', '/verify-payment'], paymentLimiter);
+app.use(['/create-payment-order', '/verify-payment', '/payment-status'], paymentLimiter);
 
 // JSON parsing for all routes EXCEPT the webhook, which needs the raw body
 // to verify the Razorpay webhook signature.
@@ -141,18 +202,46 @@ app.use((req, res, next) => {
 app.post('/create-payment-order', async (req, res) => {
   try {
     const { orderId, amount, currency = 'INR', customer } = req.body || {};
+    const user = await getVerifiedUser(req);
 
     if (!orderId || typeof orderId !== 'string') {
       return res.status(400).json({ success: false, error: 'orderId is required' });
     }
-    const rupees = Number(amount);
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+
+    const orderSnap = await db.collection(ORDER_COLLECTION).doc(orderId).get();
+    if (!orderSnap.exists) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+    const orderData = orderSnap.data() || {};
+    if (!isAdminUser(user) && orderData.customerId && orderData.customerId !== user.uid) {
+      return res.status(403).json({ success: false, error: 'Not authorized for this order' });
+    }
+    if (normalizePaymentStatus(orderData.paymentStatus) === 'Paid') {
+      return res.status(409).json({ success: false, error: 'Order is already paid' });
+    }
+
+    const requestedAmount = Number(amount);
+    const orderAmount = Number(orderData.total);
+    const rupees = Number.isFinite(orderAmount) && orderAmount > 0 ? orderAmount : requestedAmount;
     if (!Number.isFinite(rupees) || rupees < 1) {
       return res.status(400).json({ success: false, error: 'A valid amount (rupees) is required' });
+    }
+    if (
+      Number.isFinite(orderAmount) && orderAmount > 0 &&
+      Number.isFinite(requestedAmount) && Math.abs(orderAmount - requestedAmount) > 0.5
+    ) {
+      return res.status(400).json({ success: false, error: 'Order amount mismatch' });
     }
     if (rupees < MIN_ORDER_RUPEES) {
       return res.status(400).json({ success: false, error: `Minimum order amount is ₹${MIN_ORDER_RUPEES}` });
     }
     const paise = Math.round(rupees * 100);
+    const customerId = orderData.customerId || resolveCustomerId(customer) || user.uid;
+    const customerName = customer?.name || orderData.customerName || '';
+    const customerPhone = customer?.phone || orderData.phone || '';
 
     const razorpay = getRazorpay();
     const rzpOrder = await razorpay.orders.create({
@@ -161,20 +250,23 @@ app.post('/create-payment-order', async (req, res) => {
       receipt: String(orderId).slice(0, 40),
       notes: {
         orderId: String(orderId),
-        customerName: customer?.name || '',
-        customerPhone: customer?.phone || '',
+        customerName,
+        customerPhone,
+        customerId: customerId || '',
       },
     });
 
     // Track the payment intent so there is always an audit trail.
     await db.collection(PAYMENTS_COLLECTION).doc(rzpOrder.id).set({
+      paymentId: rzpOrder.id,
       orderId: String(orderId),
       razorpayOrderId: rzpOrder.id,
       amount: rupees,
-      currency,
-      customer: customer || null,
-      status: 'created',
+      customerId: customerId || null,
+      paymentStatus: 'Pending',
+      paymentMethod: 'Online',
       createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true });
 
     return res.json({
@@ -197,6 +289,12 @@ app.post('/create-payment-order', async (req, res) => {
 // ---------------------------------------------------------------------------
 app.post('/verify-payment', async (req, res) => {
   try {
+    const user = await getVerifiedUser(req);
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+    let orderData = null;
+
     const {
       orderId,
       razorpay_order_id: rzpOrderId,
@@ -209,14 +307,30 @@ app.post('/verify-payment', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing payment verification fields' });
     }
 
+    if (orderId) {
+      const orderSnap = await db.collection(ORDER_COLLECTION).doc(orderId).get();
+      if (!orderSnap.exists) {
+        return res.status(404).json({ success: false, error: 'Order not found' });
+      }
+      orderData = orderSnap.data() || {};
+      if (!isAdminUser(user) && orderData.customerId && orderData.customerId !== user.uid) {
+        return res.status(403).json({ success: false, error: 'Not authorized for this order' });
+      }
+    }
+
     if (!verifyCheckoutSignature(rzpOrderId, paymentId, signature)) {
       await recordPayment({
         paymentId,
         razorpayOrderId: rzpOrderId,
         orderId,
         amountRupees: Number(req.body.amount) || null,
-        customer,
+        customer: {
+          ...(customer || {}),
+          customerId: customer?.customerId || customer?.uid || orderData?.customerId || user.uid,
+        },
         status: 'failed',
+        method: req.body.method || 'online',
+        source: 'verify',
       });
       return res.status(400).json({ success: false, error: 'Invalid payment signature' });
     }
@@ -242,9 +356,13 @@ app.post('/verify-payment', async (req, res) => {
       razorpayOrderId: rzpOrderId,
       orderId,
       amountRupees: payment.amount / 100,
-      customer,
+      customer: {
+        ...(customer || {}),
+        customerId: customer?.customerId || customer?.uid || orderData?.customerId || user.uid,
+      },
       status: captured ? 'captured' : 'failed',
       method: payment.method,
+      source: 'verify',
       raw: {
         method: payment.method,
         bank: payment.bank || null,
@@ -266,11 +384,85 @@ app.post('/verify-payment', async (req, res) => {
       orderId: orderId || null,
       amount: payment.amount / 100,
       method: payment.method,
+      paymentStatus: captured ? 'Paid' : 'Failed',
       message: 'Payment verified successfully',
     });
   } catch (err) {
     console.error('verify-payment failed:', err);
     return res.status(500).json({ success: false, error: 'Payment verification failed' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// POST /api/payment-status
+// Body: { orderId, paymentStatus, paymentMethod?, paymentId?, razorpayOrderId?,
+//         amount?, customerId?, reason? }
+// Used for cancellation/timeout/failure updates from the client.
+// ---------------------------------------------------------------------------
+app.post('/payment-status', async (req, res) => {
+  try {
+    const user = await getVerifiedUser(req);
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+
+    const {
+      orderId,
+      paymentStatus,
+      paymentMethod = 'online',
+      paymentId = null,
+      razorpayOrderId = null,
+      amount = null,
+      customerId = null,
+      reason = '',
+    } = req.body || {};
+
+    if (!orderId || typeof orderId !== 'string') {
+      return res.status(400).json({ success: false, error: 'orderId is required' });
+    }
+
+    const orderSnap = await db.collection(ORDER_COLLECTION).doc(orderId).get();
+    if (!orderSnap.exists) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+    const orderData = orderSnap.data() || {};
+    if (!isAdminUser(user) && orderData.customerId && orderData.customerId !== user.uid) {
+      return res.status(403).json({ success: false, error: 'Not authorized for this order' });
+    }
+
+    const normalizedStatus = normalizePaymentStatus(paymentStatus);
+    if (!VALID_PAYMENT_STATUSES.has(normalizedStatus)) {
+      return res.status(400).json({ success: false, error: 'Invalid payment status' });
+    }
+    if (normalizedStatus === 'Paid' && !isAdminUser(user)) {
+      return res.status(403).json({ success: false, error: 'Cannot mark payment as paid from this endpoint' });
+    }
+
+    await recordPayment({
+      paymentId: paymentId || `manual-${orderId}`,
+      razorpayOrderId,
+      orderId,
+      amountRupees: Number.isFinite(Number(amount)) ? Number(amount) : null,
+      customer: { customerId: customerId || orderData.customerId || user.uid },
+      status: normalizedStatus,
+      method: paymentMethod,
+      source: 'client-status',
+      raw: {
+        reason: reason || null,
+      },
+    });
+
+    await db.collection(ORDER_COLLECTION).doc(orderId).set({
+      paymentStatus: normalizedStatus,
+      paymentMethod: normalizePaymentMethod(paymentMethod),
+      paymentFailureReason: reason || '',
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    return res.json({ success: true, orderId, paymentStatus: normalizedStatus });
+  } catch (err) {
+    console.error('payment-status failed:', err);
+    return res.status(500).json({ success: false, error: 'Could not update payment status' });
   }
 });
 
@@ -307,9 +499,11 @@ app.post('/razorpay-webhook', express.raw({ type: 'application/json' }), async (
       customer: entity.notes?.customerName ? {
         name: entity.notes.customerName,
         phone: entity.notes.customerPhone || '',
+        customerId: entity.notes.customerId || null,
       } : null,
       status,
       method: entity.method,
+      source: 'webhook',
       raw: {
         event: event.event,
         method: entity.method,
