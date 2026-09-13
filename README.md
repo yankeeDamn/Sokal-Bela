@@ -49,6 +49,7 @@ Sokal Bela/
 ├── package.json            # Project dependencies and npm scripts
 ├── firebase.json           # Firebase configuration (incl. /api/** → functions rewrite)
 ├── firestore.rules         # Firestore security rules (incl. payments collection)
+├── storage.rules           # Firebase Storage security rules
 └── .firebaserc             # Firebase project configuration
 ```
 
@@ -143,8 +144,9 @@ Online payments (UPI, credit/debit cards, net banking, wallets) are handled by R
 1. Customer places an order → saved to Firestore with `paymentStatus: "pending"`.
 2. Frontend calls `POST /api/create-payment-order` → backend creates a Razorpay order.
 3. Razorpay Checkout popup opens (UPI / cards / net banking / wallets).
-4. On payment, the signature is verified server-side via `POST /api/verify-payment` (HMAC-SHA256) and the payment is stored in the Firestore **`payments`** collection (`paymentId`, `orderId`, `amount`, `customer`, `status`, `method`).
+4. On payment, the signature is verified server-side via `POST /api/verify-payment` (HMAC-SHA256) and the payment is stored in the Firestore **`payments`** collection (`paymentId`, `orderId`, `amount`, `customerId`, `paymentStatus`, `paymentMethod`, `createdAt`).
 5. A `POST /api/razorpay-webhook` endpoint handles `payment.captured` / `payment.failed` as the authoritative async fallback.
+6. A `POST /api/payment-status` endpoint records cancellation/timeout/failure updates from the UI.
 6. The customer lands on the **Payment Success** or **Payment Failure** page (with retry).
 
 ### Setup (production)
@@ -160,7 +162,7 @@ firebase functions:secrets:set RAZORPAY_WEBHOOK_SECRET
 # Not needed when the frontend is served from Firebase Hosting (same-origin /api/** rewrite).
 firebase functions:secrets:set ALLOWED_ORIGINS   # e.g. https://sokal-bela-store.web.app,https://sokal-bela-store.firebaseapp.com
 
-firebase deploy --only functions,hosting,firestore:rules
+firebase deploy --only functions,hosting,firestore:rules,storage
 ```
 
 In the Razorpay Dashboard, add a webhook pointing to
@@ -173,15 +175,15 @@ Set your **publishable** key ID in `index.html` (`RZP_KEY`) — it's used as a f
 
 Copy `.env.example` to `.env`, fill in your `rzp_test_*` keys, then `npm start`. The local server uses the real Razorpay API when keys are present and falls back to mock payments otherwise.
 
-## 🔐 Admin Access
+## 🔐 Authentication & Roles
 
-To access the admin dashboard:
-1. Navigate to the Admin page from the navigation menu
-2. Use the following credentials:
-   - Username: `admin`
-   - Password: `admin123`
+The app now uses Firebase Authentication for customer and admin access.
 
-**Note**: For production, please change these credentials in the code.
+- Customers can sign up/login from the customer auth modal in `index.html`.
+- Admin dashboard access requires a Firebase user with role `Admin`.
+- Supported roles: `Customer`, `Seller`, `Admin` (stored in `users/{uid}` and/or custom claims).
+
+To bootstrap the first admin, sign in with your trusted admin email once and ensure `users/{uid}.role = "Admin"` (or set custom claim `role=Admin`).
 
 ## 📱 Features Overview
 
@@ -226,7 +228,7 @@ To access the admin dashboard:
 
 Recommended enhancements for production:
 
-- **Secure admin**: Replace the placeholder admin credentials (`admin`/`admin123`) with Firebase Authentication
+- **Role setup**: Create admin/seller users in Firebase Auth and assign roles (`users/{uid}.role`)
 - **Environment config**: Use proper environment variable management instead of hardcoded Firebase credentials
 - **Testing & CI**: Add unit tests for core functions and setup CI pipeline (currently using npm-publish-github-packages workflow)
 - **Accessibility & performance**: Run Lighthouse, optimize images, and ensure mobile accessibility

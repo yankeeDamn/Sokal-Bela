@@ -1,0 +1,23 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null &&
+        (
+          request.auth.token.role == "Admin" ||
+          request.auth.token.email == "yankeecpp90@gmail.com"
+        );
+    }
+
+    // Product images are publicly readable; only admins can upload/replace.
+    match /product-images/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Deny everything else by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
