@@ -156,6 +156,9 @@ cd backend/functions && npm install
 firebase functions:secrets:set RAZORPAY_KEY_ID
 firebase functions:secrets:set RAZORPAY_KEY_SECRET
 firebase functions:secrets:set RAZORPAY_WEBHOOK_SECRET
+# Browser origins allowed to call the API cross-origin (comma-separated).
+# Not needed when the frontend is served from Firebase Hosting (same-origin /api/** rewrite).
+firebase functions:secrets:set ALLOWED_ORIGINS   # e.g. https://sokal-bela-store.web.app,https://sokal-bela-store.firebaseapp.com
 
 firebase deploy --only functions,hosting,firestore:rules
 ```

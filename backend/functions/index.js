@@ -12,6 +12,7 @@
 const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
+const { rateLimit } = require('express-rate-limit');
 const Razorpay = require('razorpay');
 const admin = require('firebase-admin');
 const { onRequest } = require('firebase-functions/v2/https');
@@ -28,6 +29,15 @@ const db = getFirestore();
 const RAZORPAY_KEY_ID = defineString('RAZORPAY_KEY_ID', { default: '' });
 const RAZORPAY_KEY_SECRET = defineString('RAZORPAY_KEY_SECRET', { default: '' });
 const RAZORPAY_WEBHOOK_SECRET = defineString('RAZORPAY_WEBHOOK_SECRET', { default: '' });
+
+// Comma-separated list of origins allowed to call the JSON APIs from a browser.
+// If unset, cross-origin browser calls are blocked (same-origin hosting rewrites
+// still work and send no Origin header). Non-browser tools are unaffected.
+const ALLOWED_ORIGINS = defineString('ALLOWED_ORIGINS', { default: '' });
+
+function getAllowedOrigins() {
+  return ALLOWED_ORIGINS.value().split(',').map((s) => s.trim()).filter(Boolean);
+}
 
 const MIN_ORDER_RUPEES = 200;
 const ORDER_COLLECTION = 'orders';
@@ -97,7 +107,25 @@ async function recordPayment({ paymentId, razorpayOrderId, orderId, amountRupees
 }
 
 const app = express();
-app.use(cors({ origin: true }));
+app.disable('x-powered-by');
+
+// Restrict browser cross-origin access to explicitly allowed origins.
+// Requests without an Origin header (same-origin hosting rewrite, curl,
+// server-to-server webhooks) are always allowed.
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = getAllowedOrigins();
+    if (!origin || allowed.includes(origin)) return callback(null, true);
+    return callback(null, false);
+  },
+}));
+
+// Rate limits — protect endpoints that create Razorpay orders / verify
+// payments (cost and abuse), with a generous ceiling for the rest.
+const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
+const paymentLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false });
+app.use(apiLimiter);
+app.use(['/create-payment-order', '/verify-payment'], paymentLimiter);
 
 // JSON parsing for all routes EXCEPT the webhook, which needs the raw body
 // to verify the Razorpay webhook signature.
@@ -303,6 +331,6 @@ app.post('/razorpay-webhook', express.raw({ type: 'application/json' }), async (
 app.get('/health', (req, res) => res.json({ success: true, status: 'ok' }));
 
 exports.api = onRequest(
-  { region: 'asia-south1', secrets: [RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET] },
+  { region: 'asia-south1', secrets: [RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, ALLOWED_ORIGINS] },
   app
 );
