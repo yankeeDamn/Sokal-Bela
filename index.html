@@ -144,6 +144,8 @@
     .form-label{display:block;font-weight:600;font-size:13px;margin-bottom:5px}
     .form-control{width:100%;padding:10px 13px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;transition:var(--tr);background:#fff}
     .form-control:focus{border-color:var(--green)}
+    .form-control.err{border-color:var(--red)}
+    .field-err{display:none;color:var(--red);font-size:12px;margin-top:4px}
     textarea.form-control{resize:vertical}
     select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
     .pay-opts{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
@@ -386,22 +388,31 @@
           </div>
           <div class="checkout-form">
             <h3 style="margin-bottom:14px;font-size:1.05rem">📝 Delivery Details</h3>
-            <form id="checkout-form" onsubmit="handleCheckout(event)">
+            <form id="checkout-form" onsubmit="handleCheckout(event)" novalidate>
               <div class="form-group">
                 <label class="form-label">Full Name *</label>
                 <input type="text" id="cust-name" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+                <div class="field-err" id="err-name"></div>
               </div>
               <div class="form-group">
                 <label class="form-label">Phone Number * (10-digit)</label>
                 <input type="tel" id="cust-phone" class="form-control" placeholder="e.g. 9876543210" maxlength="10" required>
+                <div class="field-err" id="err-phone"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" id="cust-email" class="form-control" placeholder="e.g. ramesh@example.com" required>
+                <div class="field-err" id="err-email"></div>
               </div>
               <div class="form-group">
                 <label class="form-label">Delivery Address *</label>
                 <textarea id="cust-address" class="form-control" rows="3" placeholder="House / street / locality…" required></textarea>
+                <div class="field-err" id="err-address"></div>
               </div>
               <div class="form-group">
                 <label class="form-label">Pincode (optional)</label>
                 <input type="text" id="cust-pincode" class="form-control" placeholder="731224" maxlength="6">
+                <div class="field-err" id="err-pincode"></div>
               </div>
               <div class="form-group">
                 <label class="form-label" style="margin-bottom:10px">Payment Method *</label>
@@ -422,6 +433,25 @@
             </form>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== ORDER CONFIRMATION PAGE ====== -->
+<section id="confirmation-page" class="page">
+  <div class="section">
+    <div class="container" style="max-width:620px">
+      <div class="card card-body" style="text-align:center">
+        <div style="font-size:56px;margin-bottom:8px">🎉</div>
+        <h2 class="sec-title" style="margin-bottom:4px">Order Confirmed!</h2>
+        <p style="color:var(--text2)">Thank you for shopping with Sokal Bela. We'll call to confirm delivery.</p>
+        <div id="confirm-body" style="text-align:left;margin-top:18px"></div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="showPage('home')">Continue Shopping</button>
+          <button class="btn btn-outline" onclick="showPage('products')">Browse Products</button>
+        </div>
+        <p style="font-size:13px;color:var(--text2);margin-top:14px">Queries: <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a></p>
       </div>
     </div>
   </div>
@@ -882,73 +912,210 @@ function selectPay(m) {
 }
 
 /* ========== CHECKOUT ========== */
+let orderInFlight = false; // duplicate-submission guard
+
+function fieldError(inputId, errId, msg) {
+  const inp = document.getElementById(inputId), err = document.getElementById(errId);
+  if (msg) { inp.classList.add("err"); err.textContent = msg; err.style.display = "block"; }
+  else { inp.classList.remove("err"); err.textContent = ""; err.style.display = "none"; }
+  return !msg;
+}
+
+function validateCheckoutForm({name, phone, email, address, pincode}) {
+  let ok = true;
+  ok = fieldError("cust-name","err-name",
+    !name ? "Name is required." :
+    !/^[A-Za-z\u0980-\u09FF][A-Za-z\u0980-\u09FF .'-]{1,49}$/.test(name) ? "Enter a valid full name (letters only, 2-50 chars)." : "") && ok;
+  // Indian mobile numbers start with 6, 7, 8, or 9 followed by 9 more digits
+  ok = fieldError("cust-phone","err-phone",
+    !phone ? "Phone number is required." :
+    !/^[6-9]\d{9}$/.test(phone) ? "Enter a valid 10-digit Indian mobile number." : "") && ok;
+  ok = fieldError("cust-email","err-email",
+    !email ? "Email is required." :
+    !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? "Enter a valid email address." : "") && ok;
+  ok = fieldError("cust-address","err-address",
+    !address ? "Delivery address is required." :
+    address.length < 10 ? "Please enter a complete address (at least 10 characters)." : "") && ok;
+  ok = fieldError("cust-pincode","err-pincode",
+    pincode && !/^\d{6}$/.test(pincode) ? "Pincode must be 6 digits." : "") && ok;
+  return ok;
+}
+
 async function handleCheckout(e) {
   e.preventDefault();
-  const name    = document.getElementById("cust-name").value.trim();
-  const phone   = document.getElementById("cust-phone").value.trim();
-  const address = document.getElementById("cust-address").value.trim();
-  const pincode = document.getElementById("cust-pincode").value.trim();
-  if (!name||!phone||!address) { showToast("Please fill all required fields.","error"); return; }
-  // Indian mobile numbers start with 6, 7, 8, or 9 followed by 9 more digits
-  if (!/^[6-9]\d{9}$/.test(phone)) { showToast("Enter a valid 10-digit Indian mobile number.","error"); return; }
+  if (orderInFlight) return; // already submitting
+  const cust = {
+    name:    document.getElementById("cust-name").value.trim(),
+    phone:   document.getElementById("cust-phone").value.trim(),
+    email:   document.getElementById("cust-email").value.trim(),
+    address: document.getElementById("cust-address").value.trim(),
+    pincode: document.getElementById("cust-pincode").value.trim()
+  };
+  if (!validateCheckoutForm(cust)) { showToast("Please fix the highlighted fields.","error"); return; }
   if (!cart.length) { showToast("Your cart is empty.","error"); return; }
   const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
   if (sub<200) { showToast("Minimum order is ₹200.","error"); return; }
-  if (selPay==="online") { await handleRzp(name,phone,address,pincode,sub); }
-  else { await placeCOD(name,phone,address,pincode,sub); }
-}
+  if (!navigator.onLine) { showToast("You are offline. Please check your internet connection and try again.","error"); return; }
 
-async function placeCOD(name,phone,address,pincode,total) {
-  showLoading();
+  setCheckoutBusy(true);
   try {
-    const oid = await saveOrderFS({name,phone,address,pincode,total,paymentMethod:"COD",paymentStatus:"pending"});
-    hideLoading(); onOrderOK(oid,name,phone,address,total,"COD");
-  } catch(e) { hideLoading(); showToast("Failed to place order. Please try again.","error"); console.error(e); }
+    await validateStock();
+    if (selPay==="online") { await handleRzp(cust, sub); }
+    else { await placeCOD(cust, sub); }
+  } catch (err) {
+    handleOrderError(err);
+  } finally {
+    setCheckoutBusy(false);
+  }
 }
 
-async function handleRzp(name,phone,address,pincode,total) {
+function setCheckoutBusy(busy) {
+  orderInFlight = busy;
+  const btn = document.getElementById("checkout-btn");
+  btn.disabled = busy;
+  btn.textContent = busy ? "Placing Order…" : "Place Order";
+  if (busy) showLoading(); else hideLoading();
+}
+
+/* Verify every cart item against the latest stock in Firestore. */
+async function validateStock() {
+  if (!(fbOk && db)) return; // offline/demo mode: trust local catalogue
+  const refs = cart.map(i => db.collection("products").doc(i.id));
+  const snaps = await Promise.all(refs.map(r => r.get()));
+  const problems = [];
+  snaps.forEach((snap, idx) => {
+    const item = cart[idx];
+    const live = snap.exists ? snap.data() : null;
+    if (!live || live.active === false) { problems.push(`${item.name} is no longer available`); return; }
+    const stock = live.stock ?? 0;
+    if (stock <= 0) problems.push(`${item.name} is out of stock`);
+    else if (item.qty > stock) problems.push(`${item.name}: only ${stock} ${live.unit||item.unit} left (you have ${item.qty})`);
+    else item.price = live.price ?? item.price; // use latest price
+  });
+  if (problems.length) {
+    const err = new Error("Stock changed:\n" + problems.join("\n"));
+    err.code = "STOCK";
+    renderCart();
+    throw err;
+  }
+}
+
+function handleOrderError(err) {
+  console.error("Order failed:", err);
+  if (err.code === "STOCK") { showToast(err.message.split("\n")[1] ? "Some items are out of stock. Your cart was updated — please review it." : err.message, "error"); return; }
+  if (!navigator.onLine || err.code === "unavailable" || err.code === "network-request-failed") {
+    showToast("Network error. Your cart is saved — please try again when you're back online.","error"); return;
+  }
+  showToast("Failed to place order. Please try again or WhatsApp us.","error");
+}
+
+async function placeCOD(cust, total) {
+  const order = await saveOrderFS({...cust, total, paymentMethod:"COD", paymentStatus:"pending"});
+  onOrderOK(order);
+}
+
+async function handleRzp(cust, total) {
   if (!RZP_KEY) { showToast("Online payment not configured yet. Please use Cash on Delivery.","info"); return; }
   if (typeof Razorpay==="undefined") { showToast("Payment gateway unavailable. Try COD.","error"); return; }
-  showLoading();
-  const oid = await saveOrderFS({name,phone,address,pincode,total,paymentMethod:"Online",paymentStatus:"pending"});
-  hideLoading();
+  const order = await saveOrderFS({...cust, total, paymentMethod:"Online", paymentStatus:"pending"});
+  setCheckoutBusy(false); // release the button while the payment modal is open
   new Razorpay({
     key:RZP_KEY, amount:total*100, currency:"INR",
     name:"Sokal Bela", description:"Fresh Vegetables",
-    prefill:{name,contact:phone}, theme:{color:"#2d7a3a"},
+    prefill:{name:cust.name, contact:cust.phone, email:cust.email}, theme:{color:"#2d7a3a"},
     handler: async resp => {
-      try { if(fbOk&&db) await db.collection("orders").doc(oid).update({paymentStatus:"paid",razorpayId:resp.razorpay_payment_id}); } catch {}
-      onOrderOK(oid,name,phone,address,total,"Online");
+      try { if(fbOk&&db) await db.collection("orders").doc(order.id).update({paymentStatus:"paid",razorpayId:resp.razorpay_payment_id}); order.paymentStatus = "paid"; } catch (e) { console.error("Payment status update failed:", e); }
+      onOrderOK(order);
     },
-    modal:{ondismiss:()=>showToast("Payment cancelled. Order saved as pending.","info")}
+    modal:{ondismiss:()=>showToast("Payment cancelled. Order "+order.orderNumber+" saved as pending.","info")}
   }).open();
 }
 
+/* Human-readable, unique order number: SB-YYYYMMDD-XXXX */
+async function generateOrderNumber() {
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const suffix = String(Math.floor(1000 + Math.random()*9000));
+    const num = `SB-${ymd}-${suffix}`;
+    if (!(fbOk && db)) return num;
+    const dup = await db.collection("orders").where("orderNumber","==",num).limit(1).get();
+    if (dup.empty) return num;
+  }
+  return `SB-${ymd}-${Date.now().toString(36).toUpperCase()}`;
+}
+
+/* Save the order, then its items as a separate subcollection (batched). */
 async function saveOrderFS(d) {
-  const items = cart.map(i=>({id:i.id,name:i.name,bengaliName:i.bengaliName,price:i.price,unit:i.unit,qty:i.qty,subtotal:i.price*i.qty}));
+  const items = cart.map(i=>({productId:i.id,name:i.name,bengaliName:i.bengaliName,price:i.price,unit:i.unit,qty:i.qty,subtotal:i.price*i.qty}));
+  const orderNumber = await generateOrderNumber();
   const payload = {
-    customerName:d.name, phone:d.phone, address:d.address, pincode:d.pincode||"",
-    items, itemsSummary:items.map(i=>`${i.name} x${i.qty}`).join(", "),
+    orderNumber,
+    customerName:d.name, phone:d.phone, email:d.email, address:d.address, pincode:d.pincode||"",
+    itemsSummary:items.map(i=>`${i.name} x${i.qty}`).join(", "),
+    itemCount:items.reduce((s,i)=>s+i.qty,0),
     subtotal:d.total, total:d.total,
     paymentMethod:d.paymentMethod, paymentStatus:d.paymentStatus, orderStatus:"Pending",
     timestamp: fbOk&&db ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
   };
-  if (fbOk&&db) { const r = await db.collection("orders").add(payload); return r.id; }
-  return "LOCAL-"+Date.now();
+  if (fbOk && db) {
+    const ref = await db.collection("orders").add(payload);
+    const batch = db.batch();
+    items.forEach(i => batch.set(ref.collection("items").doc(), i));
+    await batch.commit();
+    return { id: ref.id, orderNumber, items, ...payload, timestamp: new Date() };
+  }
+  return { id: "LOCAL-"+Date.now(), orderNumber, items, ...payload, timestamp: new Date() };
 }
 
-function onOrderOK(oid,name,phone,address,total,method) {
-  const snap = [...cart]; // snapshot before clearing
+/* Notify the admin: Firestore notification doc + WhatsApp alert. */
+async function notifyAdmin(order) {
+  const items = order.items.map(i=>`${i.name} x${i.qty}`).join(", ")||"—";
+  if (fbOk && db) {
+    try {
+      await db.collection("adminNotifications").add({
+        type:"new-order", orderId:order.id, orderNumber:order.orderNumber,
+        message:`New order ${order.orderNumber} from ${order.customerName} — ₹${order.total} (${order.paymentMethod})`,
+        read:false,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (e) { console.error("Admin notification failed:", e); }
+  }
+  setTimeout(()=>{ window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(`🛒 New Order ${order.orderNumber}!\nCustomer: ${order.customerName}\nPhone: ${order.phone}\nEmail: ${order.email||"—"}\nItems: ${items}\nTotal: ₹${order.total}\nPayment: ${order.paymentMethod}\nAddress: ${order.address}`)}`, "_blank"); }, 500);
+}
+
+function onOrderOK(order) {
   cart=[]; saveCartStorage(); renderCartCount();
   document.getElementById("checkout-form").reset(); selectPay("cod");
-  document.getElementById("success-msg").textContent = `Order #${oid.slice(-6).toUpperCase()} for ₹${total}. Method: ${method}.`;
-  document.getElementById("success-modal").style.display="flex";
-  const items = snap.map(i=>`${i.name} x${i.qty}`).join(", ")||"—";
-  setTimeout(()=>{ window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(`🛒 New Order #${oid.slice(-6).toUpperCase()}!\nCustomer: ${name}\nPhone: ${phone}\nItems: ${items}\nTotal: ₹${total}\nPayment: ${method}\nAddress: ${address}`)}`, "_blank"); }, 500);
+  document.querySelectorAll(".field-err").forEach(el=>el.style.display="none");
+  document.querySelectorAll("#checkout-form .form-control").forEach(el=>el.classList.remove("err"));
+  renderConfirmation(order);
+  showPage("confirmation");
   showToast("🎉 Order placed!","success");
+  notifyAdmin(order);
 }
 
-function closeSuccessModal() { document.getElementById("success-modal").style.display="none"; showPage("home"); }
+function renderConfirmation(o) {
+  const dt = o.timestamp instanceof Date ? o.timestamp.toLocaleString("en-IN") : "";
+  const rows = o.items.map(i=>`<div class="sum-row"><span>${esc(i.name)} × ${i.qty}</span><span>₹${i.price*i.qty}</span></div>`).join("");
+  document.getElementById("confirm-body").innerHTML = `
+    <div style="background:var(--green-light);border:1px solid var(--green);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--text2)">Order Number</div>
+      <div style="font-size:20px;font-weight:700;color:var(--green)">${esc(o.orderNumber)}</div>
+      ${dt?`<div style="font-size:12px;color:var(--text2);margin-top:2px">${esc(dt)}</div>`:""}
+    </div>
+    <div class="summary-box" style="box-shadow:none;border:1px solid var(--border)">
+      ${rows}
+      <div class="sum-row total"><span>Total (${esc(o.paymentMethod)}${o.paymentStatus==="paid"?" — Paid":""})</span><span>₹${o.total}</span></div>
+    </div>
+    <div style="margin-top:14px;font-size:14px;line-height:1.7">
+      <strong>${esc(o.customerName)}</strong><br>
+      📞 ${esc(o.phone)}${o.email?` &nbsp;✉️ ${esc(o.email)}`:""}<br>
+      📍 ${esc(o.address)}${o.pincode?` — ${esc(o.pincode)}`:""}
+    </div>`;
+}
+
+function closeSuccessModal() { document.getElementById("success-modal").style.display="none"; showPage("confirmation"); }
 
 /* ========== BULK ORDER ========== */
 function initBulkRows() { const el=document.getElementById("bulk-rows"); if(el&&!el.children.length) addBulkRow(); }
