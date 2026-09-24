@@ -16,9 +16,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <!-- Razorpay -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
-  <script src="razorpay-integration.js" defer></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -257,6 +254,7 @@
       .products-grid{grid-template-columns:1fr 1fr;gap:10px}
       .pay-opts{flex-direction:column}
     }
+      .pay-note{background:var(--green-light);border:2px dashed var(--green);border-radius:var(--radius-sm);padding:14px;font-size:14px;line-height:1.5}
   </style>
 </head>
 <body>
@@ -272,6 +270,7 @@
       <li><a href="#" class="nav-link" data-page="home">Home</a></li>
       <li><a href="#" class="nav-link" data-page="products">Products</a></li>
       <li><a href="#" class="nav-link" data-page="bulk">Bulk Orders</a></li>
+      <li><a href="#" class="nav-link" data-page="catering">Catering</a></li>
       <li><a href="#" class="nav-link" data-page="cart">🛒 Cart <span class="cart-badge" id="cart-badge">0</span></a></li>
       <li><a href="#" class="nav-link" data-page="orders" id="nav-orders-link" style="display:none">📦 My Orders</a></li>
       <li id="nav-login-item"><a href="#" class="nav-link" onclick="openAuthModal('login');return false;">Login</a></li>
@@ -341,12 +340,31 @@
     </div>
   </div>
 
+  <div class="section">
+    <div class="container">
+      <h2 class="sec-title">🧺 What We Do</h2>
+      <div class="contact-grid">
+        <div class="contact-card"><div class="cc-ico">🥬</div><h3>Daily Fresh Vegetables</h3><p>Order for home delivery or shop pickup</p></div>
+        <div class="contact-card"><div class="cc-ico">📦</div><h3>Bulk Orders</h3><p>Weddings, birthdays, annaprasan &amp; programs</p><a href="#" onclick="showPage('bulk');return false">Request a quote</a></div>
+        <div class="contact-card"><div class="cc-ico">🍛</div><h3>Catering</h3><p>Veg food for events, cooked &amp; served</p><a href="#" onclick="showPage('catering');return false">Plan your event</a></div>
+      </div>
+      <h2 class="sec-title" style="margin-top:36px">How Ordering Works</h2>
+      <div class="contact-grid">
+        <div class="contact-card"><div class="cc-ico">1️⃣</div><h3>Choose</h3><p>Pick vegetables, or fill the bulk / catering form</p></div>
+        <div class="contact-card"><div class="cc-ico">2️⃣</div><h3>Send</h3><p>Order goes to us on WhatsApp / Facebook / call</p></div>
+        <div class="contact-card"><div class="cc-ico">3️⃣</div><h3>We Confirm</h3><p>We confirm price, date and time with you</p></div>
+        <div class="contact-card"><div class="cc-ico">4️⃣</div><h3>Pay on Delivery</h3><p>Cash or UPI to our person. No online payment.</p></div>
+      </div>
+    </div>
+  </div>
+
   <div class="section" style="background:var(--green-light)">
     <div class="container">
       <h2 class="sec-title">📍 Find Us</h2>
       <div class="contact-grid">
         <div class="contact-card"><div class="cc-ico">📍</div><h3>Address</h3><p>Choy Fuko, Rampurhat<br>Birbhum – 731224</p></div>
         <div class="contact-card"><div class="cc-ico">📞</div><h3>Call / WhatsApp</h3><a href="tel:+917551858583">+91 7551858583</a></div>
+        <div class="contact-card"><div class="cc-ico">📘</div><h3>Facebook</h3><a href="https://www.facebook.com/" target="_blank" rel="noopener">Message us on Facebook</a></div>
         <div class="contact-card"><div class="cc-ico">⏰</div><h3>Hours</h3><p>Monday – Sunday<br>7:00 AM – 9:00 PM</p></div>
         <div class="contact-card"><div class="cc-ico">🚚</div><h3>Delivery</h3><p>Free within 5 km<br>Min order ₹200</p></div>
       </div>
@@ -421,19 +439,7 @@
                 <div class="field-err" id="err-pincode"></div>
               </div>
               <div class="form-group">
-                <label class="form-label" style="margin-bottom:10px">Payment Method *</label>
-                <div class="pay-opts">
-                  <div class="pay-opt sel" id="pay-cod" onclick="selectPay('cod')">
-                    <div class="pay-opt-ico">💵</div>
-                    <div class="pay-opt-lbl">Cash on Delivery</div>
-                    <div class="pay-opt-sub">Pay when delivered</div>
-                  </div>
-                  <div class="pay-opt" id="pay-online" onclick="selectPay('online')">
-                    <div class="pay-opt-ico">💳</div>
-                    <div class="pay-opt-lbl">Pay Online</div>
-                    <div class="pay-opt-sub">UPI / Card / Netbanking</div>
-                  </div>
-                </div>
+                <div class="pay-note"><b>💵 No online payment needed.</b><br>Place your order and we'll confirm on WhatsApp / call. Pay by cash or UPI to our delivery person, or at the shop.</div>
               </div>
               <button type="submit" class="btn btn-primary btn-full btn-lg" id="checkout-btn">Place Order</button>
             </form>
@@ -519,6 +525,36 @@
 </section>
 
 <!-- ====== BULK ORDERS PAGE ====== -->
+<!-- ====== CATERING PAGE ====== -->
+<section id="catering-page" class="page">
+  <div class="section"><div class="container">
+    <h2 class="sec-title">🍛 Catering Services</h2>
+    <p class="sec-sub">Fresh vegetarian catering for weddings, birthdays, annaprasan, puja and office programs. Tell us your event — we'll call with a quote. No advance online payment.</p>
+    <div class="contact-grid" style="margin-bottom:24px">
+      <div class="contact-card"><div class="cc-ico">🍽️</div><h3>Full Meal Catering</h3><p>Rice, dal, sabzi, fry, chutney, sweet — per plate</p></div>
+      <div class="contact-card"><div class="cc-ico">🥗</div><h3>Vegetables + Cook</h3><p>We supply the vegetables, your cook prepares</p></div>
+      <div class="contact-card"><div class="cc-ico">☕</div><h3>Snacks &amp; Tea</h3><p>Light refreshments for small gatherings</p></div>
+    </div>
+    <div class="bulk-wrap"><div class="card card-body">
+      <form id="cat-form" onsubmit="handleCatering(event)">
+        <div class="form-group"><label class="form-label">Your Name *</label><input type="text" id="cname" class="form-control" required></div>
+        <div class="form-group"><label class="form-label">Phone * (10-digit)</label><input type="tel" id="cphone" class="form-control" maxlength="10" required></div>
+        <div class="form-group"><label class="form-label">Service</label>
+          <select id="cservice" class="form-control"><option>Full meal catering</option><option>Vegetables + cook</option><option>Snacks &amp; tea</option><option>Not sure — need advice</option></select></div>
+        <div class="form-group"><label class="form-label">Event Type</label>
+          <select id="ctype" class="form-control"><option>Wedding</option><option>Birthday / Annaprasan</option><option>Puja / Religious</option><option>Corporate</option><option>Other</option></select></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label class="form-label">Event Date</label><input type="date" id="cdate" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Guests</label><input type="number" id="cguests" class="form-control" value="50" min="1"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Venue / Area</label><input type="text" id="cvenue" class="form-control" placeholder="e.g. Rampurhat, Birbhum"></div>
+        <div class="form-group"><label class="form-label">Menu Wishes / Notes</label><textarea id="cnotes" class="form-control" rows="3"></textarea></div>
+        <button type="submit" class="btn btn-primary btn-full">Send Catering Request 📩</button>
+      </form>
+    </div></div>
+  </div></div>
+</section>
+
 <section id="bulk-page" class="page">
   <div class="section">
     <div class="container">
@@ -971,6 +1007,20 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ========== PAGE NAV ========== */
+/* Catering request: saved to Firestore (shown in admin under Bulk Orders) and sent to owner on WhatsApp. */
+async function handleCatering(e){
+  e.preventDefault();
+  const v=id=>document.getElementById(id).value.trim();
+  const phone=v("cphone").replace(/\D/g,"");
+  if(phone.length!==10){ showToast("Enter a valid 10-digit phone number","error"); return; }
+  const d={name:v("cname"),phone,eventType:"Catering - "+v("ctype"),eventDate:v("cdate"),guestCount:+v("cguests")||0,
+    notes:`[${v("cservice")}] Venue: ${v("cvenue")||"-"}. ${v("cnotes")}`,status:"new",createdAt:new Date().toISOString()};
+  try{ if(typeof fbOk!=="undefined"&&fbOk&&db) await db.collection("bulkOrders").add(d); }catch(err){ console.error(err); }
+  showToast("✅ Request ready — send it on WhatsApp so we get it instantly.","success");
+  window.open(`https://wa.me/${OWNER_WA}?text=`+encodeURIComponent(`🍛 Catering Request\nName: ${d.name}\nPhone: ${phone}\nService: ${v("cservice")}\nEvent: ${v("ctype")}\nDate: ${d.eventDate||"TBD"}\nGuests: ${d.guestCount}\nVenue: ${v("cvenue")||"-"}\nNotes: ${v("cnotes")||"-"}`),"_blank");
+  document.getElementById("cat-form").reset();
+}
+
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const el = document.getElementById(id + "-page");
@@ -1821,7 +1871,7 @@ async function saveOrderFS(d) {
 }
 
 /* Notify the admin: Firestore notification doc + optional WhatsApp alert. */
-const WA_NOTIFY_ENABLED = false; // set true to open a WhatsApp alert to the owner after each order
+const WA_NOTIFY_ENABLED = true; // set true to open a WhatsApp alert to the owner after each order
 async function notifyAdmin(order) {
   const items = order.items.map(i=>`${i.name} x${i.qty}`).join(", ")||"—";
   if (fbOk && db && currentUser) {

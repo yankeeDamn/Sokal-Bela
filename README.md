@@ -1,5 +1,7 @@
 # Sokal Bela - Local Vegetable Delivery Web App
 
+> **Update:** Online payment is disabled. Orders are confirmed by WhatsApp/call and paid on delivery or at the shop. Bulk orders and Catering are supported. See `BUSINESS-SETUP.md`. The Razorpay sections below are kept for reference only and are no longer used.
+
 A modern web application for local vegetable delivery service in Kolkata, featuring an intuitive shopping experience and comprehensive admin dashboard.
 
 ## 🌟 Features
