@@ -47,3 +47,10 @@ Owner (pricing, quotes, suppliers) · Shop helper (packing, counter) · Delivery
 - Greeting: "Namaskar! Welcome to Sokal Bela. Tell us what you need, or order at our website."
 - Confirmation: "Your order is confirmed. Delivery by [time]. Pay cash/UPI on delivery."
 - Bulk/catering: "Thank you! Please share date, guest count and venue. We'll send a quote today."
+
+## 8. Where to edit things in index.html (search for the word shown)
+- Baskets, items and prices: `EDIT ME`
+- Delivery pincodes: `DELIVERY_PINCODES`
+- Owner WhatsApp number: `OWNER_WA`
+- Facebook link: `facebook.com`
+- Admin panel: open your site link followed by `#admin` (example: `yoursite.vercel.app/#admin`). The Admin link is hidden from customers.

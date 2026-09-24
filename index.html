@@ -255,6 +255,12 @@
       .pay-opts{flex-direction:column}
     }
       .pay-note{background:var(--green-light);border:2px dashed var(--green);border-radius:var(--radius-sm);padding:14px;font-size:14px;line-height:1.5}
+      .price-board{background:#fff8e1;border-bottom:2px solid #ffe082;padding:10px 16px;text-align:center;font-size:14px}
+    .basket{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;gap:8px}
+    .basket h3{color:var(--green);font-size:1.05rem}
+    .basket ul{margin:0 0 4px 18px;font-size:14px;color:var(--text2)}
+    .basket .bp{font-weight:700}
+    .slot-note{font-size:12px;color:var(--text2);margin-top:4px}
   </style>
 </head>
 <body>
@@ -302,6 +308,16 @@
         <button class="btn btn-white btn-lg" onclick="showPage('products')">🛒 Shop Now</button>
         <button class="btn btn-lg" style="border:2px solid #fff;color:#fff;background:transparent" onclick="showPage('bulk')">📦 Bulk Orders</button>
       </div>
+    </div>
+  </div>
+
+  <div class="price-board">📅 <b>Today's rates</b> — <span id="pb-date"></span> · Prices are updated every morning as per market rate</div>
+
+  <div class="section" style="padding-bottom:0">
+    <div class="container">
+      <h2 class="sec-title">🧺 Ready Baskets</h2>
+      <p class="sec-sub">Easy ordering: pick a basket and send it on WhatsApp. We confirm today's price before delivery.</p>
+      <div class="contact-grid" id="baskets-grid"></div>
     </div>
   </div>
 
@@ -437,6 +453,17 @@
                 <label class="form-label">Pincode * (6-digit)</label>
                 <input type="text" id="cust-pincode" class="form-control" placeholder="731224" maxlength="6" required>
                 <div class="field-err" id="err-pincode"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Preferred Delivery Time</label>
+                <select id="cust-slot" class="form-control">
+                  <option>Any time today</option>
+                  <option>Morning (7 AM – 11 AM)</option>
+                  <option>Afternoon (11 AM – 4 PM)</option>
+                  <option>Evening (4 PM – 8 PM)</option>
+                  <option>Tomorrow morning</option>
+                </select>
+                <div class="slot-note">We'll confirm the exact time on call / WhatsApp.</div>
               </div>
               <div class="form-group">
                 <div class="pay-note"><b>💵 No online payment needed.</b><br>Place your order and we'll confirm on WhatsApp / call. Pay by cash or UPI to our delivery person, or at the shop.</div>
@@ -1021,6 +1048,36 @@ async function handleCatering(e){
   document.getElementById("cat-form").reset();
 }
 
+/* ===== EDIT ME: shop settings ===== */
+const DELIVERY_PINCODES = ["731224"];   // pincodes you deliver to; add more like "731224","731101"
+const BASKETS = [                        // change items/prices any time; leave price "" to show "confirm on WhatsApp"
+  {name:"Family Basket", note:"4–5 members, about 1 week", price:"", items:["Potato 2 kg","Onion 2 kg","Tomato 1 kg","Brinjal 1 kg","Green chilli 250 g","Seasonal vegetable 1 kg"]},
+  {name:"Small Family / Bachelor Basket", note:"1–2 members", price:"", items:["Potato 1 kg","Onion 1 kg","Tomato 500 g","Seasonal vegetable 1 kg"]},
+  {name:"Salad Pack", note:"Fresh & light", price:"", items:["Cucumber 500 g","Carrot 500 g","Tomato 500 g","Beetroot 250 g","Lemon 4 pcs"]}
+];
+function renderBaskets(){
+  const el=document.getElementById("baskets-grid"); if(!el) return;
+  el.innerHTML=BASKETS.map((b,i)=>`<div class="basket"><h3>🧺 ${b.name}</h3><div style="font-size:13px;color:var(--text2)">${b.note}</div>
+    <ul>${b.items.map(x=>`<li>${x}</li>`).join("")}</ul>
+    <div class="bp">${b.price?("₹"+b.price):"Price as per today's rate"}</div>
+    <button class="btn btn-wa btn-sm" onclick="orderBasket(${i})">💬 Order on WhatsApp</button></div>`).join("");
+}
+function orderBasket(i){
+  const b=BASKETS[i];
+  window.open(`https://wa.me/${OWNER_WA}?text=`+encodeURIComponent(`🧺 Basket order: ${b.name}\n${b.items.join(", ")}\nName:\nAddress:\nPreferred delivery time:`),"_blank");
+}
+window.addEventListener("load",()=>{
+  renderBaskets();
+  const d=document.getElementById("pb-date");
+  if(d) d.textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const pin=document.getElementById("cust-pincode");
+  if(pin) pin.addEventListener("input",()=>{
+    const v=pin.value.trim(), out=document.getElementById("err-pincode");
+    if(out && v.length===6) out.textContent = DELIVERY_PINCODES.includes(v) ? "" : "We may not deliver to this pincode. Place the order and we'll call to confirm.";
+  });
+  if(location.hash==="#admin") showPage("admin");
+});
+
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const el = document.getElementById(id + "-page");
@@ -1073,7 +1130,7 @@ function showPage(id) {
       const roleLabel = currentUserRole ? ` (${currentUserRole})` : "";
       userLabel.textContent = signedIn ? `Hi, ${currentUser.email || "User"}${roleLabel}` : "Hi";
     }
-    if (adminLink) adminLink.style.display = "";
+    if (adminLink) adminLink.parentElement.style.display = (location.hash === "#admin") ? "" : "none";
   }
 
   async function ensureUserProfile(user) {
@@ -1288,7 +1345,7 @@ function normalizeProduct(raw = {}) {
   return {
     id,
     productId: id,
-    name: String(raw.name || "").trim(),
+    name: String(raw.name || raw.productName || raw.product_name || raw.title || "").trim(),
     bengaliName: raw.bengaliName || "",
     description: String(raw.description || "").trim(),
     category: raw.category || "Others",
@@ -1327,7 +1384,7 @@ function renderProducts() {
 function prodCard(p) {
   const oos = p.stock <= 0, low = p.stock > 0 && p.stock < 5;
   const img = p.imageUrl
-    ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy">`
+    ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy" data-e="${esc(emoji(p))}" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'prod-emoji',textContent:this.dataset.e}))">`
     : `<div class="prod-emoji">${emoji(p)}</div>`;
   return `<div class="prod-card">
     <div class="prod-img">${img}
@@ -1493,6 +1550,8 @@ async function handleCheckout(e) {
   };
   if (!validateCheckoutForm(cust)) { showToast("Please fix the highlighted fields.","error"); return; }
   if (!cart.length) { showToast("Your cart is empty.","error"); return; }
+  cust.deliverySlot = document.getElementById("cust-slot")?.value || "";
+  if (cust.deliverySlot) cust.address += " | Delivery time: " + cust.deliverySlot;
   const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
   if (sub<200) { showToast("Minimum order is ₹200.","error"); return; }
   if (!navigator.onLine) { showToast("You are offline. Please check your internet connection and try again.","error"); return; }
