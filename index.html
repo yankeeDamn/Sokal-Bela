@@ -545,22 +545,20 @@
             </div>
             <div class="checkout-pane" id="pane-payment">
               <h3 style="margin-bottom:14px;font-size:1.05rem" data-i18n="checkout.stepPayment">Payment Method</h3>
-              <div class="pay-opts">
+                      <div class="pay-opts">
                 <div class="pay-opt sel" id="pay-cod" onclick="selectPay('cod')">
                   <div class="pay-opt-ico">💵</div>
-                  <div class="pay-opt-lbl" data-i18n="checkout.payCod">Cash on Delivery</div>
-                  <div class="pay-opt-sub" data-i18n="checkout.payCodSub">Pay cash to the delivery person</div>
+                  <div class="pay-opt-lbl">Cash on Delivery</div>
+                  <div class="pay-opt-sub">Pay after receiving the vegetables</div>
                 </div>
-                <div class="pay-opt" id="pay-upi" onclick="selectPay('upi')">
+                <div class="pay-opt" id="pay-phonepe" onclick="selectPay('phonepe')">
                   <div class="pay-opt-ico">📱</div>
-                  <div class="pay-opt-lbl" data-i18n="checkout.payUpi">UPI</div>
-                  <div class="pay-opt-sub" data-i18n="checkout.payUpiSub">Pay by UPI on delivery</div>
+                  <div class="pay-opt-lbl">PhonePe</div>
+                  <div class="pay-opt-sub">Transfer after owner confirmation</div>
                 </div>
-                <div class="pay-opt" id="pay-online" onclick="selectPay('online')">
-                  <div class="pay-opt-ico">💳</div>
-                  <div class="pay-opt-lbl" data-i18n="checkout.payOnline">Online</div>
-                  <div class="pay-opt-sub" data-i18n="checkout.payOnlineSub">UPI / Card / Net Banking</div>
-                </div>
+              </div>
+              <div class="pay-note">
+                Orders are confirmed through WhatsApp or phone. For PhonePe, the owner confirms the total first and the payment is sent directly to the shop owner.
               </div>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
                 <button type="button" class="btn btn-outline" onclick="goCheckoutStep(2)" data-i18n="checkout.back">Back</button>
@@ -1766,7 +1764,7 @@ function renderCart() {
 
 function selectPay(m) {
   selPay = m;
-  ["cod","upi","online"].forEach((key) => {
+  ["cod","phonepe"].forEach((key) => {
     document.getElementById("pay-" + key)?.classList.toggle("sel", m === key);
   });
 }
@@ -1864,12 +1862,7 @@ function validateCheckoutForm({name, phone, email, address, pincode}) {
 
 async function handleCheckout(e) {
   e.preventDefault();
-  if (orderInFlight || paymentFlowActive) return; // already submitting
-  if (!currentUser) {
-    showToast("Please login to place your order.","error");
-    openAuthModal("login");
-    return;
-  }
+  if (orderInFlight || paymentFlowActive) return;
   if (!cart.length) { showToast(t("cart.empty"),"error"); goCheckoutStep(1); return; }
   const cust = {
     name:    document.getElementById("cust-name").value.trim(),
@@ -1883,15 +1876,14 @@ async function handleCheckout(e) {
   const addressForOrder = cust.deliverySlot ? (cust.address + " | Delivery time: " + cust.deliverySlot) : cust.address;
   const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
   if (sub<200) { showToast(t("cart.minWarn"),"error"); goCheckoutStep(1); return; }
-  if (!navigator.onLine) { showToast("You are offline. Please check your internet connection and try again.","error"); return; }
 
   const cartBackup = cart.map((item) => ({ ...item }));
   const orderCust = { ...cust, address: addressForOrder, lang: window.I18N?.lang || "en" };
   setCheckoutBusy(true);
   try {
     await validateStock();
-    if (selPay==="online") { await handleRzp(orderCust, sub); }
-    else { await placeCOD(orderCust, sub); }
+    const method = selPay === "phonepe" ? "PhonePe" : "COD";
+    await placeCOD(orderCust, sub, method);
   } catch (err) {
     cart = sanitizeCart(cartBackup);
     saveCartStorage();
@@ -2017,7 +2009,7 @@ function retryPayment() {
   startPaymentFlow(lastPaymentCtx.order, lastPaymentCtx.cust);
 }
 
-const PAYMENT_METHOD_LABELS = { upi:"UPI", card:"Card", netbanking:"Net Banking", wallet:"Wallet", emi:"EMI", paylater:"Pay Later" };
+const PAYMENT_METHOD_LABELS = { cod:"Cash on Delivery", phonepe:"PhonePe", upi:"UPI", card:"Card", netbanking:"Net Banking", wallet:"Wallet", emi:"EMI", paylater:"Pay Later" };
 
 async function updateOrderPaymentState(orderId, paymentStatus, paymentFailureReason = "", extra = {}) {
   if (!orderId) return;
