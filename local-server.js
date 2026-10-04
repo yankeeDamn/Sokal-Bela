@@ -508,8 +508,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve HTML file
+// Serve HTML files
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+app.get(/^\/admin\/.+/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// SPA fallback for extensionless frontend routes
+app.get(/^\/(?!api\/)(?!.*\.[a-zA-Z0-9]+$).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
