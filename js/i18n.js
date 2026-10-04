@@ -68,9 +68,6 @@
     scope.querySelectorAll('[data-i18n-aria]').forEach((el) => {
       el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
     });
-    scope.querySelectorAll('[data-i18n-html]').forEach((el) => {
-      el.innerHTML = t(el.getAttribute('data-i18n-html'));
-    });
     document.documentElement.lang = I18N.lang === 'bn' ? 'bn' : (I18N.lang === 'hi' ? 'hi' : 'en');
     document.documentElement.setAttribute('data-lang', I18N.lang);
     const select = document.getElementById('lang-select');

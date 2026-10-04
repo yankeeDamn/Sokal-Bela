@@ -1293,7 +1293,6 @@ function showPage(id) {
       localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({
         uid: user.uid,
         email: user.email || "",
-        phoneNumber: user.phoneNumber || "",
         displayName: user.displayName || "",
         role: role || currentUserRole || ROLES.CUSTOMER
       }));
