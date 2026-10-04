@@ -15,10 +15,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Firebase v10 compat CDN -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -971,6 +967,10 @@
   </div>
 </div>
 
+<!-- Firebase after first paint so a slow/blocked CDN cannot leave a blank page -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/veg-images.js"></script>
 <!-- ======================================================
@@ -1562,12 +1562,23 @@ function showPage(id) {
   }
 
   /* ========== PRODUCTS ========== */
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(label + " timed out")), ms))
+  ]);
+}
+
 async function loadProducts() {
   renderSkeletons("featured-grid", 4);
   try {
     const lang = window.I18N?.lang || "en";
     try {
-      const res = await fetch(`${PAYMENTS_API_BASE}/products?lang=${encodeURIComponent(lang)}`);
+      const res = await withTimeout(
+        fetch(`${PAYMENTS_API_BASE}/products?lang=${encodeURIComponent(lang)}`),
+        8000,
+        "products API"
+      );
       if (res.ok) {
         const data = await res.json();
         const list = Array.isArray(data?.products) ? data.products : [];
@@ -1582,7 +1593,7 @@ async function loadProducts() {
       }
     } catch (apiErr) { console.warn("products API:", apiErr.message); }
     if (fbOk && db) {
-      const snap = await db.collection("products").get();
+      const snap = await withTimeout(db.collection("products").get(), 8000, "firestore products");
       const mapped = snap.empty ? SEEDS : snap.docs.map(d => normalizeProduct({ id: d.id, ...d.data() }));
       products = mapped.filter(p => p.status !== "archived" && p.active !== false);
     } else { products = SEEDS.map(normalizeProduct); }
