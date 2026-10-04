@@ -2,50 +2,82 @@
 (function (global) {
   'use strict';
 
-  const PUBLIC_BASE = './public/images';
+  const PUBLIC_BASE = '/public/images';
   const FALLBACK_IMG = `${PUBLIC_BASE}/veg-fallback.svg`;
 
+  function assetPath(fileName) {
+    if (!fileName) return FALLBACK_IMG;
+    if (fileName.startsWith('http://') || fileName.startsWith('https://') || fileName.startsWith('data:')) return fileName;
+    if (fileName.startsWith('/')) return fileName;
+    if (fileName.startsWith('./') || fileName.startsWith('../')) return fileName;
+    return `${PUBLIC_BASE}/${fileName}`;
+  }
+
   const IMAGES = [
-    { keys: ['potato', 'alu', 'আলু', 'आলু'], url: `${PUBLIC_BASE}/potato.svg` },
-    { keys: ['tomato', 'টমেটো', 'टमाटর'], url: `${PUBLIC_BASE}/tomato.svg` },
-    { keys: ['onion', 'peyaj', 'পেঁয়াজ', 'प्याज'], url: `${PUBLIC_BASE}/onion.svg` },
-    { keys: ['green chili', 'green chilli', 'chili', 'chilli', 'কাঁচা মরিচ', 'हरी मिर्च', 'mirch'], url: `${PUBLIC_BASE}/chili.svg` },
-    { keys: ['brinjal', 'eggplant', 'aubergine', 'begun', 'বেগুন', 'बैंगन'], url: `${PUBLIC_BASE}/veg-fallback.svg` },
-    { keys: ['spinach', 'palak', 'পালং', 'पालक'], url: `${PUBLIC_BASE}/spinach.svg` },
-    { keys: ['cauliflower', 'phulkopi', 'ফুলকপি', 'फूलगोभी'], url: `${PUBLIC_BASE}/cauliflower.svg` },
-    { keys: ['cabbage', 'bandhakopi', 'বাঁধাকপি', 'पत्ता गोभी', 'पत्तागोभी'], url: `${PUBLIC_BASE}/cabbage.svg` },
-    { keys: ['bitter gourd', 'karela', 'করला', 'करेला'], url: `${PUBLIC_BASE}/bitter-gourd.svg` },
-    { keys: ['bottle gourd', 'lau', 'লাউ', 'लौकी'], url: `${PUBLIC_BASE}/bottle-gourd.svg` },
-    { keys: ['carrot', 'গাজর', 'गाजर'], url: `${PUBLIC_BASE}/carrot.svg` },
-    { keys: ['garlic', 'রসুন', 'लहसुन'], url: `${PUBLIC_BASE}/veg-fallback.svg` },
-    { keys: ['ginger', 'আদা', 'अदरक'], url: `${PUBLIC_BASE}/ginger.svg` },
-    { keys: ['cucumber', 'শসা', 'खीरा'], url: `${PUBLIC_BASE}/cucumber.svg` },
-    { keys: ['lemon', 'লেবু', 'नींबू'], url: `${PUBLIC_BASE}/lemon.svg` }
+    { keys: ['potato', 'alu', 'আলু', 'आलू'], url: assetPath('potato.svg') },
+    { keys: ['tomato', 'টমেটো', 'टमाटর'], url: assetPath('tomato.svg') },
+    { keys: ['onion', 'peyaj', 'পেঁয়াজ', 'प्याज'], url: assetPath('onion.svg') },
+    { keys: ['green chili', 'green chilli', 'chili', 'chilli', 'কাঁচা মরিচ', 'हरी मिर्च', 'mirch'], url: assetPath('chili.svg') },
+    { keys: ['brinjal', 'eggplant', 'aubergine', 'begun', 'বেগুন', 'बैंगन'], url: FALLBACK_IMG },
+    { keys: ['spinach', 'palak', 'পালং', 'पालक'], url: assetPath('spinach.svg') },
+    { keys: ['cauliflower', 'phulkopi', 'ফুলকপি', 'ফুলगोभी'], url: assetPath('cauliflower.svg') },
+    { keys: ['cabbage', 'bandhakopi', 'বাঁধাকপি', 'पत्ता गोभी', 'पत्तागोभी'], url: assetPath('cabbage.svg') },
+    { keys: ['bitter gourd', 'karela', 'করলা', 'करेला'], url: assetPath('bitter-gourd.svg') },
+    { keys: ['bottle gourd', 'lau', 'লাউ', 'लौकी'], url: assetPath('bottle-gourd.svg') },
+    { keys: ['carrot', 'গাজর', 'गाजর'], url: assetPath('carrot.svg') },
+    { keys: ['garlic', 'রসুন', 'लहसुन'], url: FALLBACK_IMG },
+    { keys: ['ginger', 'আদা', 'अदरक'], url: assetPath('ginger.svg') },
+    { keys: ['cucumber', 'শসা', 'खीरा'], url: assetPath('cucumber.svg') },
+    { keys: ['lemon', 'লেবু', 'नींबू'], url: assetPath('lemon.svg') }
   ];
 
   const BEST_PRICE_KEYS = ['potato', 'onion', 'tomato', 'alu', 'peyaj', 'আলু', 'পেঁয়াজ', 'টমেটো', 'आलू', 'प्याज', 'टमाटर'];
 
+  function normalizeText(value) {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9ঀ-৿]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function matchesKey(sourceText, key) {
+    const text = normalizeText(sourceText);
+    const needle = normalizeText(key);
+    if (!needle) return false;
+    return text.includes(needle) || text.replace(/\s+/g, '').includes(needle.replace(/\s+/g, ''));
+  }
+
   function haystack(product) {
     if (!product) return '';
-    if (typeof product === 'string') return product.toLowerCase();
+    if (typeof product === 'string') return product;
     return [product.name, product.bengaliName, product.hindiName, product.id, product.displayName]
       .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
+      .join(' ');
+  }
+
+  function resolveLocalImage(value) {
+    if (!value) return '';
+    if (typeof value !== 'string') return '';
+    const cleaned = value.trim();
+    if (!cleaned || cleaned === 'null' || cleaned.includes('placeholder')) return '';
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://') || cleaned.startsWith('data:')) return cleaned;
+    if (cleaned.startsWith('/')) return cleaned;
+    if (cleaned.startsWith('./') || cleaned.startsWith('../')) return cleaned;
+    return `${PUBLIC_BASE}/${cleaned}`;
   }
 
   function getVegImage(product) {
     const text = haystack(product);
     for (const entry of IMAGES) {
-      if (entry.keys.some((k) => text.includes(k.toLowerCase()))) return entry.url;
+      if (entry.keys.some((k) => matchesKey(text, k))) return entry.url;
     }
-    if (product && typeof product === 'object' && product.imageUrl) return product.imageUrl;
+
+    const productUrl = product && typeof product === 'object' ? (product.imageUrl || product.image || '') : '';
+    const normalizedUrl = resolveLocalImage(productUrl);
+    if (normalizedUrl) return normalizedUrl;
     return FALLBACK_IMG;
   }
 
   function isBestPriceItem(product) {
     const text = haystack(product);
-    return BEST_PRICE_KEYS.some((k) => text.includes(k.toLowerCase()));
+    return BEST_PRICE_KEYS.some((k) => matchesKey(text, k));
   }
 
   function vegImgTag(product, alt) {
@@ -53,8 +85,9 @@
     const label = alt || (product && (product.displayName || product.name)) || 'Vegetable';
     const emoji = (global.emoji && product && typeof product === 'object') ? global.emoji(product) : '🥬';
     return '<img src="' + url + '" alt="' + label + '" loading="lazy" decoding="async" ' +
-      'onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\';this.addEventListener(\'error\',function(){this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'prod-emoji\',textContent:\'' + emoji + '\'}));},{once:true});">';
+      'onerror="this.onerror=null;this.src='' + FALLBACK_IMG + '';this.addEventListener('error',function(){this.replaceWith(Object.assign(document.createElement('div'),{className:'prod-emoji',textContent:'' + emoji + ''}));},{once:true});">';
   }
 
   global.VEG_IMAGES = { getVegImage, isBestPriceItem, vegImgTag, FALLBACK_IMG };
+
 })(window);

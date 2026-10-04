@@ -1456,12 +1456,14 @@ function showPage(id) {
     const submitBtn = document.getElementById("auth-submit-btn");
     errEl.style.display = "none";
     submitBtn.disabled = true;
+
     try {
       if (authMethod === "phone") {
         const phone = document.getElementById("auth-phone").value.replace(/\D/g, "");
         if (!/^[6-9]\d{9}$/.test(phone)) {
           errEl.textContent = "Enter a valid 10-digit Indian mobile number.";
           errEl.style.display = "block";
+          submitBtn.disabled = false;
           return;
         }
         if (!phoneConfirmResult) {
@@ -1476,6 +1478,7 @@ function showPage(id) {
         if (!/^\d{6}$/.test(code)) {
           errEl.textContent = "Enter the 6-digit OTP.";
           errEl.style.display = "block";
+          submitBtn.disabled = false;
           return;
         }
         await phoneConfirmResult.confirm(code);
@@ -1485,9 +1488,24 @@ function showPage(id) {
         const email = document.getElementById("auth-email").value.trim().toLowerCase();
         const pass = document.getElementById("auth-pass").value;
         const confirm = document.getElementById("auth-pass-confirm").value;
-        if (!email || !pass) { errEl.textContent = "Email and password are required."; errEl.style.display = "block"; return; }
-        if (mode === "signup" && pass !== confirm) { errEl.textContent = "Passwords do not match."; errEl.style.display = "block"; return; }
-        if (mode === "signup" && pass.length < 6) { errEl.textContent = "Password must be at least 6 characters."; errEl.style.display = "block"; return; }
+        if (!email || !pass) {
+          errEl.textContent = "Email and password are required.";
+          errEl.style.display = "block";
+          submitBtn.disabled = false;
+          return;
+        }
+        if (mode === "signup" && pass !== confirm) {
+          errEl.textContent = "Passwords do not match.";
+          errEl.style.display = "block";
+          submitBtn.disabled = false;
+          return;
+        }
+        if (mode === "signup" && pass.length < 6) {
+          errEl.textContent = "Password must be at least 6 characters.";
+          errEl.style.display = "block";
+          submitBtn.disabled = false;
+          return;
+        }
         if (mode === "signup") {
           await auth.createUserWithEmailAndPassword(email, pass);
           showToast("Account created successfully.","success");
@@ -1496,6 +1514,7 @@ function showPage(id) {
           showToast("Logged in successfully.","success");
         }
       }
+
       const form = document.getElementById("auth-form");
       if (form) form.reset();
       if (document.getElementById("orders-page")?.classList.contains("active")) loadMyOrders();
@@ -1510,9 +1529,11 @@ function showPage(id) {
       }
     } finally {
       submitBtn.disabled = false;
+      if (authMethod === "phone" && !phoneConfirmResult) {
+        submitBtn.textContent = t("auth.sendOtp");
+      }
     }
   }
-
   async function sendCustomerPasswordReset() {
     if (!auth) { showToast("Authentication is unavailable right now.","error"); return; }
     const email = document.getElementById("auth-email").value.trim().toLowerCase();
