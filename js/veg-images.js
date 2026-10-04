@@ -83,9 +83,9 @@
   function vegImgTag(product, alt) {
     const url = getVegImage(product);
     const label = alt || (product && (product.displayName || product.name)) || 'Vegetable';
-    const emoji = (global.emoji && product && typeof product === 'object') ? global.emoji(product) : '🥬';
-    return '<img src="' + url + '" alt="' + label + '" loading="lazy" decoding="async" ' +
-      'onerror="this.onerror=null;this.src='' + FALLBACK_IMG + '';this.addEventListener('error',function(){this.replaceWith(Object.assign(document.createElement('div'),{className:'prod-emoji',textContent:'' + emoji + ''}));},{once:true});">';
+    const safeLabel = String(label).replace(/\\/g, '\\\\').replace(/"/g, '&quot;');
+    const safeUrl = String(url).replace(/\\/g, '\\\\');
+    return '<img src="' + safeUrl + '" alt="' + safeLabel + '" loading="lazy" decoding="async" onerror="if (typeof vegImgError === \"function\") vegImgError(this);">';
   }
 
   global.VEG_IMAGES = { getVegImage, isBestPriceItem, vegImgTag, FALLBACK_IMG };
