@@ -1817,7 +1817,6 @@ function goCheckoutStep(step) {
       pincode: document.getElementById("cust-pincode").value.trim()
     };
     if (!validateCheckoutForm(cust)) { showToast("Please fix the highlighted fields.","error"); return; }
-    if (!currentUser) { showToast("Please login to place your order.","error"); openAuthModal("login"); return; }
   }
   checkoutStep = step;
   document.querySelectorAll(".checkout-pane").forEach((p) => p.classList.remove("active"));
@@ -2144,11 +2143,7 @@ async function saveOrderFS(d) {
     qty:Math.max(1, Number(i.qty)||1),
     subtotal:(Number(i.price)||0) * Math.max(1, Number(i.qty)||1)
   }));
-  if (!currentUser || (fbOk && auth && !auth.currentUser)) {
-    const err = new Error("Login required to place order");
-    err.code = "auth-required";
-    throw err;
-  }
+  // Guest checkout allowed — no login required
   const orderNumber = await generateOrderNumber();
   if (fbOk && db) {
     const orderRef = db.collection("orders").doc();
@@ -2200,8 +2195,8 @@ async function saveOrderFS(d) {
       const payload = {
         orderId: orderRef.id,
         orderNumber,
-        customerId: currentUser.uid,
-        customerRole: normalizeRole(currentUserRole),
+        customerId: currentUser?.uid || "guest",
+        customerRole: normalizeRole(currentUserRole) || "Customer",
         customerName: d.name,
         phone: d.phone,
         email: d.email,
@@ -2232,8 +2227,8 @@ async function saveOrderFS(d) {
   const payload = {
     orderId: "LOCAL-"+Date.now(),
     orderNumber,
-    customerId: currentUser.uid,
-    customerRole: normalizeRole(currentUserRole),
+    customerId: currentUser?.uid || "guest",
+        customerRole: normalizeRole(currentUserRole) || "Customer",
     customerName:d.name, phone:d.phone, email:d.email, address:d.address, pincode:d.pincode||"",
     itemsSummary:items.map(i=>`${i.name} x${i.qty}`).join(", "),
     itemCount:items.reduce((s,i)=>s+i.qty,0),
