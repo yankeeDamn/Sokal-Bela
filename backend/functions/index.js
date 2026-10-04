@@ -66,6 +66,7 @@ function normalizePaymentMethod(method) {
     emi: 'EMI',
     paylater: 'PayLater',
     cod: 'COD',
+    phonepe: 'PhonePe',
     online: 'Online',
   };
   return methodMap[key] || 'Online';

@@ -108,7 +108,7 @@ service cloud.firestore {
         data.itemCount is int && data.itemCount > 0 &&
         data.subtotal is number && data.subtotal >= 200 &&
         data.total is number && data.total >= 200 &&
-        data.paymentMethod in ["COD", "UPI", "Online"] &&
+        data.paymentMethod in ["COD", "UPI", "Online", "PhonePe"] &&
         data.paymentStatus is string && validPaymentStatus(data.paymentStatus) &&
         data.orderStatus is string && validOrderStatus(data.orderStatus) &&
         data.status == data.orderStatus &&

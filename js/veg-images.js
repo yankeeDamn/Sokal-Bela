@@ -15,7 +15,7 @@
 
   const IMAGES = [
     { keys: ['potato', 'alu', 'আলু', 'आलू'], url: assetPath('potato.svg') },
-    { keys: ['tomato', 'টমেটো', 'टमाटর'], url: assetPath('tomato.svg') },
+    { keys: ['tomato', 'টমেটো', 'टमाटर'], url: assetPath('tomato.svg') },
     { keys: ['onion', 'peyaj', 'পেঁয়াজ', 'प्याज'], url: assetPath('onion.svg') },
     { keys: ['green chili', 'green chilli', 'chili', 'chilli', 'কাঁচা মরিচ', 'हरी मिर्च', 'mirch'], url: assetPath('chili.svg') },
     { keys: ['brinjal', 'eggplant', 'aubergine', 'begun', 'বেগুন', 'बैंगन'], url: FALLBACK_IMG },
@@ -24,8 +24,8 @@
     { keys: ['cabbage', 'bandhakopi', 'বাঁধাকপি', 'पत्ता गोभी', 'पत्तागोभी'], url: assetPath('cabbage.svg') },
     { keys: ['bitter gourd', 'karela', 'করলা', 'करेला'], url: assetPath('bitter-gourd.svg') },
     { keys: ['bottle gourd', 'lau', 'লাউ', 'लौकी'], url: assetPath('bottle-gourd.svg') },
-    { keys: ['carrot', 'গাজর', 'गाजর'], url: assetPath('carrot.svg') },
-    { keys: ['garlic', 'রসুন', 'लहसुन'], url: FALLBACK_IMG },
+    { keys: ['carrot', 'গাজর', 'गाजर'], url: assetPath('carrot.svg') },
+    { keys: ['garlic', 'রসুন', 'लहसुन'], url: assetPath('garlic.svg') },
     { keys: ['ginger', 'আদা', 'अदरक'], url: assetPath('ginger.svg') },
     { keys: ['cucumber', 'শসা', 'खीरा'], url: assetPath('cucumber.svg') },
     { keys: ['lemon', 'লেবু', 'नींबू'], url: assetPath('lemon.svg') }
