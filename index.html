@@ -1136,7 +1136,6 @@ function mergeCartItems(primary = [], secondary = []) {
 /* ========== INIT ========== */
 document.addEventListener("DOMContentLoaded", async () => {
   if (window.I18N?.ready) await I18N.ready.catch(() => {});
-  hydrateAuthFromStorage();
   const thisYear = new Date().getFullYear();
   document.getElementById("yr").textContent = thisYear > 2025 ? thisYear : "";
 
@@ -1286,30 +1285,6 @@ function showPage(id) {
     if (adminLink) adminLink.parentElement.style.display = (location.hash === "#admin") ? "" : "none";
   }
 
-  const AUTH_CACHE_KEY = "sb_auth_session";
-  function persistAuthSession(user, role) {
-    try {
-      if (!user) { localStorage.removeItem(AUTH_CACHE_KEY); return; }
-      localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({
-        uid: user.uid,
-        email: user.email || "",
-        displayName: user.displayName || "",
-        role: role || currentUserRole || ROLES.CUSTOMER
-      }));
-    } catch (_) {}
-  }
-  function hydrateAuthFromStorage() {
-    try {
-      const raw = localStorage.getItem(AUTH_CACHE_KEY);
-      if (!raw || currentUser) return;
-      const cached = JSON.parse(raw);
-      if (!cached?.uid) return;
-      currentUser = cached;
-      currentUserRole = normalizeRole(cached.role);
-      updateAuthNav();
-    } catch (_) {}
-  }
-
   async function ensureUserProfile(user) {
     if (!(fbOk && db && user)) return normalizeRole(null);
     const ref = db.collection("users").doc(user.uid);
@@ -1373,7 +1348,6 @@ function showPage(id) {
     saveCartStorage();
     renderCartCount();
     if (document.getElementById("cart-page")?.classList.contains("active")) renderCart();
-    persistAuthSession(currentUser, currentUserRole);
     if (currentUser) {
       const emailField = document.getElementById("cust-email");
       if (emailField && !emailField.value) emailField.value = currentUser.email || "";
@@ -1558,7 +1532,6 @@ function showPage(id) {
     if (auth) {
       try { await auth.signOut(); } catch (err) { console.error(err); }
     }
-    persistAuthSession(null);
     if (!auth) {
       currentUser = null;
       currentUserRole = null;
