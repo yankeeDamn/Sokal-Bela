@@ -1,0 +1,8 @@
+backend
+local-server.js
+*.zip
+.env
+.env.*
+.git
+.github
+node_modules
