@@ -2250,7 +2250,7 @@ async function notifyAdmin(order) {
       await db.collection("adminNotifications").add({
         type:"new-order", orderId:order.id, orderNumber:order.orderNumber,
         message:`New order ${order.orderNumber} from ${order.customerName} — ₹${order.total} (${order.paymentMethod})`,
-        customerId: currentUser.uid,
+        customerId: currentUser?.uid || "guest",
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -2404,8 +2404,8 @@ async function handleBulk(e) {
   if(!/^[6-9]\d{9}$/.test(phone)){showToast("Enter a valid 10-digit Indian mobile number.","error");return;}
   const btn=document.getElementById("bulk-btn"); btn.disabled=true; btn.textContent="Sending…";
   const payload={
-    customerId: currentUser.uid,
-    customerRole: normalizeRole(currentUserRole),
+        customerId: currentUser?.uid || "guest",
+    customerRole: normalizeRole(currentUserRole) || "Customer",
     contactName:name, phone, email:document.getElementById("bemail").value.trim(),
     eventType:document.getElementById("betype").value, eventDate:document.getElementById("bedate").value,
     guestCount:parseInt(document.getElementById("bguests").value)||0,
