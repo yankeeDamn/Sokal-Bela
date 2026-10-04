@@ -22,7 +22,7 @@ const SAMPLE_PRODUCTS = [
         unit: 'kg',
         base_price: 30,
         stock: 500,
-        images: ['https://images.unsplash.com/photo-1582515073490-3998137b60d7?auto=format&fit=crop&w=800&q=60'],
+        images: ['./public/images/potato.svg'],
         description: 'Fresh local potatoes'
     },
     {
@@ -32,7 +32,7 @@ const SAMPLE_PRODUCTS = [
         unit: 'kg',
         base_price: 40,
         stock: 300,
-        images: ['https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=800&q=60'],
+        images: ['./public/images/tomato.svg'],
         description: 'Ripe red tomatoes'
     },
     {
@@ -42,7 +42,7 @@ const SAMPLE_PRODUCTS = [
         unit: 'kg',
         base_price: 35,
         stock: 400,
-        images: ['https://images.unsplash.com/photo-1582464312705-1f7a1b7b8d1b?auto=format&fit=crop&w=800&q=60'],
+        images: ['./public/images/onion.svg'],
         description: 'Fresh red onions'
     }
 ];

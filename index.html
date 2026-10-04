@@ -433,7 +433,7 @@
         <div class="contact-card"><div class="cc-ico">1️⃣</div><h3>Choose</h3><p>Pick vegetables, or fill the bulk / catering form</p></div>
         <div class="contact-card"><div class="cc-ico">2️⃣</div><h3>Send</h3><p>Order goes to us on WhatsApp / Facebook / call</p></div>
         <div class="contact-card"><div class="cc-ico">3️⃣</div><h3>We Confirm</h3><p>We confirm price, date and time with you</p></div>
-        <div class="contact-card"><div class="cc-ico">4️⃣</div><h3>Pay on Delivery</h3><p>Cash or UPI to our person. No online payment.</p></div>
+        <div class="contact-card"><div class="cc-ico">4️⃣</div><h3>Pay on Delivery</h3><p>Cash on Delivery or PhonePe after shop confirmation.</p></div>
       </div>
     </div>
   </div>
@@ -545,22 +545,20 @@
             </div>
             <div class="checkout-pane" id="pane-payment">
               <h3 style="margin-bottom:14px;font-size:1.05rem" data-i18n="checkout.stepPayment">Payment Method</h3>
-              <div class="pay-opts">
+                      <div class="pay-opts">
                 <div class="pay-opt sel" id="pay-cod" onclick="selectPay('cod')">
                   <div class="pay-opt-ico">💵</div>
-                  <div class="pay-opt-lbl" data-i18n="checkout.payCod">Cash on Delivery</div>
-                  <div class="pay-opt-sub" data-i18n="checkout.payCodSub">Pay cash to the delivery person</div>
+                  <div class="pay-opt-lbl">Cash on Delivery</div>
+                  <div class="pay-opt-sub">Pay after receiving the vegetables</div>
                 </div>
-                <div class="pay-opt" id="pay-upi" onclick="selectPay('upi')">
+                <div class="pay-opt" id="pay-phonepe" onclick="selectPay('phonepe')">
                   <div class="pay-opt-ico">📱</div>
-                  <div class="pay-opt-lbl" data-i18n="checkout.payUpi">UPI</div>
-                  <div class="pay-opt-sub" data-i18n="checkout.payUpiSub">Pay by UPI on delivery</div>
+                  <div class="pay-opt-lbl">PhonePe</div>
+                  <div class="pay-opt-sub">Transfer after owner confirmation</div>
                 </div>
-                <div class="pay-opt" id="pay-online" onclick="selectPay('online')">
-                  <div class="pay-opt-ico">💳</div>
-                  <div class="pay-opt-lbl" data-i18n="checkout.payOnline">Online</div>
-                  <div class="pay-opt-sub" data-i18n="checkout.payOnlineSub">UPI / Card / Net Banking</div>
-                </div>
+              </div>
+              <div class="pay-note">
+                Orders are confirmed through WhatsApp or phone. For PhonePe, the owner confirms the total first and the payment is sent directly to the shop owner.
               </div>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
                 <button type="button" class="btn btn-outline" onclick="goCheckoutStep(2)" data-i18n="checkout.back">Back</button>
@@ -617,8 +615,8 @@
     <div class="container" style="max-width:620px">
       <div class="card card-body" style="text-align:center">
         <div style="font-size:56px;margin-bottom:8px">✅</div>
-        <h2 class="sec-title" style="margin-bottom:4px">Payment Successful!</h2>
-        <p style="color:var(--text2)">Your payment was received and your order is confirmed.</p>
+        <h2 class="sec-title" style="margin-bottom:4px">Order Confirmed!</h2>
+        <p style="color:var(--text2)">Your order has been noted and the owner will confirm the final details by WhatsApp or phone.</p>
         <div id="payment-success-body" style="text-align:left;margin-top:18px"></div>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap">
           <button class="btn btn-primary" onclick="showPage('home')">Continue Shopping</button>
@@ -636,14 +634,14 @@
     <div class="container" style="max-width:620px">
       <div class="card card-body" style="text-align:center">
         <div style="font-size:56px;margin-bottom:8px">❌</div>
-        <h2 class="sec-title" style="margin-bottom:4px">Payment Failed</h2>
-        <p style="color:var(--text2)" id="payment-failure-msg">We couldn't complete your payment. No money was deducted.</p>
+        <h2 class="sec-title" style="margin-bottom:4px">Order Pending</h2>
+        <p style="color:var(--text2)" id="payment-failure-msg">Your order is saved and the owner will contact you to confirm the total and payment method.</p>
         <div id="payment-failure-body" style="text-align:left;margin-top:18px"></div>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="retryPayment()">🔁 Retry Payment</button>
-          <button class="btn btn-outline" onclick="showPage('cart')">Back to Cart</button>
+          <button class="btn btn-primary" onclick="showPage('cart')">Back to Cart</button>
+          <button class="btn btn-outline" onclick="showPage('products')">Continue Shopping</button>
         </div>
-        <p style="font-size:13px;color:var(--text2);margin-top:14px">Amount deducted but shown as failed? It's auto-refunded in 5–7 working days. Call <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a>.</p>
+        <p style="font-size:13px;color:var(--text2);margin-top:14px">Call <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a> to confirm Cash on Delivery or PhonePe transfer.</p>
       </div>
     </div>
   </div>
@@ -975,7 +973,6 @@
 
 <script src="js/i18n.js"></script>
 <script src="js/veg-images.js"></script>
-<script src="razorpay-integration.js"></script>
 <!-- ======================================================
      JAVASCRIPT
 ====================================================== -->
@@ -1459,12 +1456,14 @@ function showPage(id) {
     const submitBtn = document.getElementById("auth-submit-btn");
     errEl.style.display = "none";
     submitBtn.disabled = true;
+
     try {
       if (authMethod === "phone") {
         const phone = document.getElementById("auth-phone").value.replace(/\D/g, "");
         if (!/^[6-9]\d{9}$/.test(phone)) {
           errEl.textContent = "Enter a valid 10-digit Indian mobile number.";
           errEl.style.display = "block";
+          submitBtn.disabled = false;
           return;
         }
         if (!phoneConfirmResult) {
@@ -1479,6 +1478,7 @@ function showPage(id) {
         if (!/^\d{6}$/.test(code)) {
           errEl.textContent = "Enter the 6-digit OTP.";
           errEl.style.display = "block";
+          submitBtn.disabled = false;
           return;
         }
         await phoneConfirmResult.confirm(code);
@@ -1488,9 +1488,24 @@ function showPage(id) {
         const email = document.getElementById("auth-email").value.trim().toLowerCase();
         const pass = document.getElementById("auth-pass").value;
         const confirm = document.getElementById("auth-pass-confirm").value;
-        if (!email || !pass) { errEl.textContent = "Email and password are required."; errEl.style.display = "block"; return; }
-        if (mode === "signup" && pass !== confirm) { errEl.textContent = "Passwords do not match."; errEl.style.display = "block"; return; }
-        if (mode === "signup" && pass.length < 6) { errEl.textContent = "Password must be at least 6 characters."; errEl.style.display = "block"; return; }
+        if (!email || !pass) {
+          errEl.textContent = "Email and password are required.";
+          errEl.style.display = "block";
+          submitBtn.disabled = false;
+          return;
+        }
+        if (mode === "signup" && pass !== confirm) {
+          errEl.textContent = "Passwords do not match.";
+          errEl.style.display = "block";
+          submitBtn.disabled = false;
+          return;
+        }
+        if (mode === "signup" && pass.length < 6) {
+          errEl.textContent = "Password must be at least 6 characters.";
+          errEl.style.display = "block";
+          submitBtn.disabled = false;
+          return;
+        }
         if (mode === "signup") {
           await auth.createUserWithEmailAndPassword(email, pass);
           showToast("Account created successfully.","success");
@@ -1499,6 +1514,7 @@ function showPage(id) {
           showToast("Logged in successfully.","success");
         }
       }
+
       const form = document.getElementById("auth-form");
       if (form) form.reset();
       if (document.getElementById("orders-page")?.classList.contains("active")) loadMyOrders();
@@ -1513,9 +1529,11 @@ function showPage(id) {
       }
     } finally {
       submitBtn.disabled = false;
+      if (authMethod === "phone" && !phoneConfirmResult) {
+        submitBtn.textContent = t("auth.sendOtp");
+      }
     }
   }
-
   async function sendCustomerPasswordReset() {
     if (!auth) { showToast("Authentication is unavailable right now.","error"); return; }
     const email = document.getElementById("auth-email").value.trim().toLowerCase();
@@ -1766,7 +1784,7 @@ function renderCart() {
 
 function selectPay(m) {
   selPay = m;
-  ["cod","upi","online"].forEach((key) => {
+  ["cod","phonepe"].forEach((key) => {
     document.getElementById("pay-" + key)?.classList.toggle("sel", m === key);
   });
 }
@@ -1864,12 +1882,7 @@ function validateCheckoutForm({name, phone, email, address, pincode}) {
 
 async function handleCheckout(e) {
   e.preventDefault();
-  if (orderInFlight || paymentFlowActive) return; // already submitting
-  if (!currentUser) {
-    showToast("Please login to place your order.","error");
-    openAuthModal("login");
-    return;
-  }
+  if (orderInFlight || paymentFlowActive) return;
   if (!cart.length) { showToast(t("cart.empty"),"error"); goCheckoutStep(1); return; }
   const cust = {
     name:    document.getElementById("cust-name").value.trim(),
@@ -1883,15 +1896,14 @@ async function handleCheckout(e) {
   const addressForOrder = cust.deliverySlot ? (cust.address + " | Delivery time: " + cust.deliverySlot) : cust.address;
   const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
   if (sub<200) { showToast(t("cart.minWarn"),"error"); goCheckoutStep(1); return; }
-  if (!navigator.onLine) { showToast("You are offline. Please check your internet connection and try again.","error"); return; }
 
   const cartBackup = cart.map((item) => ({ ...item }));
   const orderCust = { ...cust, address: addressForOrder, lang: window.I18N?.lang || "en" };
   setCheckoutBusy(true);
   try {
     await validateStock();
-    if (selPay==="online") { await handleRzp(orderCust, sub); }
-    else { await placeCOD(orderCust, sub); }
+    const method = selPay === "phonepe" ? "PhonePe" : "COD";
+    await placeCOD(orderCust, sub, method);
   } catch (err) {
     cart = sanitizeCart(cartBackup);
     saveCartStorage();
@@ -1959,65 +1971,12 @@ function updateCheckoutBtnLabel() {
 }
 
 async function placeCOD(cust, total) {
-  const method = selPay === "upi" ? "UPI" : "COD";
+  const method = selPay === "phonepe" ? "PhonePe" : "COD";
   const order = await saveOrderFS({...cust, total, paymentMethod: method, paymentStatus:PAYMENT_STATUSES.PENDING});
   onOrderOK(order);
 }
 
-/* Last pending online payment — used by the failure page's Retry button. */
-let lastPaymentCtx = null;
-
-async function handleRzp(cust, total) {
-  if (!window.SokalPayments) { showToast("Payment gateway unavailable. Try Cash on Delivery.","error"); return; }
-  // Save the order first with payment pending, then take payment for it.
-  const order = await saveOrderFS({...cust, total, paymentMethod:"Online", paymentStatus:PAYMENT_STATUSES.PENDING});
-  paymentFlowActive = true;
-  setCheckoutBusy(false); // release loading state while payment popup is open
-  startPaymentFlow(order, { ...cust, customerId: currentUser?.uid || null, uid: currentUser?.uid || null });
-}
-
-function startPaymentFlow(order, cust) {
-  lastPaymentCtx = { order, cust };
-  if (paymentWatchdog) clearTimeout(paymentWatchdog);
-  paymentWatchdog = setTimeout(async () => {
-    if (!lastPaymentCtx || lastPaymentCtx.order.id !== order.id) return;
-    await updateOrderPaymentState(order.id, PAYMENT_STATUSES.TIMEOUT, "Checkout timed out", {
-      paymentMethod: "online",
-      amount: order.total
-    });
-    paymentFlowActive = false;
-    onPaymentFailed(order, "timeout");
-  }, PAYMENT_TIMEOUT_MS);
-
-  window.SokalPayments.startPayment({
-    order,
-    customer: cust,
-    onSuccess: (result) => onPaymentOK(order, result),
-    onFailure: ({ reason }) => onPaymentFailed(order, reason || "failed"),
-    onDismiss: async () => {
-      if (paymentWatchdog) clearTimeout(paymentWatchdog);
-      await updateOrderPaymentState(order.id, PAYMENT_STATUSES.CANCELLED, "Customer dismissed payment", {
-        paymentMethod: "online",
-        amount: order.total
-      });
-      paymentFlowActive = false;
-      showToast(`Payment not completed. Order ${order.orderNumber} is saved — you can retry from this page.`,"info");
-    },
-  });
-}
-
-function retryPayment() {
-  if (!lastPaymentCtx) { showPage("cart"); return; }
-  if (paymentFlowActive) return;
-  updateOrderPaymentState(lastPaymentCtx.order.id, PAYMENT_STATUSES.PENDING, "", {
-    paymentMethod: "online",
-    amount: lastPaymentCtx.order.total
-  });
-  paymentFlowActive = true;
-  startPaymentFlow(lastPaymentCtx.order, lastPaymentCtx.cust);
-}
-
-const PAYMENT_METHOD_LABELS = { upi:"UPI", card:"Card", netbanking:"Net Banking", wallet:"Wallet", emi:"EMI", paylater:"Pay Later" };
+const PAYMENT_METHOD_LABELS = { cod:"Cash on Delivery", phonepe:"PhonePe" };
 
 async function updateOrderPaymentState(orderId, paymentStatus, paymentFailureReason = "", extra = {}) {
   if (!orderId) return;
