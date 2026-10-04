@@ -1,0 +1,11 @@
+{
+  "name": "sokal-bela-api",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "firebase-admin": "^14.4.0"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
