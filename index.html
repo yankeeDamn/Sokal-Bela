@@ -973,7 +973,6 @@
 
 <script src="js/i18n.js"></script>
 <script src="js/veg-images.js"></script>
-<script src="razorpay-integration.js"></script>
 <!-- ======================================================
      JAVASCRIPT
 ====================================================== -->
@@ -1951,65 +1950,12 @@ function updateCheckoutBtnLabel() {
 }
 
 async function placeCOD(cust, total) {
-  const method = selPay === "upi" ? "UPI" : "COD";
+  const method = selPay === "phonepe" ? "PhonePe" : "COD";
   const order = await saveOrderFS({...cust, total, paymentMethod: method, paymentStatus:PAYMENT_STATUSES.PENDING});
   onOrderOK(order);
 }
 
-/* Last pending online payment — used by the failure page's Retry button. */
-let lastPaymentCtx = null;
-
-async function handleRzp(cust, total) {
-  if (!window.SokalPayments) { showToast("Payment gateway unavailable. Try Cash on Delivery.","error"); return; }
-  // Save the order first with payment pending, then take payment for it.
-  const order = await saveOrderFS({...cust, total, paymentMethod:"Online", paymentStatus:PAYMENT_STATUSES.PENDING});
-  paymentFlowActive = true;
-  setCheckoutBusy(false); // release loading state while payment popup is open
-  startPaymentFlow(order, { ...cust, customerId: currentUser?.uid || null, uid: currentUser?.uid || null });
-}
-
-function startPaymentFlow(order, cust) {
-  lastPaymentCtx = { order, cust };
-  if (paymentWatchdog) clearTimeout(paymentWatchdog);
-  paymentWatchdog = setTimeout(async () => {
-    if (!lastPaymentCtx || lastPaymentCtx.order.id !== order.id) return;
-    await updateOrderPaymentState(order.id, PAYMENT_STATUSES.TIMEOUT, "Checkout timed out", {
-      paymentMethod: "online",
-      amount: order.total
-    });
-    paymentFlowActive = false;
-    onPaymentFailed(order, "timeout");
-  }, PAYMENT_TIMEOUT_MS);
-
-  window.SokalPayments.startPayment({
-    order,
-    customer: cust,
-    onSuccess: (result) => onPaymentOK(order, result),
-    onFailure: ({ reason }) => onPaymentFailed(order, reason || "failed"),
-    onDismiss: async () => {
-      if (paymentWatchdog) clearTimeout(paymentWatchdog);
-      await updateOrderPaymentState(order.id, PAYMENT_STATUSES.CANCELLED, "Customer dismissed payment", {
-        paymentMethod: "online",
-        amount: order.total
-      });
-      paymentFlowActive = false;
-      showToast(`Payment not completed. Order ${order.orderNumber} is saved — you can retry from this page.`,"info");
-    },
-  });
-}
-
-function retryPayment() {
-  if (!lastPaymentCtx) { showPage("cart"); return; }
-  if (paymentFlowActive) return;
-  updateOrderPaymentState(lastPaymentCtx.order.id, PAYMENT_STATUSES.PENDING, "", {
-    paymentMethod: "online",
-    amount: lastPaymentCtx.order.total
-  });
-  paymentFlowActive = true;
-  startPaymentFlow(lastPaymentCtx.order, lastPaymentCtx.cust);
-}
-
-const PAYMENT_METHOD_LABELS = { cod:"Cash on Delivery", phonepe:"PhonePe", upi:"UPI", card:"Card", netbanking:"Net Banking", wallet:"Wallet", emi:"EMI", paylater:"Pay Later" };
+const PAYMENT_METHOD_LABELS = { cod:"Cash on Delivery", phonepe:"PhonePe" };
 
 async function updateOrderPaymentState(orderId, paymentStatus, paymentFailureReason = "", extra = {}) {
   if (!orderId) return;
