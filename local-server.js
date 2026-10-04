@@ -32,68 +32,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '.')));
 
-// Mock database in memory
+// Mock database in memory — match the storefront vegetable catalogue
 let products = [
-  {
-    id: '1',
-    name: 'Fresh Tomatoes',
-    category: 'vegetables',
-    unit: 'kg',
-    base_price: 40,
-    stock: 50,
-    images: ['tomato.jpg'],
-    description: 'Fresh red tomatoes',
-    rating: 4.5,
-    reviews: 12
-  },
-  {
-    id: '2',
-    name: 'Organic Milk',
-    category: 'dairy',
-    unit: 'liter',
-    base_price: 60,
-    stock: 100,
-    images: ['milk.jpg'],
-    description: '1L pack of pure milk',
-    rating: 4.8,
-    reviews: 45
-  },
-  {
-    id: '3',
-    name: 'Whole Wheat Bread',
-    category: 'bakery',
-    unit: 'piece',
-    base_price: 40,
-    stock: 30,
-    images: ['bread.jpg'],
-    description: 'Fresh baked bread',
-    rating: 4.3,
-    reviews: 28
-  },
-  {
-    id: '4',
-    name: 'Bananas',
-    category: 'fruits',
-    unit: 'dozen',
-    base_price: 60,
-    stock: 60,
-    images: ['banana.jpg'],
-    description: 'Fresh yellow bananas',
-    rating: 4.6,
-    reviews: 34
-  },
-  {
-    id: '5',
-    name: 'Chicken Breast',
-    category: 'meat',
-    unit: 'kg',
-    base_price: 250,
-    stock: 25,
-    images: ['chicken.jpg'],
-    description: 'Fresh chicken breast',
-    rating: 4.7,
-    reviews: 52
-  }
+  { id: 'alu', name: 'Potato', bengaliName: 'আলু', hindiName: 'आलू', category: 'Root Vegetables', unit: 'kg', price: 30, base_price: 30, stock: 200, imageUrl: '/public/images/potato.svg', description: 'Fresh local potatoes', active: true, emoji: '🥔' },
+  { id: 'peyaj', name: 'Onion', bengaliName: 'পেঁয়াজ', hindiName: 'प्याज', category: 'Root Vegetables', unit: 'kg', price: 40, base_price: 40, stock: 150, imageUrl: '/public/images/onion.svg', description: 'Fresh red onions', active: true, emoji: '🧅' },
+  { id: 'tomato', name: 'Tomato', bengaliName: 'টমেটো', hindiName: 'टमाटर', category: 'Others', unit: 'kg', price: 60, base_price: 60, stock: 100, imageUrl: '/public/images/tomato.svg', description: 'Ripe red tomatoes', active: true, emoji: '🍅' },
+  { id: 'morich', name: 'Green Chili', bengaliName: 'কাঁচা মরিচ', hindiName: 'हरी मिर्च', category: 'Others', unit: 'kg', price: 80, base_price: 80, stock: 40, imageUrl: '/public/images/chili.svg', description: 'Fresh green chillies', active: true, emoji: '🌶️' },
+  { id: 'begun', name: 'Brinjal', bengaliName: 'বেগুন', hindiName: 'बैंगन', category: 'Others', unit: 'kg', price: 40, base_price: 40, stock: 80, imageUrl: '/public/images/veg-fallback.svg', description: 'Fresh brinjal', active: true, emoji: '🍆' },
+  { id: 'palong', name: 'Spinach', bengaliName: 'পালং শাক', hindiName: 'पालक', category: 'Leafy Greens', unit: 'bunch', price: 20, base_price: 20, stock: 90, imageUrl: '/public/images/spinach.svg', description: 'Fresh spinach', active: true, emoji: '🥬' },
+  { id: 'phkopi', name: 'Cauliflower', bengaliName: 'ফুলকপি', hindiName: 'फूलगोभी', category: 'Others', unit: 'piece', price: 50, base_price: 50, stock: 60, imageUrl: '/public/images/cauliflower.svg', description: 'Fresh cauliflower', active: true, emoji: '🥦' },
+  { id: 'bkopi', name: 'Cabbage', bengaliName: 'বাঁধাকপি', hindiName: 'पत्ता गोभी', category: 'Others', unit: 'piece', price: 35, base_price: 35, stock: 50, imageUrl: '/public/images/cabbage.svg', description: 'Fresh cabbage', active: true, emoji: '🥬' },
+  { id: 'karela', name: 'Bitter Gourd', bengaliName: 'করলা', hindiName: 'करेला', category: 'Gourds', unit: 'kg', price: 60, base_price: 60, stock: 40, imageUrl: '/public/images/bitter-gourd.svg', description: 'Fresh bitter gourd', active: true, emoji: '🥒' },
+  { id: 'lau', name: 'Bottle Gourd', bengaliName: 'লাউ', hindiName: 'लौकी', category: 'Gourds', unit: 'piece', price: 25, base_price: 25, stock: 70, imageUrl: '/public/images/bottle-gourd.svg', description: 'Fresh bottle gourd', active: true, emoji: '🫙' }
 ];
 
 let orders = [];

@@ -243,7 +243,7 @@
     /* RESPONSIVE */
     @media(max-width:700px){
       .hamburger{display:flex}
-      .nav-menu{display:none;position:absolute;top:60px;left:0;right:0;background:#fff;box-shadow:var(--shadow);flex-direction:column;padding:6px 0;z-index:999}
+      .nav-menu{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;box-shadow:var(--shadow);flex-direction:column;padding:6px 0;z-index:999}
       .nav-menu.open{display:flex}
       .nav-link{padding:12px 18px;border-radius:0}
       .products-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr))}
@@ -294,7 +294,7 @@
     .user-chip{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     @media(max-width:700px){
       .nav-search{order:3;max-width:none;flex-basis:100%}
-      .nav-menu{top:auto}
+      .nav-menu{top:100%}
     }
   </style>
 </head>
@@ -1011,7 +1011,8 @@ const PAYMENTS_API_BASE = window.PAYMENTS_API_BASE || '/api';
 /* ========== FIREBASE INIT ========== */
 let db = null, auth = null, fbOk = false;
 try {
-  firebase.initializeApp(FIREBASE_CFG);
+  if (typeof firebase === "undefined") throw new Error("Firebase SDK not loaded");
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CFG);
   db = firebase.firestore();
   auth = firebase.auth();
   fbOk = true;
@@ -1038,6 +1039,7 @@ let adminUser = null;
 let orderInFlight = false; // duplicate-submission guard
 let paymentFlowActive = false;
 let paymentWatchdog = null;
+let lastPaymentCtx = null;
 let unsubOrders = null, unsubBulk = null, unsubInventory = null;
 
 /* ========== PRODUCT EMOJIS ========== */
@@ -1579,7 +1581,7 @@ async function loadProducts() {
         8000,
         "products API"
       );
-      if (res.ok) {
+      if (res.ok && (res.headers.get("content-type") || "").includes("json")) {
         const data = await res.json();
         const list = Array.isArray(data?.products) ? data.products : [];
         const catalogLike = list.some(p => p.bengaliName || p.hindiName || /potato|tomato|onion|vegetable|alu|brinjal/i.test(String(p.name||"")) || /Root|Leafy|Gourd/i.test(String(p.category||"")));
@@ -1981,9 +1983,9 @@ function updateCheckoutBtnLabel() {
   if (btn && !orderInFlight && !paymentFlowActive) btn.textContent = t("checkout.confirm");
 }
 
-async function placeCOD(cust, total) {
-  const method = selPay === "phonepe" ? "PhonePe" : "COD";
-  const order = await saveOrderFS({...cust, total, paymentMethod: method, paymentStatus:PAYMENT_STATUSES.PENDING});
+async function placeCOD(cust, total, method) {
+  const paymentMethod = method || (selPay === "phonepe" ? "PhonePe" : "COD");
+  const order = await saveOrderFS({...cust, total, paymentMethod, paymentStatus:PAYMENT_STATUSES.PENDING});
   onOrderOK(order);
 }
 
@@ -2181,7 +2183,7 @@ async function saveOrderFS(d) {
           category: live.category || "Others",
           price,
           unit: live.unit || "kg",
-          qty: requested.qty,
+          qty: Math.trunc(requested.qty),
           subtotal: lineTotal,
           sellerId: live.sellerId || ""
         });
@@ -2206,7 +2208,7 @@ async function saveOrderFS(d) {
         address: d.address,
         pincode: d.pincode || "",
         itemsSummary: finalizedItems.map(i => `${i.name} x${i.qty}`).join(", "),
-        itemCount: finalizedItems.reduce((s, i) => s + i.qty, 0),
+        itemCount: finalizedItems.reduce((s, i) => s + Math.trunc(i.qty), 0),
         subtotal,
         total: subtotal,
         paymentMethod: d.paymentMethod || "COD",
@@ -2770,7 +2772,7 @@ window.navSearch=navSearch; window.headerUserAction=headerUserAction; window.veg
 window.setAuthMethod=setAuthMethod; window.addBulkRow=addBulkRow;
 window.openAuthModal=openAuthModal; window.closeAuthModal=closeAuthModal; window.toggleAuthMode=toggleAuthMode;
 window.submitAuthForm=submitAuthForm; window.sendCustomerPasswordReset=sendCustomerPasswordReset; window.logoutUser=logoutUser;
-window.loadMyOrders=loadMyOrders; window.retryPayment=retryPayment;
+window.loadMyOrders=loadMyOrders;
 window.handleAdminLogin=handleAdminLogin; window.doAdminLogout=doAdminLogout; window.doForgotPw=doForgotPw;
 window.updOrderStatus=updOrderStatus; window.updBulkStatus=updBulkStatus; window.waCustomer=waCustomer;
 window.openEditModal=openEditModal; window.closeEditModal=closeEditModal; window.loadToForm=loadToForm;
