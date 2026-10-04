@@ -522,6 +522,33 @@ app.post('/razorpay-webhook', express.raw({ type: 'application/json' }), async (
   }
 });
 
+function localizeProductName(data, lang) {
+  if (lang === 'bn') return data.bengaliName || data.name || '';
+  if (lang === 'hi') return data.hindiName || data.name || '';
+  return data.name || data.displayName || '';
+}
+
+// GET /api/products?lang=en|bn|hi — optional localized displayName from DB fields
+app.get('/products', async (req, res) => {
+  try {
+    const lang = String(req.query.lang || req.get('x-language') || 'en').toLowerCase().slice(0, 8);
+    const snap = await db.collection('products').get();
+    const products = snap.docs.map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        ...data,
+        displayName: localizeProductName(data, lang),
+        lang,
+      };
+    });
+    return res.json({ success: true, products, lang });
+  } catch (err) {
+    console.error('products list failed:', err);
+    return res.status(500).json({ success: false, error: 'Could not load products' });
+  }
+});
+
 app.get('/health', (req, res) => res.json({ success: true, status: 'ok' }));
 
 exports.api = onRequest(

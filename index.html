@@ -12,6 +12,9 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sokal-bela.vercel.app/">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥬</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
   <!-- Firebase v10 compat CDN -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -27,7 +30,7 @@
       --radius:12px;--radius-sm:8px;--tr:.2s ease
     }
     html{scroll-behavior:smooth}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    body{font-family:'Noto Sans','Noto Sans Bengali','Noto Sans Devanagari',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
     a{color:inherit;text-decoration:none}
     img{max-width:100%;display:block}
     button{cursor:pointer;font-family:inherit;border:none}
@@ -37,7 +40,7 @@
 
     /* NAV */
     .navbar{position:sticky;top:0;z-index:1000;background:var(--white);box-shadow:var(--shadow)}
-    .nav-container{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 16px}
+    .nav-container{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:60px;padding:8px 16px;flex-wrap:wrap}
     .nav-logo{display:flex;align-items:center;gap:8px;font-size:1.2rem;font-weight:700;color:var(--green);cursor:pointer}
     .nav-menu{list-style:none;display:flex;gap:4px;align-items:center}
     .nav-link{padding:8px 12px;border-radius:var(--radius-sm);font-weight:500;color:var(--text2);transition:var(--tr);white-space:nowrap;display:block}
@@ -261,31 +264,80 @@
     .basket ul{margin:0 0 4px 18px;font-size:14px;color:var(--text2)}
     .basket .bp{font-weight:700}
     .slot-note{font-size:12px;color:var(--text2);margin-top:4px}
+
+    .nav-search{flex:1;min-width:160px;max-width:280px;position:relative}
+    .nav-search input{width:100%;padding:8px 12px 8px 34px;border:2px solid var(--border);border-radius:99px;font-size:13px;outline:none}
+    .nav-search input:focus{border-color:var(--green)}
+    .nav-search .search-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px}
+    .nav-actions{display:flex;align-items:center;gap:8px}
+    .lang-select{border:2px solid var(--border);border-radius:99px;padding:6px 10px;font-weight:700;font-size:12px;background:#fff;color:var(--green);cursor:pointer}
+    .icon-btn{position:relative;background:var(--green-light);border:none;width:40px;height:40px;border-radius:50%;font-size:18px;display:flex;align-items:center;justify-content:center}
+    .icon-btn .cart-badge{position:absolute;top:-4px;right:-4px;margin:0}
+    .hero-badge{display:inline-block;background:var(--orange);color:#fff;font-weight:800;font-size:13px;padding:8px 16px;border-radius:99px;margin-bottom:16px;box-shadow:0 6px 18px rgba(244,166,36,.35);animation:floaty 3s ease-in-out infinite}
+    @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+    .feature-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;border:1px solid var(--green-light)}
+    .feature-card h3{font-size:15px;margin:6px 0 4px}
+    .feature-card p{font-size:13px;color:var(--text2)}
+    .badge-deal{position:absolute;top:8px;right:8px;background:var(--orange);color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;z-index:1}
+    .checkout-steps{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+    .cstep{flex:1;min-width:120px;text-align:center;padding:8px 10px;border-radius:99px;background:#fff;border:2px solid var(--border);font-size:12px;font-weight:700;color:var(--text2)}
+    .cstep.active{border-color:var(--green);background:var(--green-light);color:var(--green)}
+    .cstep.done{border-color:var(--green);color:var(--green)}
+    .checkout-pane{display:none}
+    .checkout-pane.active{display:block}
+    .auth-tabs{display:flex;gap:8px;margin-bottom:14px}
+    .auth-tab{flex:1;padding:8px;border-radius:var(--radius-sm);border:2px solid var(--border);background:#fff;font-weight:700;font-size:13px}
+    .auth-tab.active{border-color:var(--green);background:var(--green-light);color:var(--green)}
+    .drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8500;display:none}
+    .drawer{position:fixed;top:0;right:0;width:min(400px,100%);height:100%;background:#fff;z-index:8501;box-shadow:var(--shadow-md);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease}
+    .drawer.open{transform:translateX(0)}
+    .drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
+    .drawer-body{flex:1;overflow:auto;padding:12px}
+    .drawer-foot{padding:12px 16px;border-top:1px solid var(--border)}
+    .user-chip{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    @media(max-width:700px){
+      .nav-search{order:3;max-width:none;flex-basis:100%}
+      .nav-menu{top:auto}
+    }
   </style>
 </head>
 <body>
 
 <!-- DELIVERY BANNER -->
-<div class="banner">🚚 <strong>Free delivery</strong> on orders ₹300+ within 5 km &nbsp;|&nbsp; Min order ₹200 &nbsp;|&nbsp; Mon–Sun 7AM–9PM</div>
+<div class="banner" data-i18n="banner.delivery">🚚 Free delivery on orders ₹300+ within 5 km | Min order ₹200 | Mon–Sun 7AM–9PM</div>
 
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-container">
-    <div class="nav-logo" onclick="showPage('home')">🥬 Sokal Bela</div>
+    <div class="nav-logo" onclick="showPage('home')">🥬 <span data-i18n="brand">Sokal Bela</span></div>
+    <div class="nav-search">
+      <span class="search-ico">🔍</span>
+      <input type="search" id="nav-search-input" data-i18n-placeholder="search.placeholder" placeholder="Search vegetables..." onkeydown="if(event.key==='Enter'){event.preventDefault();navSearch();}">
+    </div>
+    <div class="nav-actions">
+      <select id="lang-select" class="lang-select" aria-label="Language" onchange="I18N.setLang(this.value)">
+        <option value="en">EN</option>
+        <option value="bn">বাংলা</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+      <button class="icon-btn" onclick="openCartDrawer()" data-i18n-aria="nav.cart" aria-label="Cart">🛒<span class="cart-badge" id="cart-badge">0</span></button>
+      <button class="icon-btn" id="nav-user-btn" onclick="headerUserAction()" data-i18n-aria="nav.login" aria-label="Login">👤</button>
+      <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    </div>
     <ul class="nav-menu" id="nav-menu">
-      <li><a href="#" class="nav-link" data-page="home">Home</a></li>
-      <li><a href="#" class="nav-link" data-page="products">Products</a></li>
-      <li><a href="#" class="nav-link" data-page="bulk">Bulk Orders</a></li>
-      <li><a href="#" class="nav-link" data-page="catering">Catering</a></li>
-      <li><a href="#" class="nav-link" data-page="cart">🛒 Cart <span class="cart-badge" id="cart-badge">0</span></a></li>
-      <li><a href="#" class="nav-link" data-page="orders" id="nav-orders-link" style="display:none">📦 My Orders</a></li>
-      <li id="nav-login-item"><a href="#" class="nav-link" onclick="openAuthModal('login');return false;">Login</a></li>
-      <li id="nav-signup-item"><a href="#" class="nav-link" onclick="openAuthModal('signup');return false;">Sign Up</a></li>
-      <li id="nav-user-item" style="display:none"><a href="#" class="nav-link" id="nav-user-label" onclick="showPage('orders');return false;">Hi</a></li>
-      <li id="nav-logout-item" style="display:none"><a href="#" class="nav-link" onclick="logoutUser();return false;">Logout</a></li>
-      <li><a href="#" class="nav-link" data-page="admin">Admin</a></li>
+      <li><a href="#" class="nav-link" data-page="home" data-i18n="nav.home">Home</a></li>
+      <li><a href="#" class="nav-link" data-page="products" data-i18n="nav.products">Products</a></li>
+      <li><a href="#" class="nav-link" data-page="bulk" data-i18n="nav.bulk">Bulk Orders</a></li>
+      <li><a href="#" class="nav-link" data-page="catering" data-i18n="nav.catering">Catering</a></li>
+      <li><a href="#" class="nav-link" data-page="cart">🛒 <span data-i18n="nav.cart">Cart</span></a></li>
+      <li><a href="#" class="nav-link" data-page="orders" id="nav-orders-link" style="display:none">📦 <span data-i18n="nav.orders">My Orders</span></a></li>
+      <li id="nav-login-item"><a href="#" class="nav-link" onclick="openAuthModal('login');return false;" data-i18n="nav.login">Login</a></li>
+      <li id="nav-signup-item"><a href="#" class="nav-link" onclick="openAuthModal('signup');return false;" data-i18n="nav.signup">Sign Up</a></li>
+      <li id="nav-user-item" style="display:none"><a href="#" class="nav-link user-chip" id="nav-user-label" onclick="showPage('orders');return false;">Hi</a></li>
+      <li id="nav-logout-item" style="display:none"><a href="#" class="nav-link" onclick="logoutUser();return false;" data-i18n="nav.logout">Logout</a></li>
+      <li><a href="#" class="nav-link" data-page="admin" data-i18n="nav.admin">Admin</a></li>
     </ul>
-    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
   </div>
 </nav>
 
@@ -296,17 +348,29 @@
 
   <div class="hero">
     <div class="hero-inner">
-      <h1>🥬 সকাল বেলা<br>Fresh Local Vegetables — Delivered Fast</h1>
-      <p>Farm-to-doorstep produce for Rampurhat households &amp; events. Quality guaranteed.</p>
+      <div class="hero-badge" data-i18n="hero.badge">Lowest Price Guaranteed | 20-30% Cheaper than Local Market</div>
+      <h1>🥬 <span data-i18n="brand">Sokal Bela</span><br><span data-i18n="hero.title">Fresh Local Vegetables — Delivered Fast</span></h1>
+      <p data-i18n="hero.sub">Farm-to-doorstep produce for Rampurhat households &amp; events. Quality guaranteed.</p>
       <div class="trust-badges">
-        <span class="trust-badge">🌿 100% Fresh</span>
-        <span class="trust-badge">🚚 Same Day Delivery</span>
-        <span class="trust-badge">🌾 Farm Direct</span>
-        <span class="trust-badge">✅ No Hidden Charges</span>
+        <span class="trust-badge">🌿 <span data-i18n="trust.fresh">100% Fresh</span></span>
+        <span class="trust-badge">🚚 <span data-i18n="trust.delivery">Same Day Delivery</span></span>
+        <span class="trust-badge">🌾 <span data-i18n="trust.farm">Farm Direct</span></span>
+        <span class="trust-badge">✅ <span data-i18n="trust.price">No Hidden Charges</span></span>
       </div>
       <div class="hero-btns">
-        <button class="btn btn-white btn-lg" onclick="showPage('products')">🛒 Shop Now</button>
-        <button class="btn btn-lg" style="border:2px solid #fff;color:#fff;background:transparent" onclick="showPage('bulk')">📦 Bulk Orders</button>
+        <button class="btn btn-white btn-lg" onclick="showPage('products')">🛒 <span data-i18n="hero.shop">Shop Now</span></button>
+        <button class="btn btn-lg" style="border:2px solid #fff;color:#fff;background:transparent" onclick="showPage('bulk')">📦 <span data-i18n="hero.bulk">Bulk Orders</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-bottom:0">
+    <div class="container">
+      <div class="feature-grid">
+        <div class="feature-card"><div class="cc-ico">🌅</div><h3 data-i18n="feature.morning.title">Fresh Morning Delivery</h3><p data-i18n="feature.morning.desc">Harvested at dawn, delivered to your door.</p></div>
+        <div class="feature-card"><div class="cc-ico">🚜</div><h3 data-i18n="feature.farmers.title">Directly from Farmers</h3><p data-i18n="feature.farmers.desc">Farm-fresh produce with zero middleman markup.</p></div>
+        <div class="feature-card"><div class="cc-ico">⚡</div><h3 data-i18n="feature.fast.title">Fast &amp; Easy Ordering</h3><p data-i18n="feature.fast.desc">1-tap ordering with instantly updated cart quantity selectors.</p></div>
+        <div class="feature-card"><div class="cc-ico">📞</div><h3 data-i18n="feature.whatsapp.title">WhatsApp Ordering</h3><p data-i18n="feature.whatsapp.desc">Quick support and direct ordering via WhatsApp button.</p></div>
       </div>
     </div>
   </div>
@@ -323,8 +387,8 @@
 
   <div class="section" style="padding-bottom:0">
     <div class="container">
-      <h2 class="sec-title">⭐ Featured Vegetables</h2>
-      <p class="sec-sub">Freshly picked, available today</p>
+      <h2 class="sec-title" data-i18n="products.featured">⭐ Featured Vegetables</h2>
+      <p class="sec-sub" data-i18n="products.featuredSub">Freshly picked, available today</p>
       <div class="products-grid" id="featured-grid"></div>
     </div>
   </div>
@@ -393,11 +457,11 @@
 <section id="products-page" class="page">
   <div class="section">
     <div class="container">
-      <h2 class="sec-title">🥦 Our Fresh Vegetables</h2>
+      <h2 class="sec-title" data-i18n="products.title">🥦 Our Fresh Vegetables</h2>
       <div class="products-controls">
         <div class="search-wrap">
           <span class="search-ico">🔍</span>
-          <input type="text" id="search-input" placeholder="Search vegetables…" oninput="filterProducts()">
+          <input type="text" id="search-input" data-i18n-placeholder="search.placeholder" placeholder="Search vegetables..." oninput="filterProducts()">
         </div>
         <div class="cat-tabs" id="cat-tabs"></div>
       </div>
@@ -410,52 +474,61 @@
 <section id="cart-page" class="page">
   <div class="section">
     <div class="container">
-      <h2 class="sec-title">🛒 Shopping Cart</h2>
+      <h2 class="sec-title" data-i18n="cart.title">🛒 Shopping Cart</h2>
       <div id="cart-empty" class="empty-cart" style="display:none">
         <div class="empty-ico">🛒</div>
-        <h3>Your cart is empty</h3>
-        <p style="color:var(--text2);margin:8px 0 18px">Add some fresh vegetables!</p>
-        <button class="btn btn-primary" onclick="showPage('products')">Shop Now</button>
+        <h3 data-i18n="cart.empty">Your cart is empty</h3>
+        <p style="color:var(--text2);margin:8px 0 18px" data-i18n="cart.emptyHint">Add some fresh vegetables!</p>
+        <button class="btn btn-primary" onclick="showPage('products')" data-i18n="hero.shop">Shop Now</button>
       </div>
       <div id="cart-filled" style="display:none">
         <div class="cart-wrap">
-          <div id="cart-items-list"></div>
-          <div class="summary-box">
-            <div class="sum-row"><span>Subtotal</span><span id="c-subtotal">₹0</span></div>
-            <div class="sum-row"><span>Delivery</span><span id="c-delivery">Free</span></div>
-            <div class="sum-row total"><span>Total</span><span id="c-total">₹0</span></div>
-            <div id="min-warn" class="min-warn" style="display:none;margin-top:10px">⚠️ Minimum order is ₹200. Please add more items.</div>
+          <div class="checkout-steps" id="checkout-steps">
+            <div class="cstep active" data-step="1" data-i18n="checkout.stepCart">Cart Summary</div>
+            <div class="cstep" data-step="2" data-i18n="checkout.stepAddress">Delivery Address</div>
+            <div class="cstep" data-step="3" data-i18n="checkout.stepPayment">Payment Method</div>
+          </div>
+          <div class="checkout-pane active" id="pane-cart">
+            <div id="cart-items-list"></div>
+            <div class="summary-box">
+              <div class="sum-row"><span data-i18n="cart.subtotal">Subtotal</span><span id="c-subtotal">₹0</span></div>
+              <div class="sum-row"><span data-i18n="cart.delivery">Delivery</span><span id="c-delivery">Free</span></div>
+              <div class="sum-row total"><span data-i18n="cart.total">Total</span><span id="c-total">₹0</span></div>
+              <div id="min-warn" class="min-warn" style="display:none;margin-top:10px" data-i18n="cart.minWarn">⚠️ Minimum order is ₹200. Please add more items.</div>
+            </div>
+            <button type="button" class="btn btn-primary btn-full btn-lg" onclick="goCheckoutStep(2)" data-i18n="checkout.continue">Continue</button>
           </div>
           <div class="checkout-form">
-            <h3 style="margin-bottom:14px;font-size:1.05rem">📝 Delivery Details</h3>
             <form id="checkout-form" onsubmit="handleCheckout(event)" novalidate>
+            <div class="checkout-pane" id="pane-address">
+            <h3 style="margin-bottom:14px;font-size:1.05rem" data-i18n="checkout.details">📝 Delivery Details</h3>
               <div class="form-group">
-                <label class="form-label">Full Name *</label>
+                <label class="form-label" data-i18n="checkout.name">Full Name *</label>
                 <input type="text" id="cust-name" class="form-control" placeholder="e.g. Ramesh Kumar" required>
                 <div class="field-err" id="err-name"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Phone Number * (10-digit)</label>
+                <label class="form-label" data-i18n="checkout.phone">Phone Number * (10-digit)</label>
                 <input type="tel" id="cust-phone" class="form-control" placeholder="e.g. 9876543210" maxlength="10" required>
                 <div class="field-err" id="err-phone"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Email *</label>
+                <label class="form-label" data-i18n="checkout.email">Email *</label>
                 <input type="email" id="cust-email" class="form-control" placeholder="e.g. ramesh@example.com" required>
                 <div class="field-err" id="err-email"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Delivery Address *</label>
+                <label class="form-label" data-i18n="checkout.address">Delivery Address *</label>
                 <textarea id="cust-address" class="form-control" rows="3" placeholder="House / street / locality…" required></textarea>
                 <div class="field-err" id="err-address"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Pincode * (6-digit)</label>
+                <label class="form-label" data-i18n="checkout.pincode">Pincode * (6-digit)</label>
                 <input type="text" id="cust-pincode" class="form-control" placeholder="731224" maxlength="6" required>
                 <div class="field-err" id="err-pincode"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Preferred Delivery Time</label>
+                <label class="form-label" data-i18n="checkout.slot">Preferred Delivery Time</label>
                 <select id="cust-slot" class="form-control">
                   <option>Any time today</option>
                   <option>Morning (7 AM – 11 AM)</option>
@@ -465,10 +538,35 @@
                 </select>
                 <div class="slot-note">We'll confirm the exact time on call / WhatsApp.</div>
               </div>
-              <div class="form-group">
-                <div class="pay-note"><b>💵 No online payment needed.</b><br>Place your order and we'll confirm on WhatsApp / call. Pay by cash or UPI to our delivery person, or at the shop.</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button type="button" class="btn btn-outline" onclick="goCheckoutStep(1)" data-i18n="checkout.back">Back</button>
+                <button type="button" class="btn btn-primary" style="flex:1" onclick="goCheckoutStep(3)" data-i18n="checkout.continue">Continue</button>
               </div>
-              <button type="submit" class="btn btn-primary btn-full btn-lg" id="checkout-btn">Place Order</button>
+            </div>
+            <div class="checkout-pane" id="pane-payment">
+              <h3 style="margin-bottom:14px;font-size:1.05rem" data-i18n="checkout.stepPayment">Payment Method</h3>
+              <div class="pay-opts">
+                <div class="pay-opt sel" id="pay-cod" onclick="selectPay('cod')">
+                  <div class="pay-opt-ico">💵</div>
+                  <div class="pay-opt-lbl" data-i18n="checkout.payCod">Cash on Delivery</div>
+                  <div class="pay-opt-sub" data-i18n="checkout.payCodSub">Pay cash to the delivery person</div>
+                </div>
+                <div class="pay-opt" id="pay-upi" onclick="selectPay('upi')">
+                  <div class="pay-opt-ico">📱</div>
+                  <div class="pay-opt-lbl" data-i18n="checkout.payUpi">UPI</div>
+                  <div class="pay-opt-sub" data-i18n="checkout.payUpiSub">Pay by UPI on delivery</div>
+                </div>
+                <div class="pay-opt" id="pay-online" onclick="selectPay('online')">
+                  <div class="pay-opt-ico">💳</div>
+                  <div class="pay-opt-lbl" data-i18n="checkout.payOnline">Online</div>
+                  <div class="pay-opt-sub" data-i18n="checkout.payOnlineSub">UPI / Card / Net Banking</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button type="button" class="btn btn-outline" onclick="goCheckoutStep(2)" data-i18n="checkout.back">Back</button>
+                <button type="submit" class="btn btn-primary btn-lg" style="flex:1" id="checkout-btn" data-i18n="checkout.confirm">Confirm Order</button>
+              </div>
+            </div>
             </form>
           </div>
         </div>
@@ -697,6 +795,7 @@
               <input type="hidden" id="pf-id">
               <div class="form-group"><label class="form-label">English Name *</label><input type="text" id="pf-name" class="form-control" required></div>
               <div class="form-group"><label class="form-label">Bengali Name</label><input type="text" id="pf-bn" class="form-control"></div>
+              <div class="form-group"><label class="form-label">Hindi Name</label><input type="text" id="pf-hi" class="form-control"></div>
               <div class="form-group"><label class="form-label">Description</label><textarea id="pf-desc" class="form-control" rows="3" placeholder="Fresh farm-picked vegetables"></textarea></div>
               <div class="form-group"><label class="form-label">Price (₹) *</label><input type="number" id="pf-price" class="form-control" min="0" step="0.5" required></div>
               <div class="form-group"><label class="form-label">Unit</label>
@@ -784,31 +883,48 @@
 <!-- CUSTOMER AUTH MODAL -->
 <div class="modal-bg" id="auth-modal" style="display:none">
   <div class="modal-box">
-    <h3 class="modal-title" id="auth-modal-title">Customer Login</h3>
+    <h3 class="modal-title" id="auth-modal-title" data-i18n="auth.loginTitle">Customer Login</h3>
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" id="auth-tab-email" onclick="setAuthMethod('email')" data-i18n="auth.tabEmail">Email</button>
+      <button type="button" class="auth-tab" id="auth-tab-phone" onclick="setAuthMethod('phone')" data-i18n="auth.tabPhone">Phone / OTP</button>
+    </div>
     <form id="auth-form" onsubmit="submitAuthForm(event)">
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" id="auth-email" class="form-control" required autocomplete="email">
+      <div id="auth-email-pane">
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth.email">Email</label>
+          <input type="email" id="auth-email" class="form-control" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth.password">Password</label>
+          <input type="password" id="auth-pass" class="form-control" autocomplete="current-password" minlength="6">
+        </div>
+        <div class="form-group" id="auth-confirm-wrap" style="display:none">
+          <label class="form-label" data-i18n="auth.confirm">Confirm Password</label>
+          <input type="password" id="auth-pass-confirm" class="form-control" autocomplete="new-password" minlength="6">
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" id="auth-pass" class="form-control" required autocomplete="current-password" minlength="6">
-      </div>
-      <div class="form-group" id="auth-confirm-wrap" style="display:none">
-        <label class="form-label">Confirm Password</label>
-        <input type="password" id="auth-pass-confirm" class="form-control" autocomplete="new-password" minlength="6">
+      <div id="auth-phone-pane" style="display:none">
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth.phone">Phone Number</label>
+          <input type="tel" id="auth-phone" class="form-control" placeholder="9876543210" maxlength="10" autocomplete="tel">
+        </div>
+        <div class="form-group" id="auth-otp-wrap" style="display:none">
+          <label class="form-label" data-i18n="auth.otp">OTP Code</label>
+          <input type="text" id="auth-otp" class="form-control" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+        </div>
+        <div id="recaptcha-container"></div>
       </div>
       <div id="auth-err" style="display:none;color:var(--red);font-size:13px;margin-top:-6px;margin-bottom:10px"></div>
       <div class="modal-acts">
-        <button type="submit" class="btn btn-primary" id="auth-submit-btn">Login</button>
-        <button type="button" class="btn btn-outline" onclick="closeAuthModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="auth-submit-btn" data-i18n="auth.login">Login</button>
+        <button type="button" class="btn btn-outline" onclick="closeAuthModal()" data-i18n="auth.cancel">Cancel</button>
       </div>
     </form>
-    <p style="margin-top:14px;font-size:13px;color:var(--text2)">
-      <span id="auth-toggle-label">New customer?</span>
-      <a href="#" id="auth-toggle-link" onclick="toggleAuthMode();return false;" style="color:var(--green)">Create account</a>
+    <p id="auth-email-links" style="margin-top:14px;font-size:13px;color:var(--text2)">
+      <span id="auth-toggle-label" data-i18n="auth.newCustomer">New customer?</span>
+      <a href="#" id="auth-toggle-link" onclick="toggleAuthMode();return false;" style="color:var(--green)" data-i18n="auth.createAccount">Create account</a>
       &nbsp;•&nbsp;
-      <a href="#" onclick="sendCustomerPasswordReset();return false;" style="color:var(--green)">Forgot password?</a>
+      <a href="#" onclick="sendCustomerPasswordReset();return false;" style="color:var(--green)" data-i18n="auth.forgot">Forgot password?</a>
     </p>
   </div>
 </div>
@@ -817,14 +933,28 @@
 <div class="modal-bg" id="success-modal" style="display:none">
   <div class="modal-box" style="text-align:center">
     <div style="font-size:56px;margin-bottom:10px">🎉</div>
-    <h2 class="modal-title">Order Placed!</h2>
+    <h2 class="modal-title" data-i18n="success.title">Order Placed!</h2>
     <p id="success-msg" style="color:var(--text2);margin-bottom:6px"></p>
+    <p style="font-size:14px;font-weight:600;color:var(--green)" data-i18n="success.eta">Estimated morning delivery: 7 AM – 11 AM</p>
     <p style="font-size:13px;color:var(--text2)">We'll call to confirm delivery. Queries: <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a></p>
     <div class="modal-acts" style="justify-content:center">
-      <button class="btn btn-primary" onclick="closeSuccessModal()">Continue Shopping</button>
+      <a class="btn btn-wa" id="success-wa" href="#" target="_blank" rel="noopener" data-i18n="success.trackWa">Track on WhatsApp</a>
+      <button class="btn btn-primary" onclick="closeSuccessModal()" data-i18n="success.continue">Continue Shopping</button>
     </div>
   </div>
 </div>
+
+<div class="drawer-bg" id="cart-drawer-bg" onclick="closeCartDrawer()"></div>
+<aside class="drawer" id="cart-drawer" aria-label="Cart">
+  <div class="drawer-head">
+    <strong data-i18n="nav.cart">Cart</strong>
+    <button class="btn btn-outline btn-sm" onclick="closeCartDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="cart-drawer-body"></div>
+  <div class="drawer-foot">
+    <button class="btn btn-primary btn-full" onclick="closeCartDrawer();showPage('cart');goCheckoutStep(1)" data-i18n="cart.checkout">Proceed to Checkout</button>
+  </div>
+</aside>
 
 <!-- EDIT PRODUCT MODAL -->
 <div class="modal-bg" id="edit-modal" style="display:none">
@@ -843,11 +973,15 @@
   </div>
 </div>
 
+<script src="js/i18n.js"></script>
+<script src="js/veg-images.js"></script>
+<script src="razorpay-integration.js"></script>
 <!-- ======================================================
      JAVASCRIPT
 ====================================================== -->
 <script>
 'use strict';
+if (typeof t !== 'function') { window.t = function (key) { return key; }; }
 
 /* ========== CONFIG ========== */
 const FIREBASE_CFG = {
@@ -884,6 +1018,7 @@ try {
   db = firebase.firestore();
   auth = firebase.auth();
   fbOk = true;
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 } catch (e) {
   console.warn("Firebase init failed:", e.message);
 }
@@ -898,6 +1033,10 @@ let currentUserRole = null;
 let cart = loadCartStorage(null);
 let curCat = "All";
 let selPay = "cod";
+let checkoutStep = 1;
+let authMethod = "email";
+let phoneConfirmResult = null;
+let recaptchaVerifier = null;
 let adminUser = null;
 let orderInFlight = false; // duplicate-submission guard
 let paymentFlowActive = false;
@@ -907,7 +1046,7 @@ let unsubOrders = null, unsubBulk = null, unsubInventory = null;
 /* ========== PRODUCT EMOJIS ========== */
 const EMOJIS = {potato:"🥔",onion:"🧅",tomato:"🍅",brinjal:"🍆",cauliflower:"🥦",
   cabbage:"🥬","bitter gourd":"🥒","bottle gourd":"🫙",carrot:"🥕",
-  spinach:"🥬",garlic:"🧄",ginger:"🫚"};
+  spinach:"🥬",garlic:"🧄",ginger:"🫚",chili:"🌶️",chilli:"🌶️"};
 function emoji(p) {
   if (p.emoji) return p.emoji;
   const k = (p.name||"").toLowerCase();
@@ -917,14 +1056,16 @@ function emoji(p) {
 
 /* ========== SEED DATA ========== */
 const SEEDS = [
-  {id:"alu",    name:"Potato",      bengaliName:"আলু",       price:30, unit:"kg",    stock:200,category:"Root Vegetables",active:true,emoji:"🥔"},
-  {id:"peyaj",  name:"Onion",       bengaliName:"পেঁয়াজ",    price:40, unit:"kg",    stock:150,category:"Root Vegetables",active:true,emoji:"🧅"},
-  {id:"tomato", name:"Tomato",      bengaliName:"টমেটো",     price:60, unit:"kg",    stock:100,category:"Others",         active:true,emoji:"🍅"},
-  {id:"begun",  name:"Brinjal",     bengaliName:"বেগুন",     price:40, unit:"kg",    stock:80, category:"Others",         active:true,emoji:"🍆"},
-  {id:"phkopi", name:"Cauliflower", bengaliName:"ফুলকপি",    price:50, unit:"piece", stock:60, category:"Others",         active:true,emoji:"🥦"},
-  {id:"bkopi",  name:"Cabbage",     bengaliName:"বাঁধাকপি",  price:35, unit:"piece", stock:50, category:"Others",         active:true,emoji:"🥬"},
-  {id:"karela", name:"Bitter Gourd",bengaliName:"করলা",      price:60, unit:"kg",    stock:40, category:"Gourds",         active:true,emoji:"🥒"},
-  {id:"lau",    name:"Bottle Gourd",bengaliName:"লাউ",       price:25, unit:"piece", stock:70, category:"Gourds",         active:true,emoji:"🫙"},
+  {id:"alu",    name:"Potato",      bengaliName:"আলু",       hindiName:"आलू",        price:30, unit:"kg",    stock:200,category:"Root Vegetables",active:true,emoji:"🥔"},
+  {id:"peyaj",  name:"Onion",       bengaliName:"পেঁয়াজ",    hindiName:"प्याज",       price:40, unit:"kg",    stock:150,category:"Root Vegetables",active:true,emoji:"🧅"},
+  {id:"tomato", name:"Tomato",      bengaliName:"টমেটো",     hindiName:"टमाटर",      price:60, unit:"kg",    stock:100,category:"Others",         active:true,emoji:"🍅"},
+  {id:"morich", name:"Green Chili", bengaliName:"কাঁচা মরিচ", hindiName:"हरी मिर्च",  price:80, unit:"kg",    stock:40, category:"Others",         active:true,emoji:"🌶️"},
+  {id:"begun",  name:"Brinjal",     bengaliName:"বেগুন",     hindiName:"बैंगन",      price:40, unit:"kg",    stock:80, category:"Others",         active:true,emoji:"🍆"},
+  {id:"palong", name:"Spinach",     bengaliName:"পালং শাক",  hindiName:"पालक",       price:20, unit:"bunch", stock:90, category:"Leafy Greens",    active:true,emoji:"🥬"},
+  {id:"phkopi", name:"Cauliflower", bengaliName:"ফুলকপি",    hindiName:"फूलगोभी",    price:50, unit:"piece", stock:60, category:"Others",         active:true,emoji:"🥦"},
+  {id:"bkopi",  name:"Cabbage",     bengaliName:"বাঁধাকপি",  hindiName:"पत्ता गोभी",  price:35, unit:"piece", stock:50, category:"Others",         active:true,emoji:"🥬"},
+  {id:"karela", name:"Bitter Gourd",bengaliName:"করলা",      hindiName:"करेला",      price:60, unit:"kg",    stock:40, category:"Gourds",         active:true,emoji:"🥒"},
+  {id:"lau",    name:"Bottle Gourd",bengaliName:"লাউ",       hindiName:"लौकी",       price:25, unit:"piece", stock:70, category:"Gourds",         active:true,emoji:"🫙"},
 ];
 
 function parseRole(role) {
@@ -993,7 +1134,9 @@ function mergeCartItems(primary = [], secondary = []) {
 }
 
 /* ========== INIT ========== */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  if (window.I18N?.ready) await I18N.ready.catch(() => {});
+  hydrateAuthFromStorage();
   const thisYear = new Date().getFullYear();
   document.getElementById("yr").textContent = thisYear > 2025 ? thisYear : "";
 
@@ -1031,6 +1174,13 @@ document.addEventListener("DOMContentLoaded", () => {
   cart = loadCartStorage();
   loadProducts();
   renderCartCount();
+  if (window.I18N) {
+    I18N.apply();
+    I18N.onChange(() => {
+      renderFeatured(); renderProducts(); renderCatTabs(); renderCart(); renderCartCount(); renderBaskets();
+      updateAuthNav(); updateCheckoutBtnLabel();
+    });
+  }
 });
 
 /* ========== PAGE NAV ========== */
@@ -1049,7 +1199,7 @@ async function handleCatering(e){
 }
 
 /* ===== EDIT ME: shop settings ===== */
-const SHOW_PRODUCT_PHOTOS = false;   // set true after you upload real working photos (broken imgbb photos load as a blue "image not found" picture)
+const SHOW_PRODUCT_PHOTOS = true;
 const DELIVERY_PINCODES = ["731224"];   // pincodes you deliver to; add more like "731224","731101"
 const BASKETS = [                        // change items/prices any time; leave price "" to show "confirm on WhatsApp"
   {name:"Family Basket", note:"4–5 members, about 1 week", price:"", items:["Potato 2 kg","Onion 2 kg","Tomato 1 kg","Brinjal 1 kg","Green chilli 250 g","Seasonal vegetable 1 kg"]},
@@ -1128,10 +1278,37 @@ function showPage(id) {
     if (logoutItem) logoutItem.style.display = signedIn ? "" : "none";
     if (ordersLink) ordersLink.style.display = signedIn ? "" : "none";
     if (userLabel) {
-      const roleLabel = currentUserRole ? ` (${currentUserRole})` : "";
-      userLabel.textContent = signedIn ? `Hi, ${currentUser.email || "User"}${roleLabel}` : "Hi";
+      const label = currentUser?.displayName || currentUser?.phoneNumber || currentUser?.email || "User";
+      userLabel.textContent = signedIn ? `Hi, ${label}` : "Hi";
     }
+    const userBtn = document.getElementById("nav-user-btn");
+    if (userBtn) userBtn.setAttribute("aria-label", signedIn ? (currentUser?.email || currentUser?.phoneNumber || "Profile") : t("nav.login"));
     if (adminLink) adminLink.parentElement.style.display = (location.hash === "#admin") ? "" : "none";
+  }
+
+  const AUTH_CACHE_KEY = "sb_auth_session";
+  function persistAuthSession(user, role) {
+    try {
+      if (!user) { localStorage.removeItem(AUTH_CACHE_KEY); return; }
+      localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({
+        uid: user.uid,
+        email: user.email || "",
+        phoneNumber: user.phoneNumber || "",
+        displayName: user.displayName || "",
+        role: role || currentUserRole || ROLES.CUSTOMER
+      }));
+    } catch (_) {}
+  }
+  function hydrateAuthFromStorage() {
+    try {
+      const raw = localStorage.getItem(AUTH_CACHE_KEY);
+      if (!raw || currentUser) return;
+      const cached = JSON.parse(raw);
+      if (!cached?.uid) return;
+      currentUser = cached;
+      currentUserRole = normalizeRole(cached.role);
+      updateAuthNav();
+    } catch (_) {}
   }
 
   async function ensureUserProfile(user) {
@@ -1147,7 +1324,8 @@ function showPage(id) {
       await ref.set({
         uid: user.uid,
         email: user.email || "",
-        displayName: user.displayName || "",
+        phoneNumber: user.phoneNumber || "",
+        displayName: user.displayName || user.phoneNumber || "",
         role,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1158,8 +1336,9 @@ function showPage(id) {
 
     const role = claimRole || parseRole(snap.data()?.role) || fallbackRole;
     await ref.set({
-      email: user.email || "",
-      displayName: user.displayName || "",
+      email: user.email || snap.data()?.email || "",
+      phoneNumber: user.phoneNumber || snap.data()?.phoneNumber || "",
+      displayName: user.displayName || user.phoneNumber || snap.data()?.displayName || "",
       role,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1195,9 +1374,13 @@ function showPage(id) {
     saveCartStorage();
     renderCartCount();
     if (document.getElementById("cart-page")?.classList.contains("active")) renderCart();
+    persistAuthSession(currentUser, currentUserRole);
     if (currentUser) {
       const emailField = document.getElementById("cust-email");
       if (emailField && !emailField.value) emailField.value = currentUser.email || "";
+      const phoneField = document.getElementById("cust-phone");
+      const phoneDigits = String(currentUser.phoneNumber || "").replace(/\D/g, "").slice(-10);
+      if (phoneField && !phoneField.value && phoneDigits.length === 10) phoneField.value = phoneDigits;
     }
     updateAuthNav();
     closeAuthModal();
@@ -1225,23 +1408,49 @@ function showPage(id) {
 
     modal.dataset.mode = mode;
     if (mode === "signup") {
-      if (title) title.textContent = "Create Customer Account";
-      if (submit) submit.textContent = "Sign Up";
-      if (toggleLabel) toggleLabel.textContent = "Already registered?";
-      if (toggleLink) toggleLink.textContent = "Login";
-      if (confirmWrap) confirmWrap.style.display = "block";
+      if (title) title.textContent = t("auth.signupTitle");
+      if (submit) submit.textContent = t("auth.signup");
+      if (toggleLabel) toggleLabel.textContent = t("auth.haveAccount");
+      if (toggleLink) toggleLink.textContent = t("auth.login");
+      if (confirmWrap) confirmWrap.style.display = authMethod === "email" ? "block" : "none";
       if (passInput) passInput.setAttribute("autocomplete", "new-password");
     } else {
-      if (title) title.textContent = "Customer Login";
-      if (submit) submit.textContent = "Login";
-      if (toggleLabel) toggleLabel.textContent = "New customer?";
-      if (toggleLink) toggleLink.textContent = "Create account";
+      if (title) title.textContent = t("auth.loginTitle");
+      if (submit) submit.textContent = authMethod === "phone" ? (phoneConfirmResult ? t("auth.verifyOtp") : t("auth.sendOtp")) : t("auth.login");
+      if (toggleLabel) toggleLabel.textContent = t("auth.newCustomer");
+      if (toggleLink) toggleLink.textContent = t("auth.createAccount");
       if (confirmWrap) confirmWrap.style.display = "none";
       if (passInput) passInput.setAttribute("autocomplete", "current-password");
     }
-    const form = document.getElementById("auth-form");
-    if (form) form.reset();
     document.getElementById("auth-err").style.display = "none";
+    setAuthMethod(authMethod, true);
+  }
+
+  function setAuthMethod(method, keepValues) {
+    authMethod = method === "phone" ? "phone" : "email";
+    document.getElementById("auth-tab-email")?.classList.toggle("active", authMethod === "email");
+    document.getElementById("auth-tab-phone")?.classList.toggle("active", authMethod === "phone");
+    const emailPane = document.getElementById("auth-email-pane");
+    const phonePane = document.getElementById("auth-phone-pane");
+    const emailLinks = document.getElementById("auth-email-links");
+    if (emailPane) emailPane.style.display = authMethod === "email" ? "block" : "none";
+    if (phonePane) phonePane.style.display = authMethod === "phone" ? "block" : "none";
+    if (emailLinks) emailLinks.style.display = authMethod === "email" ? "block" : "none";
+    const emailInput = document.getElementById("auth-email");
+    const passInput = document.getElementById("auth-pass");
+    if (emailInput) emailInput.required = authMethod === "email";
+    if (passInput) passInput.required = authMethod === "email";
+    const submit = document.getElementById("auth-submit-btn");
+    const mode = document.getElementById("auth-modal")?.dataset?.mode || "login";
+    if (submit) {
+      if (authMethod === "phone") submit.textContent = phoneConfirmResult ? t("auth.verifyOtp") : t("auth.sendOtp");
+      else submit.textContent = mode === "signup" ? t("auth.signup") : t("auth.login");
+    }
+    if (!keepValues) {
+      phoneConfirmResult = null;
+      const otpWrap = document.getElementById("auth-otp-wrap");
+      if (otpWrap) otpWrap.style.display = "none";
+    }
   }
 
   function closeAuthModal() {
@@ -1259,31 +1468,63 @@ function showPage(id) {
     return msg.replace("Firebase: ", "").replace(/\(auth\/[^)]+\)\.?/g, "").trim();
   }
 
+  async function ensureRecaptcha() {
+    if (!auth) throw new Error("Authentication is unavailable right now.");
+    if (recaptchaVerifier) return recaptchaVerifier;
+    recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
+    await recaptchaVerifier.render();
+    return recaptchaVerifier;
+  }
+
   async function submitAuthForm(e) {
     e.preventDefault();
     if (!auth) { showToast("Authentication is unavailable right now.","error"); return; }
 
     const modal = document.getElementById("auth-modal");
     const mode = modal?.dataset?.mode || "login";
-    const email = document.getElementById("auth-email").value.trim().toLowerCase();
-    const pass = document.getElementById("auth-pass").value;
-    const confirm = document.getElementById("auth-pass-confirm").value;
     const errEl = document.getElementById("auth-err");
     const submitBtn = document.getElementById("auth-submit-btn");
-
     errEl.style.display = "none";
-    if (!email || !pass) { errEl.textContent = "Email and password are required."; errEl.style.display = "block"; return; }
-    if (mode === "signup" && pass !== confirm) { errEl.textContent = "Passwords do not match."; errEl.style.display = "block"; return; }
-    if (mode === "signup" && pass.length < 6) { errEl.textContent = "Password must be at least 6 characters."; errEl.style.display = "block"; return; }
-
     submitBtn.disabled = true;
     try {
-      if (mode === "signup") {
-        await auth.createUserWithEmailAndPassword(email, pass);
-        showToast("Account created successfully.","success");
-      } else {
-        await auth.signInWithEmailAndPassword(email, pass);
+      if (authMethod === "phone") {
+        const phone = document.getElementById("auth-phone").value.replace(/\D/g, "");
+        if (!/^[6-9]\d{9}$/.test(phone)) {
+          errEl.textContent = "Enter a valid 10-digit Indian mobile number.";
+          errEl.style.display = "block";
+          return;
+        }
+        if (!phoneConfirmResult) {
+          const verifier = await ensureRecaptcha();
+          phoneConfirmResult = await auth.signInWithPhoneNumber("+91" + phone, verifier);
+          document.getElementById("auth-otp-wrap").style.display = "block";
+          submitBtn.textContent = t("auth.verifyOtp");
+          showToast("OTP sent to +91 " + phone, "success");
+          return;
+        }
+        const code = document.getElementById("auth-otp").value.trim();
+        if (!/^\d{6}$/.test(code)) {
+          errEl.textContent = "Enter the 6-digit OTP.";
+          errEl.style.display = "block";
+          return;
+        }
+        await phoneConfirmResult.confirm(code);
+        phoneConfirmResult = null;
         showToast("Logged in successfully.","success");
+      } else {
+        const email = document.getElementById("auth-email").value.trim().toLowerCase();
+        const pass = document.getElementById("auth-pass").value;
+        const confirm = document.getElementById("auth-pass-confirm").value;
+        if (!email || !pass) { errEl.textContent = "Email and password are required."; errEl.style.display = "block"; return; }
+        if (mode === "signup" && pass !== confirm) { errEl.textContent = "Passwords do not match."; errEl.style.display = "block"; return; }
+        if (mode === "signup" && pass.length < 6) { errEl.textContent = "Password must be at least 6 characters."; errEl.style.display = "block"; return; }
+        if (mode === "signup") {
+          await auth.createUserWithEmailAndPassword(email, pass);
+          showToast("Account created successfully.","success");
+        } else {
+          await auth.signInWithEmailAndPassword(email, pass);
+          showToast("Logged in successfully.","success");
+        }
       }
       const form = document.getElementById("auth-form");
       if (form) form.reset();
@@ -1291,6 +1532,12 @@ function showPage(id) {
     } catch (err) {
       errEl.textContent = authFriendlyError(err);
       errEl.style.display = "block";
+      showToast(authFriendlyError(err), "error");
+      if (authMethod === "phone") {
+        phoneConfirmResult = null;
+        try { recaptchaVerifier?.clear(); } catch (_) {}
+        recaptchaVerifier = null;
+      }
     } finally {
       submitBtn.disabled = false;
     }
@@ -1312,6 +1559,7 @@ function showPage(id) {
     if (auth) {
       try { await auth.signOut(); } catch (err) { console.error(err); }
     }
+    persistAuthSession(null);
     if (!auth) {
       currentUser = null;
       currentUserRole = null;
@@ -1327,6 +1575,22 @@ function showPage(id) {
 async function loadProducts() {
   renderSkeletons("featured-grid", 4);
   try {
+    const lang = window.I18N?.lang || "en";
+    try {
+      const res = await fetch(`${PAYMENTS_API_BASE}/products?lang=${encodeURIComponent(lang)}`);
+      if (res.ok) {
+        const data = await res.json();
+        const list = Array.isArray(data?.products) ? data.products : [];
+        const catalogLike = list.some(p => p.bengaliName || p.hindiName || /potato|tomato|onion|vegetable|alu|brinjal/i.test(String(p.name||"")) || /Root|Leafy|Gourd/i.test(String(p.category||"")));
+        if (data && data.success && list.length && catalogLike) {
+          products = list.map(normalizeProduct).filter(p => p.status !== "archived" && p.active !== false);
+          cart = sanitizeCart(cart);
+          saveCartStorage();
+          renderFeatured(); renderProducts(); renderCatTabs();
+          return;
+        }
+      }
+    } catch (apiErr) { console.warn("products API:", apiErr.message); }
     if (fbOk && db) {
       const snap = await db.collection("products").get();
       const mapped = snap.empty ? SEEDS : snap.docs.map(d => normalizeProduct({ id: d.id, ...d.data() }));
@@ -1348,6 +1612,8 @@ function normalizeProduct(raw = {}) {
     productId: id,
     name: String(raw.name || raw.productName || raw.product_name || raw.title || raw.itemName || raw.item_name || raw.name_en || raw.englishName || raw.productname || "").trim(),
     bengaliName: raw.bengaliName || "",
+    hindiName: raw.hindiName || "",
+    displayName: raw.displayName || "",
     description: String(raw.description || "").trim(),
     category: raw.category || "Others",
     price: Number(raw.price ?? raw.base_price ?? 0) || 0,
@@ -1378,24 +1644,49 @@ function renderProducts() {
   const q = (document.getElementById("search-input")?.value||"").toLowerCase();
   let list = products.filter(p => p.active !== false);
   if (curCat !== "All") list = list.filter(p => p.category === curCat);
-  if (q) list = list.filter(p => (p.name||"").toLowerCase().includes(q)||(p.bengaliName||"").toLowerCase().includes(q));
-  el.innerHTML = list.length ? list.map(prodCard).join("") : `<p style="grid-column:1/-1;color:var(--text2)">No products found.</p>`;
+  if (q) list = list.filter(p => [p.name,p.bengaliName,p.hindiName,p.displayName].some(n => (n||"").toLowerCase().includes(q)));
+  el.innerHTML = list.length ? list.map(prodCard).join("") : `<p style="grid-column:1/-1;color:var(--text2)">${esc(t("products.empty"))}</p>`;
+}
+
+function displayName(p) {
+  const lang = window.I18N?.lang || "en";
+  if (lang === "bn") return p.bengaliName || p.displayName || p.name;
+  if (lang === "hi") return p.hindiName || p.displayName || p.name;
+  return p.displayName || p.name;
+}
+
+function vegImgError(img) {
+  const fb = img.dataset.fallback;
+  if (fb && !img.dataset.triedFallback) {
+    img.dataset.triedFallback = "1";
+    img.src = fb;
+    return;
+  }
+  const div = document.createElement("div");
+  div.className = "prod-emoji";
+  div.textContent = img.dataset.e || "🥬";
+  img.replaceWith(div);
 }
 
 function prodCard(p) {
   const oos = p.stock <= 0, low = p.stock > 0 && p.stock < 5;
-  const img = (p.imageUrl && SHOW_PRODUCT_PHOTOS)
-    ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy" data-e="${esc(emoji(p))}" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'prod-emoji',textContent:this.dataset.e}))">`
+  const mapped = window.VEG_IMAGES ? VEG_IMAGES.getVegImage(p) : (p.imageUrl || "");
+  const fallback = window.VEG_IMAGES ? VEG_IMAGES.FALLBACK_IMG : "";
+  const deal = window.VEG_IMAGES && VEG_IMAGES.isBestPriceItem(p);
+  const img = (SHOW_PRODUCT_PHOTOS && mapped)
+    ? `<img src="${esc(mapped)}" alt="${esc(displayName(p))}" loading="lazy" data-fallback="${esc(fallback)}" data-e="${esc(emoji(p))}" onerror="vegImgError(this)">`
     : `<div class="prod-emoji">${emoji(p)}</div>`;
+  const priceLabel = window.I18N ? I18N.formatPrice(p.price, p.unit) : (`₹${p.price}/${p.unit}`);
   return `<div class="prod-card">
     <div class="prod-img">${img}
-      ${oos ? '<span class="badge-oos">Out of Stock</span>' : ""}
-      ${low ? `<span class="badge-low">Only ${p.stock} left</span>` : ""}
+      ${deal ? `<span class="badge-deal">${esc(t("price.best"))}</span>` : ""}
+      ${oos ? `<span class="badge-oos">${esc(t("product.outOfStock"))}</span>` : ""}
+      ${low ? `<span class="badge-low">${esc(t("product.onlyLeft", { n: p.stock }))}</span>` : ""}
     </div>
     <div class="prod-info">
-      <div class="prod-bn">${esc(p.bengaliName||"")}</div>
-      <div class="prod-name">${esc(p.name)}</div>
-      <div class="prod-price">₹${p.price}/${p.unit}</div>
+      <div class="prod-bn">${esc(p.bengaliName || p.hindiName || "")}</div>
+      <div class="prod-name">${esc(displayName(p))}</div>
+      <div class="prod-price">${esc(priceLabel)}</div>
     </div>
     <div class="prod-foot">
       <div class="qty-wrap">
@@ -1403,7 +1694,7 @@ function prodCard(p) {
         <input class="qty-inp" id="qty-${p.id}" type="number" value="1" min="1" max="${p.stock||999}">
         <button class="qty-btn" onclick="chQty('${p.id}',1)">+</button>
       </div>
-      <button class="btn btn-primary btn-sm" ${oos?"disabled":""} onclick="addToCart('${p.id}')">${oos?"Sold Out":"Add"}</button>
+      <button class="btn btn-primary btn-sm" ${oos?"disabled":""} onclick="addToCart('${p.id}')">${oos?esc(t("product.soldOut")):esc(t("product.add"))}</button>
     </div>
   </div>`;
 }
@@ -1417,7 +1708,7 @@ function filterProducts() { renderProducts(); }
 function renderCatTabs() {
   const el = document.getElementById("cat-tabs"); if (!el) return;
   const cats = ["All",...new Set(products.map(p=>p.category).filter(Boolean))];
-  el.innerHTML = cats.map(c =>`<button class="cat-btn${c===curCat?" active":""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  el.innerHTML = cats.map(c =>`<button class="cat-btn${c===curCat?" active":""}" data-cat="${esc(c)}">${esc(c==="All"?t("cat.all"):c)}</button>`).join("");
   el.querySelectorAll(".cat-btn").forEach(btn => {
     btn.addEventListener("click", () => setCat(btn.dataset.cat || "All"));
   });
@@ -1443,17 +1734,17 @@ function addToCart(id) {
   const qty = Math.max(1, requestedQty);
   const ex = cart.find(x=>x.id===id);
   if (ex) ex.qty = Math.min(ex.qty + qty, p.stock || 999);
-  else cart.push({id, productId: p.productId || p.id, name:p.name, bengaliName:p.bengaliName||"", price:p.price, unit:p.unit, qty: Math.min(qty, p.stock || qty)});
-  saveCartStorage(); renderCartCount(); showToast(`✅ ${p.name} added to cart`,"success");
+  else cart.push({id, productId: p.productId || p.id, name:p.name, bengaliName:p.bengaliName||"", hindiName:p.hindiName||"", price:p.price, unit:p.unit, qty: Math.min(qty, p.stock || qty)});
+  saveCartStorage(); renderCartCount(); renderCartDrawer(); showToast(`✅ ${displayName(p)} ${t("product.addToCart")}`,"success");
 }
-function removeFromCart(id) { cart = cart.filter(x=>x.id!==id); saveCartStorage(); renderCartCount(); renderCart(); }
+function removeFromCart(id) { cart = cart.filter(x=>x.id!==id); saveCartStorage(); renderCartCount(); renderCart(); renderCartDrawer(); }
 function updCartQty(id, qty) {
   const i = cart.find(x=>x.id===id); if (!i) return;
   if (qty <= 0) { removeFromCart(id); return; }
   const prod = products.find(x => x.id === id);
   const maxStock = Math.max(1, Number(prod?.stock ?? 999999));
   i.qty = Math.min(Math.max(1, Number(qty) || 1), maxStock);
-  saveCartStorage(); renderCartCount(); renderCart();
+  saveCartStorage(); renderCartCount(); renderCart(); renderCartDrawer();
 }
 
 function renderCart() {
@@ -1481,8 +1772,8 @@ function renderCart() {
   empty.style.display="none"; filled.style.display="block";
   list.innerHTML = cart.map(i=>`<div class="cart-item">
     <div class="ci-info">
-      <div class="ci-name">${esc(i.name)} <small style="color:var(--text2)">${esc(i.bengaliName||"")}</small></div>
-      <div class="ci-price">₹${i.price}/${i.unit}</div>
+      <div class="ci-name">${esc(displayName(i))} <small style="color:var(--text2)">${esc(i.bengaliName||"")}</small></div>
+      <div class="ci-price">${esc(window.I18N ? I18N.formatPrice(i.price, i.unit) : ("₹"+i.price+"/"+i.unit))}</div>
     </div>
     <div class="qty-wrap">
       <button class="qty-btn" onclick="updCartQty('${i.id}',${i.qty-1})">−</button>
@@ -1493,16 +1784,81 @@ function renderCart() {
     <button class="btn btn-danger btn-sm" onclick="removeFromCart('${i.id}')">🗑</button>
   </div>`).join("");
   const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
-  document.getElementById("c-subtotal").textContent = "₹"+sub;
-  document.getElementById("c-delivery").textContent = "Free";
-  document.getElementById("c-total").textContent    = "₹"+sub;
+  const money = (n) => window.I18N ? ("₹" + I18N.localizeDigits(n)) : ("₹"+n);
+  document.getElementById("c-subtotal").textContent = money(sub);
+  document.getElementById("c-delivery").textContent = t("cart.free");
+  document.getElementById("c-total").textContent    = money(sub);
   document.getElementById("min-warn").style.display = sub<200?"block":"none";
+  renderCartDrawer();
 }
 
 function selectPay(m) {
-  selPay=m;
-  document.getElementById("pay-cod").classList.toggle("sel",m==="cod");
-  document.getElementById("pay-online").classList.toggle("sel",m==="online");
+  selPay = m;
+  ["cod","upi","online"].forEach((key) => {
+    document.getElementById("pay-" + key)?.classList.toggle("sel", m === key);
+  });
+}
+
+function goCheckoutStep(step) {
+  if (step === 2 && !cart.length) { showToast(t("cart.empty"), "error"); return; }
+  if (step === 2) {
+    const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
+    if (sub < 200) { showToast(t("cart.minWarn"), "error"); return; }
+  }
+  if (step === 3) {
+    const cust = {
+      name: document.getElementById("cust-name").value.trim(),
+      phone: document.getElementById("cust-phone").value.trim(),
+      email: document.getElementById("cust-email").value.trim(),
+      address: document.getElementById("cust-address").value.trim(),
+      pincode: document.getElementById("cust-pincode").value.trim()
+    };
+    if (!validateCheckoutForm(cust)) { showToast("Please fix the highlighted fields.","error"); return; }
+    if (!currentUser) { showToast("Please login to place your order.","error"); openAuthModal("login"); return; }
+  }
+  checkoutStep = step;
+  document.querySelectorAll(".checkout-pane").forEach((p) => p.classList.remove("active"));
+  const pane = step === 1 ? "pane-cart" : step === 2 ? "pane-address" : "pane-payment";
+  document.getElementById(pane)?.classList.add("active");
+  document.querySelectorAll("#checkout-steps .cstep").forEach((el) => {
+    const n = Number(el.dataset.step);
+    el.classList.toggle("active", n === step);
+    el.classList.toggle("done", n < step);
+  });
+}
+
+function renderCartDrawer() {
+  const body = document.getElementById("cart-drawer-body");
+  if (!body) return;
+  if (!cart.length) {
+    body.innerHTML = `<p style="color:var(--text2);text-align:center;padding:24px">${esc(t("cart.empty"))}</p>`;
+    return;
+  }
+  body.innerHTML = cart.map((i) => `<div class="cart-item">
+    <div class="ci-info"><div class="ci-name">${esc(displayName(i))}</div>
+    <div class="ci-price">${esc(window.I18N ? I18N.formatPrice(i.price, i.unit) : ("₹"+i.price))}</div></div>
+    <div class="ci-sub">₹${i.price * i.qty}</div>
+  </div>`).join("");
+}
+function openCartDrawer() {
+  renderCartDrawer();
+  document.getElementById("cart-drawer-bg").style.display = "block";
+  document.getElementById("cart-drawer").classList.add("open");
+}
+function closeCartDrawer() {
+  document.getElementById("cart-drawer-bg").style.display = "none";
+  document.getElementById("cart-drawer").classList.remove("open");
+}
+function navSearch() {
+  const q = document.getElementById("nav-search-input")?.value || "";
+  const dest = document.getElementById("search-input");
+  if (dest) dest.value = q;
+  showPage("products");
+  filterProducts();
+}
+function headerUserAction() {
+  if (currentUser) showPage("orders");
+  else openAuthModal("login");
 }
 
 /* ========== CHECKOUT ========== */
@@ -1542,6 +1898,7 @@ async function handleCheckout(e) {
     openAuthModal("login");
     return;
   }
+  if (!cart.length) { showToast(t("cart.empty"),"error"); goCheckoutStep(1); return; }
   const cust = {
     name:    document.getElementById("cust-name").value.trim(),
     phone:   document.getElementById("cust-phone").value.trim(),
@@ -1549,20 +1906,25 @@ async function handleCheckout(e) {
     address: document.getElementById("cust-address").value.trim(),
     pincode: document.getElementById("cust-pincode").value.trim()
   };
-  if (!validateCheckoutForm(cust)) { showToast("Please fix the highlighted fields.","error"); return; }
-  if (!cart.length) { showToast("Your cart is empty.","error"); return; }
+  if (!validateCheckoutForm(cust)) { showToast("Please fix the highlighted fields.","error"); goCheckoutStep(2); return; }
   cust.deliverySlot = document.getElementById("cust-slot")?.value || "";
-  if (cust.deliverySlot) cust.address += " | Delivery time: " + cust.deliverySlot;
+  const addressForOrder = cust.deliverySlot ? (cust.address + " | Delivery time: " + cust.deliverySlot) : cust.address;
   const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
-  if (sub<200) { showToast("Minimum order is ₹200.","error"); return; }
+  if (sub<200) { showToast(t("cart.minWarn"),"error"); goCheckoutStep(1); return; }
   if (!navigator.onLine) { showToast("You are offline. Please check your internet connection and try again.","error"); return; }
 
+  const cartBackup = cart.map((item) => ({ ...item }));
+  const orderCust = { ...cust, address: addressForOrder, lang: window.I18N?.lang || "en" };
   setCheckoutBusy(true);
   try {
     await validateStock();
-    if (selPay==="online") { await handleRzp(cust, sub); }
-    else { await placeCOD(cust, sub); }
+    if (selPay==="online") { await handleRzp(orderCust, sub); }
+    else { await placeCOD(orderCust, sub); }
   } catch (err) {
+    cart = sanitizeCart(cartBackup);
+    saveCartStorage();
+    renderCartCount();
+    renderCart();
     handleOrderError(err);
   } finally {
     setCheckoutBusy(false);
@@ -1574,7 +1936,7 @@ function setCheckoutBusy(busy) {
   const btn = document.getElementById("checkout-btn");
   if (btn) {
     btn.disabled = busy || paymentFlowActive;
-    btn.textContent = busy ? "Placing Order…" : (paymentFlowActive ? "Payment In Progress…" : "Place Order");
+    btn.textContent = busy ? t("checkout.placing") : (paymentFlowActive ? "Payment In Progress…" : t("checkout.confirm"));
   }
   if (busy) showLoading(); else hideLoading();
 }
@@ -1619,8 +1981,14 @@ function handleOrderError(err) {
   showToast("Failed to place order. Please try again or WhatsApp us.","error");
 }
 
+function updateCheckoutBtnLabel() {
+  const btn = document.getElementById("checkout-btn");
+  if (btn && !orderInFlight && !paymentFlowActive) btn.textContent = t("checkout.confirm");
+}
+
 async function placeCOD(cust, total) {
-  const order = await saveOrderFS({...cust, total, paymentMethod:"COD", paymentStatus:PAYMENT_STATUSES.PENDING});
+  const method = selPay === "upi" ? "UPI" : "COD";
+  const order = await saveOrderFS({...cust, total, paymentMethod: method, paymentStatus:PAYMENT_STATUSES.PENDING});
   onOrderOK(order);
 }
 
@@ -1739,8 +2107,10 @@ async function onPaymentOK(order, result) {
       amount: order.total
     });
   }
-  cart=[]; saveCartStorage(); renderCartCount();
-  document.getElementById("checkout-form").reset(); selectPay("cod");
+  cart=[]; saveCartStorage(); renderCartCount(); renderCartDrawer();
+  document.getElementById("checkout-form")?.reset();
+  try { selectPay("cod"); } catch (_) {}
+  goCheckoutStep(1);
   renderPaymentSuccess(order, result);
   showPage("payment-success");
   showToast("🎉 Payment successful! Order confirmed.","success");
@@ -1830,7 +2200,7 @@ async function saveOrderFS(d) {
     qty:Math.max(1, Number(i.qty)||1),
     subtotal:(Number(i.price)||0) * Math.max(1, Number(i.qty)||1)
   }));
-  if (!currentUser) {
+  if (!currentUser || (fbOk && auth && !auth.currentUser)) {
     const err = new Error("Login required to place order");
     err.code = "auth-required";
     throw err;
@@ -1898,6 +2268,7 @@ async function saveOrderFS(d) {
         subtotal,
         total: subtotal,
         paymentMethod: d.paymentMethod || "COD",
+        lang: d.lang || window.I18N?.lang || "en",
         paymentStatus: d.paymentStatus || PAYMENT_STATUSES.PENDING,
         orderStatus: ORDER_STATUSES[0],
         status: ORDER_STATUSES[0],
@@ -1924,6 +2295,7 @@ async function saveOrderFS(d) {
     itemCount:items.reduce((s,i)=>s+i.qty,0),
     subtotal:d.total, total:d.total,
     paymentMethod:d.paymentMethod, paymentStatus:d.paymentStatus, orderStatus:ORDER_STATUSES[0], status:ORDER_STATUSES[0],
+    lang: d.lang || window.I18N?.lang || "en",
     createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(),
     timestamp:new Date().toISOString()
   };
@@ -1952,25 +2324,43 @@ function onOrderOK(order) {
   if (paymentWatchdog) clearTimeout(paymentWatchdog);
   paymentFlowActive = false;
   lastPaymentCtx = null;
-  cart=[]; saveCartStorage(); renderCartCount();
-  document.getElementById("checkout-form").reset(); selectPay("cod");
+  cart=[]; saveCartStorage(); renderCartCount(); renderCartDrawer();
+  document.getElementById("checkout-form")?.reset();
+  try { selectPay("cod"); } catch (_) {}
+  goCheckoutStep(1);
   document.querySelectorAll(".field-err").forEach(el=>el.style.display="none");
   document.querySelectorAll("#checkout-form .form-control").forEach(el=>el.classList.remove("err"));
   renderConfirmation(order);
+  showSuccessModal(order);
   showPage("confirmation");
   showToast("🎉 Order placed!","success");
   if (document.getElementById("orders-page")?.classList.contains("active")) loadMyOrders();
   notifyAdmin(order);
 }
 
+function showSuccessModal(order) {
+  const modal = document.getElementById("success-modal");
+  const msg = document.getElementById("success-msg");
+  const wa = document.getElementById("success-wa");
+  if (msg) msg.textContent = `${order.orderNumber} · ₹${order.total}`;
+  if (wa) {
+    const text = encodeURIComponent(`Hi Sokal Bela, I'd like to track order ${order.orderNumber}. Total ₹${order.total}.`);
+    wa.href = `https://wa.me/${OWNER_WA}?text=${text}`;
+  }
+  if (modal) modal.style.display = "flex";
+}
+
 function renderConfirmation(o) {
   const dt = o.timestamp instanceof Date ? o.timestamp.toLocaleString("en-IN") : "";
   const rows = o.items.map(i=>`<div class="sum-row"><span>${esc(i.name)} × ${i.qty}</span><span>₹${i.price*i.qty}</span></div>`).join("");
+  const waText = encodeURIComponent(`Hi Sokal Bela, I'd like to track order ${o.orderNumber}.`);
   document.getElementById("confirm-body").innerHTML = `
     <div style="background:var(--green-light);border:1px solid var(--green);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px">
       <div style="font-size:12px;color:var(--text2)">Order Number</div>
       <div style="font-size:20px;font-weight:700;color:var(--green)">${esc(o.orderNumber)}</div>
       ${dt?`<div style="font-size:12px;color:var(--text2);margin-top:2px">${esc(dt)}</div>`:""}
+      <div style="font-size:13px;margin-top:8px;font-weight:600">${esc(t("success.eta"))}</div>
+      <a class="btn btn-wa btn-sm" style="margin-top:10px" href="https://wa.me/${OWNER_WA}?text=${waText}" target="_blank" rel="noopener">${esc(t("success.trackWa"))}</a>
     </div>
     <div class="summary-box" style="box-shadow:none;border:1px solid var(--border)">
       ${rows}
@@ -2351,6 +2741,7 @@ async function loadToForm(id) {
     document.getElementById("pf-id").value=id;
     document.getElementById("pf-name").value=p.name||"";
     document.getElementById("pf-bn").value=p.bengaliName||"";
+    document.getElementById("pf-hi").value=p.hindiName||"";
     document.getElementById("pf-desc").value=p.description||"";
     document.getElementById("pf-price").value=p.price||"";
     document.getElementById("pf-unit").value=p.unit||"kg";
@@ -2374,6 +2765,7 @@ async function saveProduct(e) {
   const data={
     name:document.getElementById("pf-name").value.trim(),
     bengaliName:document.getElementById("pf-bn").value.trim(),
+    hindiName:document.getElementById("pf-hi").value.trim(),
     description:document.getElementById("pf-desc").value.trim(),
     category:document.getElementById("pf-cat").value,
     price:parseFloat(document.getElementById("pf-price").value),
@@ -2430,7 +2822,10 @@ document.addEventListener("click",e=>{ if(e.target.classList.contains("modal-bg"
 /* Expose globals */
 window.showPage=showPage; window.addToCart=addToCart; window.removeFromCart=removeFromCart;
 window.updCartQty=updCartQty; window.chQty=chQty; window.filterProducts=filterProducts;
-window.setCat=setCat; window.selectPay=selectPay; window.addBulkRow=addBulkRow;
+window.setCat=setCat; window.selectPay=selectPay; window.goCheckoutStep=goCheckoutStep;
+window.openCartDrawer=openCartDrawer; window.closeCartDrawer=closeCartDrawer;
+window.navSearch=navSearch; window.headerUserAction=headerUserAction; window.vegImgError=vegImgError;
+window.setAuthMethod=setAuthMethod; window.addBulkRow=addBulkRow;
 window.openAuthModal=openAuthModal; window.closeAuthModal=closeAuthModal; window.toggleAuthMode=toggleAuthMode;
 window.submitAuthForm=submitAuthForm; window.sendCustomerPasswordReset=sendCustomerPasswordReset; window.logoutUser=logoutUser;
 window.loadMyOrders=loadMyOrders; window.retryPayment=retryPayment;
