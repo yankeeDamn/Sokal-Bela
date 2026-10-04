@@ -165,7 +165,13 @@ app.get('/api/products', (req, res) => {
       const search = req.query.search.toLowerCase();
       filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
     }
-    res.json({ success: true, products: filtered });
+    const lang = String(req.query.lang || req.get('x-language') || 'en').toLowerCase();
+    const localized = filtered.map((p) => ({
+      ...p,
+      displayName: lang === 'bn' ? (p.bengaliName || p.name) : lang === 'hi' ? (p.hindiName || p.name) : p.name,
+      lang
+    }));
+    res.json({ success: true, products: localized, lang });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
