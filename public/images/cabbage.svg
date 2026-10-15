@@ -1,22 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="Cabbage">
+  <title>Cabbage</title>
   <defs>
-    <linearGradient id="bg" x1="0" x2="1">
-      <stop offset="0%" stop-color="#edf8ee"/>
-      <stop offset="100%" stop-color="#dff2df"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef6e2"/>
+      <stop offset="1" stop-color="#d7e8c1"/>
     </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+<radialGradient id="cb" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#c9ec9c"/><stop offset=".6" stop-color="#8fcf62"/><stop offset="1" stop-color="#5aa238"/></radialGradient>
   </defs>
   <rect width="600" height="600" fill="url(#bg)"/>
-  <circle cx="300" cy="300" r="210" fill="#e5f4e2"/>
-  <g fill="#85c96d">
-    <path d="M293 148c-55 0-96 42-96 96s41 96 96 96 96-42 96-96-41-96-96-96zm0 52c24 0 44 20 44 44s-20 44-44 44-44-20-44-44 20-44 44-44z"/>
-    <path d="M260 276c12 36 22 74 18 119h30c4-44 11-85 26-121l-74 2z" opacity="0.9"/>
-    <path d="M205 240c26-34 80-53 127-35-16 38-52 63-93 79-17 7-34 11-34 11s-6-26 0-55z" fill="#467e3f" opacity="0.8"/>
-    <path d="M382 235c-24-28-69-44-109-35 18 31 50 53 92 68 15 6 30 10 31 10s7-17 0-43z" fill="#467e3f" opacity="0.7"/>
+  <circle cx="300" cy="290" r="250" fill="url(#glow)"/>
+  <ellipse cx="300" cy="505" rx="160" ry="17" fill="#1b2a14" opacity="0.2" filter="url(#soft)"/>
+
+  <circle cx="300" cy="310" r="178" fill="#4c9332"/>
+  <path d="M135 330 C130 250 190 160 300 150 C410 160 470 250 465 330 C460 420 390 478 300 478 C210 478 140 420 135 330 Z" fill="url(#cb)"/>
+  <g fill="none" stroke="#e8f8cf" stroke-width="5" stroke-linecap="round" opacity=".75">
+    <path d="M300 470 C300 380 300 250 300 160"/>
+    <path d="M300 440 C240 400 190 330 180 250"/>
+    <path d="M300 440 C360 400 410 330 420 250"/>
+    <path d="M300 410 C260 380 225 340 215 300"/>
+    <path d="M300 410 C340 380 375 340 385 300"/>
   </g>
-  <g fill="#ffffff" opacity="0.75">
-    <circle cx="230" cy="212" r="18"/>
-    <circle cx="353" cy="188" r="14"/>
-    <circle cx="370" cy="302" r="10"/>
+  <g fill="none" stroke="#3f7f29" stroke-width="4" stroke-linecap="round" opacity=".45">
+    <path d="M150 380 C190 330 230 300 300 292"/><path d="M450 380 C410 330 370 300 300 292"/>
+    <path d="M190 280 C230 250 270 232 300 232"/><path d="M410 280 C370 250 330 232 300 232"/>
   </g>
-  <text x="300" y="500" text-anchor="middle" font-size="46" fill="#467e3f" font-family="Arial, sans-serif" font-weight="700">Cabbage</text>
+  <path d="M185 250 C205 210 245 180 290 170" stroke="#fff" stroke-width="12" stroke-linecap="round" fill="none" opacity=".35"/>
 </svg>

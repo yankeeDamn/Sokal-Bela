@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="Beetroot">
+  <title>Beetroot</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f9ebf0"/>
+      <stop offset="1" stop-color="#efcfdb"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+<radialGradient id="br" cx=".38" cy=".32" r=".85"><stop offset="0" stop-color="#d44b86"/><stop offset=".6" stop-color="#9c1f58"/><stop offset="1" stop-color="#5f0f37"/></radialGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#bg)"/>
+  <circle cx="300" cy="290" r="250" fill="url(#glow)"/>
+  <ellipse cx="300" cy="505" rx="140" ry="17" fill="#1b2a14" opacity="0.2" filter="url(#soft)"/>
+
+  <g transform="translate(300 220)">
+    <g transform="rotate(-24)"><path d="M0 0 C -40 -40 -48 -110 0 -160 C 48 -110 40 -40 0 0 Z" fill="#3f8c3a"/><path d="M0 0 L0 -145" stroke="#b8305f" stroke-width="5" stroke-linecap="round"/></g>
+    <g transform="rotate(24)"><path d="M0 0 C -40 -40 -48 -110 0 -160 C 48 -110 40 -40 0 0 Z" fill="#3f8c3a"/><path d="M0 0 L0 -145" stroke="#b8305f" stroke-width="5" stroke-linecap="round"/></g>
+    <g><path d="M0 0 C -46 -44 -54 -120 0 -180 C 54 -120 46 -44 0 0 Z" fill="#4fa047"/><path d="M0 0 L0 -164" stroke="#c23a6c" stroke-width="6" stroke-linecap="round"/></g>
+  </g>
+  <path d="M300 210 C410 200 468 270 460 350 C452 430 392 470 330 478 C318 482 308 500 304 520 C302 526 298 526 296 520 C292 500 282 482 270 478 C208 470 148 430 140 350 C132 270 190 200 300 210 Z" fill="url(#br)"/>
+  <g fill="none" stroke="#e98ab3" stroke-width="3.5" stroke-linecap="round" opacity=".35">
+    <path d="M170 330 C220 300 380 300 430 330"/><path d="M180 390 C230 366 370 366 420 390"/>
+  </g>
+  <path d="M185 300 C196 258 234 232 276 226" stroke="#fff" stroke-width="13" stroke-linecap="round" fill="none" opacity=".32"/>
+</svg>

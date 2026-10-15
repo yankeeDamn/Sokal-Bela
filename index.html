@@ -11,6 +11,12 @@
   <meta property="og:description" content="Order fresh local vegetables online. Farm-to-door delivery in Rampurhat. Call +91 7551858583.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sokal-bela.vercel.app/">
+  <meta property="og:image" content="https://sokal-bela.vercel.app/public/images/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_IN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#2d7a3a">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥬</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -209,6 +215,7 @@
     .footer h4{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.55);margin-bottom:10px}
     .footer p,.footer a{font-size:13px;color:rgba(255,255,255,.8);margin-bottom:5px;display:block}
     .footer a:hover{color:var(--orange)}
+    .footer p a{display:inline;margin:0}
     .footer-bottom{border-top:1px solid rgba(255,255,255,.15);padding-top:16px;text-align:center;font-size:12px;color:rgba(255,255,255,.45)}
     .map-wrap{border-radius:var(--radius-sm);overflow:hidden;margin-top:7px}
     .map-wrap iframe{width:100%;height:190px;border:none;display:block}
@@ -805,7 +812,7 @@
                 </select>
               </div>
               <div class="form-group"><label class="form-label">Stock *</label><input type="number" id="pf-stock" class="form-control" min="0" required></div>
-              <div class="form-group"><label class="form-label">Image URL (optional)</label><input type="url" id="pf-img" class="form-control" placeholder="https://…"></div>
+              <div class="form-group"><label class="form-label">Image URL (optional)</label><input type="url" id="pf-img" class="form-control" placeholder="https://…"><small style="color:var(--text2)">Leave blank to use the built-in picture for this vegetable (matched by name).</small></div>
               <div class="form-group"><label class="form-label">Emoji fallback</label><input type="text" id="pf-emoji" class="form-control" placeholder="🥔" maxlength="4"></div>
               <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="pf-active" checked> Active (visible to customers)</label></div>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -849,7 +856,7 @@
         <h4>Our Location</h4>
         <div class="map-wrap">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14576.07!2d87.7954!3d24.1742!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f9c4b4b4b4b4b4%3A0x1!2sRampurhat%2C+Birbhum%2C+West+Bengal!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+            src="https://www.google.com/maps?q=24.1742,87.7954&z=14&output=embed"
             loading="lazy" referrerpolicy="no-referrer-when-downgrade"
             title="Sokal Bela location — Rampurhat, Birbhum">
           </iframe>
@@ -1045,7 +1052,8 @@ let unsubOrders = null, unsubBulk = null, unsubInventory = null;
 /* ========== PRODUCT EMOJIS ========== */
 const EMOJIS = {potato:"🥔",onion:"🧅",tomato:"🍅",brinjal:"🍆",cauliflower:"🥦",
   cabbage:"🥬","bitter gourd":"🥒","bottle gourd":"🫙",carrot:"🥕",
-  spinach:"🥬",garlic:"🧄",ginger:"🫚",chili:"🌶️",chilli:"🌶️"};
+  spinach:"🥬",garlic:"🧄",ginger:"🫚",chili:"🌶️",chilli:"🌶️",
+  lemon:"🍋",cucumber:"🥒",capsicum:"🫑",okra:"🥒",radish:"🥬",beetroot:"🥬"};
 function emoji(p) {
   if (p.emoji) return p.emoji;
   const k = (p.name||"").toLowerCase();
@@ -1188,11 +1196,18 @@ async function handleCatering(e){
   const v=id=>document.getElementById(id).value.trim();
   const phone=v("cphone").replace(/\D/g,"");
   if(phone.length!==10){ showToast("Enter a valid 10-digit phone number","error"); return; }
-  const d={name:v("cname"),phone,eventType:"Catering - "+v("ctype"),eventDate:v("cdate"),guestCount:+v("cguests")||0,
-    notes:`[${v("cservice")}] Venue: ${v("cvenue")||"-"}. ${v("cnotes")}`,status:"new",createdAt:new Date().toISOString()};
+  if(!/^[6-9]\d{9}$/.test(phone)){ showToast("Enter a valid 10-digit Indian mobile number","error"); return; }
+  // Same shape as a bulk order (contactName / timestamp / items...) so it passes the Firestore
+  // rules and shows up in Admin → Bulk Orders next to the other event requests.
+  const stamp = (typeof fbOk!=="undefined"&&fbOk&&db) ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString();
+  const d={customerId:currentUser?.uid||"guest",customerRole:normalizeRole(currentUserRole),
+    contactName:v("cname"),phone,email:"",eventType:"Catering - "+v("ctype"),eventDate:v("cdate"),
+    guestCount:parseInt(v("cguests"),10)||0,
+    notes:`[${v("cservice")}] Venue: ${v("cvenue")||"-"}. ${v("cnotes")}`,items:[],status:"new",
+    createdAt:stamp,updatedAt:stamp,timestamp:stamp};
   try{ if(typeof fbOk!=="undefined"&&fbOk&&db) await db.collection("bulkOrders").add(d); }catch(err){ console.error(err); }
   showToast("✅ Request ready — send it on WhatsApp so we get it instantly.","success");
-  window.open(`https://wa.me/${OWNER_WA}?text=`+encodeURIComponent(`🍛 Catering Request\nName: ${d.name}\nPhone: ${phone}\nService: ${v("cservice")}\nEvent: ${v("ctype")}\nDate: ${d.eventDate||"TBD"}\nGuests: ${d.guestCount}\nVenue: ${v("cvenue")||"-"}\nNotes: ${v("cnotes")||"-"}`),"_blank");
+  window.open(`https://wa.me/${OWNER_WA}?text=`+encodeURIComponent(`🍛 Catering Request\nName: ${d.contactName}\nPhone: ${phone}\nService: ${v("cservice")}\nEvent: ${v("ctype")}\nDate: ${d.eventDate||"TBD"}\nGuests: ${d.guestCount}\nVenue: ${v("cvenue")||"-"}\nNotes: ${v("cnotes")||"-"}`),"_blank");
   document.getElementById("cat-form").reset();
 }
 
@@ -1222,7 +1237,11 @@ window.addEventListener("load",()=>{
   const pin=document.getElementById("cust-pincode");
   if(pin) pin.addEventListener("input",()=>{
     const v=pin.value.trim(), out=document.getElementById("err-pincode");
-    if(out && v.length===6) out.textContent = DELIVERY_PINCODES.includes(v) ? "" : "We may not deliver to this pincode. Place the order and we'll call to confirm.";
+    if(out && v.length===6){
+      const outside = !DELIVERY_PINCODES.includes(v);
+      out.textContent = outside ? "We may not deliver to this pincode. Place the order and we'll call to confirm." : "";
+      out.style.display = outside ? "block" : "none";
+    }
   });
   if(location.hash==="#admin") showPage("admin");
 });
@@ -1674,7 +1693,8 @@ function vegImgError(img) {
 function prodCard(p) {
   const oos = p.stock <= 0, low = p.stock > 0 && p.stock < 5;
   const mapped = window.VEG_IMAGES ? VEG_IMAGES.getVegImage(p) : (p.imageUrl || "");
-  const fallback = window.VEG_IMAGES ? VEG_IMAGES.FALLBACK_IMG : "";
+  // If the owner's own image fails to load, fall back to the bundled illustration, then the emoji.
+  const fallback = window.VEG_IMAGES ? VEG_IMAGES.getBundledImage(p) : "";
   const deal = window.VEG_IMAGES && VEG_IMAGES.isBestPriceItem(p);
   const img = (SHOW_PRODUCT_PHOTOS && mapped)
     ? `<img src="${esc(mapped)}" alt="${esc(displayName(p))}" loading="lazy" data-fallback="${esc(fallback)}" data-e="${esc(emoji(p))}" onerror="vegImgError(this)">`
@@ -2122,14 +2142,14 @@ function renderPaymentFailure(o, reason) {
 async function generateOrderNumber() {
   const d = new Date();
   const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const suffix = String(Math.floor(1000 + Math.random()*9000));
-    const num = `SB-${ymd}-${suffix}`;
-    if (!(fbOk && db)) return num;
-    const dup = await db.collection("orders").where("orderNumber","==",num).limit(1).get();
-    if (dup.empty) return num;
-  }
-  return `SB-${ymd}-${Date.now().toString(36).toUpperCase()}`;
+  // 5 characters from an alphabet without look-alikes (no 0/O/1/I): ~28 million combinations a day,
+  // so a clash is practically impossible. Customers are NOT allowed to search all orders
+  // (Firestore rules), so we cannot check for duplicates from the browser - and don't need to.
+  const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const rnd = new Uint32Array(5);
+  (window.crypto || window.msCrypto).getRandomValues(rnd);
+  const suffix = Array.from(rnd, n => ALPHABET[n % ALPHABET.length]).join("");
+  return `SB-${ymd}-${suffix}`;
 }
 
 /* Save the order, then its items as a separate subcollection (batched). */
@@ -2184,8 +2204,8 @@ async function saveOrderFS(d) {
         });
 
         const remainingStock = Math.max(0, live.stock - requested.qty);
+        // Only stock/status/updatedAt are written: that is all the Firestore rules let a customer change.
         tx.set(productRefs[idx], {
-          productId: live.productId || live.id,
           stock: remainingStock,
           status: remainingStock > 0 ? "active" : "out_of_stock",
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()

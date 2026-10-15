@@ -1,22 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="Chili">
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="Green chili">
+  <title>Green chili</title>
   <defs>
-    <linearGradient id="bg" x1="0" x2="1">
-      <stop offset="0%" stop-color="#edf8ee"/>
-      <stop offset="100%" stop-color="#dff2df"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef7e6"/>
+      <stop offset="1" stop-color="#d9ecc9"/>
     </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+<linearGradient id="c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7fd13f"/><stop offset="1" stop-color="#2f8f2a"/></linearGradient>
+         <linearGradient id="c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5fbf33"/><stop offset="1" stop-color="#23761f"/></linearGradient>
   </defs>
   <rect width="600" height="600" fill="url(#bg)"/>
-  <circle cx="300" cy="300" r="210" fill="#e5f4e2"/>
-  <g fill="#f08346">
-    <path d="M293 148c-55 0-96 42-96 96s41 96 96 96 96-42 96-96-41-96-96-96zm0 52c24 0 44 20 44 44s-20 44-44 44-44-20-44-44 20-44 44-44z"/>
-    <path d="M260 276c12 36 22 74 18 119h30c4-44 11-85 26-121l-74 2z" opacity="0.9"/>
-    <path d="M205 240c26-34 80-53 127-35-16 38-52 63-93 79-17 7-34 11-34 11s-6-26 0-55z" fill="#9b3a1d" opacity="0.8"/>
-    <path d="M382 235c-24-28-69-44-109-35 18 31 50 53 92 68 15 6 30 10 31 10s7-17 0-43z" fill="#9b3a1d" opacity="0.7"/>
+  <circle cx="300" cy="290" r="250" fill="url(#glow)"/>
+  <ellipse cx="300" cy="505" rx="150" ry="17" fill="#1b2a14" opacity="0.2" filter="url(#soft)"/>
+<g transform="translate(300 300) scale(1.3) translate(-285 -275)">
+  <g transform="translate(215 150) rotate(-8)">
+    <path d="M0 0 C 40 -10 70 20 80 70 C 92 130 70 200 20 250 C 8 262 -2 258 4 244 C 28 190 34 140 22 92 C 14 60 -10 38 -34 36 C -40 20 -22 4 0 0 Z" fill="url(#c2)"/>
+    <path d="M-2 4 C 28 14 48 40 56 76" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none" opacity=".35"/>
+    <path d="M-34 36 C -52 30 -64 12 -62 -6 C -50 -2 -40 2 -22 6 C -24 20 -30 28 -34 36 Z" fill="#3b7a22"/>
   </g>
-  <g fill="#ffffff" opacity="0.75">
-    <circle cx="230" cy="212" r="18"/>
-    <circle cx="353" cy="188" r="14"/>
-    <circle cx="370" cy="302" r="10"/>
-  </g>
-  <text x="300" y="500" text-anchor="middle" font-size="46" fill="#9b3a1d" font-family="Arial, sans-serif" font-weight="700">Chili</text>
+  <g transform="translate(330 135) rotate(12)">
+    <path d="M0 0 C 40 -10 70 20 80 70 C 92 130 70 200 20 250 C 8 262 -2 258 4 244 C 28 190 34 140 22 92 C 14 60 -10 38 -34 36 C -40 20 -22 4 0 0 Z" fill="url(#c1)"/>
+    <path d="M-2 4 C 28 14 48 40 56 76" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none" opacity=".35"/>
+    <path d="M-34 36 C -52 30 -64 12 -62 -6 C -50 -2 -40 2 -22 6 C -24 20 -30 28 -34 36 Z" fill="#3b7a22"/>
+  </g></g>
 </svg>

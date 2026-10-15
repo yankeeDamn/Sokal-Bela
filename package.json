@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node local-server.js",
     "dev": "npx nodemon local-server.js",
-    "func:start": "cd backend/functions && npm run start"
+    "func:start": "cd backend/functions && npm run start",
+    "test": "node --check local-server.js && node --check build.js && node --check js/veg-images.js && node --check js/i18n.js && node scripts/check-images.js",
+    "build": "node build.js"
   },
   "devDependencies": {
     "cors": "^2.8.6",
