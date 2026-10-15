@@ -1,11 +1,18 @@
 {
   "functions": { "source": "backend/functions" },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "storage": {
     "rules": "storage.rules"
   },
   "hosting": {
     "public": ".",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "backend/**"],
+    "ignore": [
+      "firebase.json", "**/.*", "**/node_modules/**", "backend/**", "api/**", "scripts/**",
+      "*.zip", "*.md", "*.rules", "package.json", "package-lock.json",
+      "local-server.js", "build.js", "vercel.json"
+    ],
     "rewrites": [
       { "source": "/api/**", "function": { "functionId": "api", "region": "asia-south1" } },
       { "source": "/admin", "destination": "/admin.html" },

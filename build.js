@@ -6,7 +6,7 @@ const path = require('path');
 const SRC = __dirname;
 const OUT = path.join(SRC, 'dist');
 const SKIP = new Set([
-  'dist', 'api', 'backend', 'node_modules', '.git', '.github', '.vercel',
+  'dist', 'api', 'backend', 'scripts', 'node_modules', '.git', '.github', '.vercel',
   'local-server.js', 'build.js', 'vercel.json', 'package.json', 'package-lock.json',
   '.vercelignore', '.gitignore', '.env', '.env.example', '.firebaserc', 'firebase.json',
   'firestore.rules', 'storage.rules', 'README.md', 'BUSINESS-SETUP.md'
