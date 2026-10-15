@@ -1,0 +1,27 @@
+// Fails if a product image the app refers to is missing from public/images.
+// Run with: npm test
+const fs = require('fs');
+const path = require('path');
+
+const root = path.join(__dirname, '..');
+const imgDir = path.join(root, 'public', 'images');
+const wanted = new Set();
+
+// Every "file: 'name.svg'" in the name -> picture table
+const veg = fs.readFileSync(path.join(root, 'js', 'veg-images.js'), 'utf8');
+for (const m of veg.matchAll(/file:\s*'([^']+)'/g)) wanted.add(m[1]);
+wanted.add('veg-fallback.svg');
+wanted.add('og-cover.png'); // social share preview used in index.html
+
+// Every /public/images/... path written directly in the code
+for (const f of ['index.html', 'local-server.js']) {
+  const text = fs.readFileSync(path.join(root, f), 'utf8');
+  for (const m of text.matchAll(/\/public\/images\/([A-Za-z0-9._-]+)/g)) wanted.add(m[1]);
+}
+
+const missing = [...wanted].filter((f) => !fs.existsSync(path.join(imgDir, f)));
+if (missing.length) {
+  console.error('Missing images in public/images:\n  ' + missing.join('\n  '));
+  process.exit(1);
+}
+console.log(`OK - all ${wanted.size} referenced images exist.`);

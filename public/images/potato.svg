@@ -1,22 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="Potato">
+  <title>Potato</title>
   <defs>
-    <linearGradient id="bg" x1="0" x2="1">
-      <stop offset="0%" stop-color="#edf8ee"/>
-      <stop offset="100%" stop-color="#dff2df"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6ecd9"/>
+      <stop offset="1" stop-color="#ead9b8"/>
     </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+<radialGradient id="p" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ecc891"/><stop offset=".6" stop-color="#cf9b58"/><stop offset="1" stop-color="#a4733a"/></radialGradient>
+         <radialGradient id="p2" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#e5bd83"/><stop offset="1" stop-color="#9c6b33"/></radialGradient>
   </defs>
   <rect width="600" height="600" fill="url(#bg)"/>
-  <circle cx="300" cy="300" r="210" fill="#e5f4e2"/>
-  <g fill="#d9a15d">
-    <path d="M293 148c-55 0-96 42-96 96s41 96 96 96 96-42 96-96-41-96-96-96zm0 52c24 0 44 20 44 44s-20 44-44 44-44-20-44-44 20-44 44-44z"/>
-    <path d="M260 276c12 36 22 74 18 119h30c4-44 11-85 26-121l-74 2z" opacity="0.9"/>
-    <path d="M205 240c26-34 80-53 127-35-16 38-52 63-93 79-17 7-34 11-34 11s-6-26 0-55z" fill="#7a5427" opacity="0.8"/>
-    <path d="M382 235c-24-28-69-44-109-35 18 31 50 53 92 68 15 6 30 10 31 10s7-17 0-43z" fill="#7a5427" opacity="0.7"/>
+  <circle cx="300" cy="290" r="250" fill="url(#glow)"/>
+  <ellipse cx="300" cy="505" rx="150" ry="17" fill="#1b2a14" opacity="0.2" filter="url(#soft)"/>
+
+  <path d="M330 220 C400 205 470 250 470 320 C470 385 410 420 350 415 C300 410 270 370 275 315 C280 262 290 228 330 220 Z" fill="url(#p2)"/>
+  <path d="M140 330 C125 250 200 190 300 195 C400 200 450 270 435 350 C420 425 340 462 255 452 C185 444 150 400 140 330 Z" fill="url(#p)"/>
+  <path d="M175 270 C200 232 250 215 300 218" stroke="#fff" stroke-width="10" stroke-linecap="round" fill="none" opacity=".35"/>
+  <g fill="#8a5a2a" opacity=".75">
+    <ellipse cx="230" cy="330" rx="9" ry="6" transform="rotate(-20 230 330)"/>
+    <ellipse cx="320" cy="285" rx="8" ry="5" transform="rotate(15 320 285)"/>
+    <ellipse cx="365" cy="375" rx="9" ry="6" transform="rotate(30 365 375)"/>
+    <ellipse cx="270" cy="400" rx="7" ry="5"/>
+    <ellipse cx="400" cy="320" rx="6" ry="4"/>
   </g>
-  <g fill="#ffffff" opacity="0.75">
-    <circle cx="230" cy="212" r="18"/>
-    <circle cx="353" cy="188" r="14"/>
-    <circle cx="370" cy="302" r="10"/>
+  <g fill="#8a5a2a" opacity=".35">
+    <circle cx="200" cy="380" r="4"/><circle cx="300" cy="350" r="3.5"/><circle cx="345" cy="330" r="3"/><circle cx="250" cy="260" r="3.5"/><circle cx="395" cy="270" r="3"/><circle cx="420" cy="385" r="3"/>
   </g>
-  <text x="300" y="500" text-anchor="middle" font-size="46" fill="#7a5427" font-family="Arial, sans-serif" font-weight="700">Potato</text>
 </svg>

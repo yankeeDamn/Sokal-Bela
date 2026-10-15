@@ -1,4 +1,10 @@
-/* Dynamic vegetable image mapping with reliable local fallbacks */
+/* Vegetable image mapping with reliable local fallbacks.
+ *
+ * Image priority for a product:
+ *   1. Its own image set in Admin (imageUrl / image) - the owner's photo always wins.
+ *   2. A bundled illustration matched by name (English, Bengali or Hindi).
+ *   3. A neutral fallback illustration.
+ */
 (function (global) {
   'use strict';
 
@@ -7,87 +13,125 @@
 
   function assetPath(fileName) {
     if (!fileName) return FALLBACK_IMG;
-    if (fileName.startsWith('http://') || fileName.startsWith('https://') || fileName.startsWith('data:')) return fileName;
-    if (fileName.startsWith('/')) return fileName;
-    if (fileName.startsWith('./') || fileName.startsWith('../')) return fileName;
+    if (/^(https?:|data:)/i.test(fileName)) return fileName;
+    if (fileName.startsWith('/') || fileName.startsWith('./') || fileName.startsWith('../')) return fileName;
     return `${PUBLIC_BASE}/${fileName}`;
   }
 
+  /* More specific names must come BEFORE generic ones
+     (e.g. "bitter gourd" before anything that could match "gourd"). */
   const IMAGES = [
-    { keys: ['potato', 'alu', 'আলু', 'आलू'], url: assetPath('potato.svg') },
-    { keys: ['tomato', 'টমেটো', 'टमाटर'], url: assetPath('tomato.svg') },
-    { keys: ['onion', 'peyaj', 'পেঁয়াজ', 'प्याज'], url: assetPath('onion.svg') },
-    { keys: ['green chili', 'green chilli', 'chili', 'chilli', 'কাঁচা মরিচ', 'हरी मिर्च', 'mirch'], url: assetPath('chili.svg') },
-    { keys: ['brinjal', 'eggplant', 'aubergine', 'begun', 'বেগুন', 'बैंगन'], url: FALLBACK_IMG },
-    { keys: ['spinach', 'palak', 'পালং', 'पालक'], url: assetPath('spinach.svg') },
-    { keys: ['cauliflower', 'phulkopi', 'ফুলকপি', 'ফুলगोभी'], url: assetPath('cauliflower.svg') },
-    { keys: ['cabbage', 'bandhakopi', 'বাঁধাকপি', 'पत्ता गोभी', 'पत्तागोभी'], url: assetPath('cabbage.svg') },
-    { keys: ['bitter gourd', 'karela', 'করলা', 'करेला'], url: assetPath('bitter-gourd.svg') },
-    { keys: ['bottle gourd', 'lau', 'লাউ', 'लौकी'], url: assetPath('bottle-gourd.svg') },
-    { keys: ['carrot', 'গাজর', 'गाजर'], url: assetPath('carrot.svg') },
-    { keys: ['garlic', 'রসুন', 'लहसुन'], url: assetPath('garlic.svg') },
-    { keys: ['ginger', 'আদা', 'अदरक'], url: assetPath('ginger.svg') },
-    { keys: ['cucumber', 'শসা', 'खीरा'], url: assetPath('cucumber.svg') },
-    { keys: ['lemon', 'লেবু', 'नींबू'], url: assetPath('lemon.svg') }
-  ];
+    { keys: ['bitter gourd', 'bitter melon', 'karela', 'korola', 'উচ্ছে', 'করলা', 'करेला'], file: 'bitter-gourd.svg' },
+    { keys: ['bottle gourd', 'lau', 'lauki', 'লাউ', 'लौकी'], file: 'bottle-gourd.svg' },
+    { keys: ['capsicum', 'bell pepper', 'shimla', 'ক্যাপসিকাম', 'शिमला मिर्च'], file: 'capsicum.svg' },
+    { keys: ['green chili', 'green chilli', 'chili', 'chilli', 'chile', 'morich', 'mirch', 'কাঁচা মরিচ', 'কাঁচালঙ্কা', 'লঙ্কা', 'हरी मिर्च', 'मिर्च'], file: 'chili.svg' },
+    { keys: ['potato', 'alu', 'aloo', 'আলু', 'आलू'], file: 'potato.svg' },
+    { keys: ['tomato', 'টমেটো', 'टमाटर'], file: 'tomato.svg' },
+    { keys: ['onion', 'peyaj', 'piyaj', 'পেঁয়াজ', 'প্যাঁজ', 'प्याज'], file: 'onion.svg' },
+    { keys: ['brinjal', 'eggplant', 'aubergine', 'begun', 'baingan', 'বেগুন', 'बैंगन'], file: 'brinjal.svg' },
+    { keys: ['spinach', 'palak', 'palong', 'পালং', 'পালংশাক', 'पालक'], file: 'spinach.svg' },
+    { keys: ['cauliflower', 'phulkopi', 'phulkopi', 'ফুলকপি', 'फूलगोभी', 'फूल गोभी'], file: 'cauliflower.svg' },
+    { keys: ['cabbage', 'bandhakopi', 'bandhakopi', 'বাঁধাকপি', 'पत्ता गोभी', 'पत्तागोभी', 'बंद गोभी'], file: 'cabbage.svg' },
+    { keys: ['carrot', 'gajar', 'গাজর', 'गाजर'], file: 'carrot.svg' },
+    { keys: ['garlic', 'roshun', 'lahsun', 'রসুন', 'लहसुन'], file: 'garlic.svg' },
+    { keys: ['ginger', 'ada', 'adrak', 'আদা', 'अदरक'], file: 'ginger.svg' },
+    { keys: ['cucumber', 'sosha', 'kheera', 'শসা', 'खीरा'], file: 'cucumber.svg' },
+    { keys: ['lemon', 'lime', 'lebu', 'nimbu', 'লেবু', 'নেবু', 'नींबू'], file: 'lemon.svg' },
+    { keys: ['okra', 'ladies finger', "lady's finger", 'ladyfinger', 'bhindi', 'dherosh', 'ঢেঁড়স', 'ভেন্ডি', 'भिंडी'], file: 'okra.svg' },
+    { keys: ['pumpkin', 'kumro', 'kaddu', 'কুমড়া', 'কুমড়ো', 'मीठा कद्दू', 'कद्दू'], file: 'pumpkin.svg' },
+    { keys: ['radish', 'mulo', 'muli', 'mooli', 'মুলো', 'মূলা', 'मूली'], file: 'radish.svg' },
+    { keys: ['beetroot', 'beet', 'chukandar', 'বিট', 'চুকন্দর', 'चुकंदर'], file: 'beetroot.svg' }
+  ].map((entry) => ({ keys: entry.keys, url: assetPath(entry.file) }));
 
   const BEST_PRICE_KEYS = ['potato', 'onion', 'tomato', 'alu', 'peyaj', 'আলু', 'পেঁয়াজ', 'টমেটো', 'आलू', 'प्याज', 'टमाटर'];
 
+  /* Keep letters, combining marks (vowel signs) and digits from ANY script,
+     so Bengali and Devanagari names can be matched too. */
   function normalizeText(value) {
-    return String(value || '').toLowerCase().replace(/[^a-z0-9ঀ-৿]+/g, ' ').replace(/\s+/g, ' ').trim();
+    return String(value || '')
+      .toLowerCase()
+      .replace(/[^\p{L}\p{M}\p{N}]+/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
-  function matchesKey(sourceText, key) {
-    const text = normalizeText(sourceText);
+  const ASCII_ONLY = /^[a-z0-9 ]+$/;
+
+  /* Latin keys must match whole words ("alu" must not match "valuable");
+     Bengali / Hindi keys are matched as substrings because those scripts
+     attach suffixes to words. */
+  function matchesKey(normalizedText, key) {
     const needle = normalizeText(key);
     if (!needle) return false;
-    return text.includes(needle) || text.replace(/\s+/g, '').includes(needle.replace(/\s+/g, ''));
+    if (ASCII_ONLY.test(needle)) {
+      // whole word, optionally plural: potato / potatoes, chilli / chillies, onion / onions
+      const padded = ' ' + normalizedText + ' ';
+      return [' ', 's ', 'es '].some((ending) => padded.includes(' ' + needle + ending));
+    }
+    return normalizedText.includes(needle);
   }
 
   function haystack(product) {
     if (!product) return '';
     if (typeof product === 'string') return product;
-    return [product.name, product.bengaliName, product.hindiName, product.id, product.displayName]
+    return [product.name, product.bengaliName, product.hindiName, product.displayName, product.id]
       .filter(Boolean)
       .join(' ');
   }
 
   function resolveLocalImage(value) {
-    if (!value) return '';
-    if (typeof value !== 'string') return '';
+    if (!value || typeof value !== 'string') return '';
     const cleaned = value.trim();
-    if (!cleaned || cleaned === 'null' || cleaned.includes('placeholder')) return '';
-    if (cleaned.startsWith('http://') || cleaned.startsWith('https://') || cleaned.startsWith('data:')) return cleaned;
-    if (cleaned.startsWith('/')) return cleaned;
-    if (cleaned.startsWith('./') || cleaned.startsWith('../')) return cleaned;
-    return `${PUBLIC_BASE}/${cleaned}`;
+    if (!cleaned || cleaned === 'null' || cleaned === 'undefined' || cleaned.includes('placeholder')) return '';
+    return assetPath(cleaned);
   }
 
-  function getVegImage(product) {
-    const text = haystack(product);
+  function findBundledImage(product) {
+    const text = normalizeText(haystack(product));
+    if (!text) return '';
     for (const entry of IMAGES) {
       if (entry.keys.some((k) => matchesKey(text, k))) return entry.url;
     }
+    return '';
+  }
 
-    const productUrl = product && typeof product === 'object' ? (product.imageUrl || product.image || '') : '';
-    const normalizedUrl = resolveLocalImage(productUrl);
-    if (normalizedUrl) return normalizedUrl;
-    return FALLBACK_IMG;
+  function getVegImage(product) {
+    // 1. The owner's own image (set in Admin) always wins.
+    const own = product && typeof product === 'object'
+      ? resolveLocalImage(product.imageUrl || product.image || (Array.isArray(product.images) ? product.images[0] : ''))
+      : '';
+    if (own) return own;
+    // 2. Bundled illustration by name, 3. neutral fallback.
+    return findBundledImage(product) || FALLBACK_IMG;
+  }
+
+  /* The bundled illustration for a product, if there is one (used as the
+     second attempt when the owner's own image fails to load). */
+  function getBundledImage(product) {
+    return findBundledImage(product) || FALLBACK_IMG;
   }
 
   function isBestPriceItem(product) {
-    const text = haystack(product);
+    const text = normalizeText(haystack(product));
     return BEST_PRICE_KEYS.some((k) => matchesKey(text, k));
   }
 
+  function escAttr(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* Ready-made <img> markup with a two-step fallback:
+     own image -> bundled illustration -> emoji. */
   function vegImgTag(product, alt) {
     const url = getVegImage(product);
     const label = alt || (product && (product.displayName || product.name)) || 'Vegetable';
-    const emoji = (global.emoji && product && typeof product === 'object') ? global.emoji(product) : '🥬';
-    return '<img src="' + url + '" alt="' + String(label).replace(/"/g, '&quot;') + '" loading="lazy" decoding="async" ' +
-      'onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\';this.addEventListener(\'error\',function(){this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'prod-emoji\',textContent:\'' + emoji + '\'}));},{once:true});">';
+    const emoji = (typeof global.emoji === 'function' && product && typeof product === 'object') ? global.emoji(product) : '🥬';
+    return '<img src="' + escAttr(url) + '" alt="' + escAttr(label) + '" loading="lazy" decoding="async"' +
+      ' data-fallback="' + escAttr(getBundledImage(product)) + '" data-e="' + escAttr(emoji) + '"' +
+      ' onerror="if(window.vegImgError)vegImgError(this)">';
   }
 
-  global.VEG_IMAGES = { getVegImage, isBestPriceItem, vegImgTag, FALLBACK_IMG };
+  global.VEG_IMAGES = { getVegImage, getBundledImage, isBestPriceItem, vegImgTag, FALLBACK_IMG };
 
 })(window);

@@ -1,22 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="Carrot">
+  <title>Carrot</title>
   <defs>
-    <linearGradient id="bg" x1="0" x2="1">
-      <stop offset="0%" stop-color="#edf8ee"/>
-      <stop offset="100%" stop-color="#dff2df"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff0e2"/>
+      <stop offset="1" stop-color="#f9d9bb"/>
     </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+<linearGradient id="ca" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a3d"/><stop offset="1" stop-color="#e2641a"/></linearGradient>
   </defs>
   <rect width="600" height="600" fill="url(#bg)"/>
-  <circle cx="300" cy="300" r="210" fill="#e5f4e2"/>
-  <g fill="#f59d2c">
-    <path d="M293 148c-55 0-96 42-96 96s41 96 96 96 96-42 96-96-41-96-96-96zm0 52c24 0 44 20 44 44s-20 44-44 44-44-20-44-44 20-44 44-44z"/>
-    <path d="M260 276c12 36 22 74 18 119h30c4-44 11-85 26-121l-74 2z" opacity="0.9"/>
-    <path d="M205 240c26-34 80-53 127-35-16 38-52 63-93 79-17 7-34 11-34 11s-6-26 0-55z" fill="#b75d0d" opacity="0.8"/>
-    <path d="M382 235c-24-28-69-44-109-35 18 31 50 53 92 68 15 6 30 10 31 10s7-17 0-43z" fill="#b75d0d" opacity="0.7"/>
+  <circle cx="300" cy="290" r="250" fill="url(#glow)"/>
+  <ellipse cx="300" cy="505" rx="130" ry="17" fill="#1b2a14" opacity="0.2" filter="url(#soft)"/>
+
+  <g transform="rotate(32 300 300)">
+    <g fill="#4aa43c">
+      <path d="M300 195 C268 150 262 110 280 62 C306 104 312 150 300 195 Z"/>
+      <path d="M300 195 C300 140 296 96 300 40 C318 94 318 146 300 195 Z" fill="#58b648"/>
+      <path d="M300 195 C332 150 340 112 322 66 C294 106 288 152 300 195 Z"/>
+    </g>
+    <path d="M300 182 C346 182 366 218 358 262 L318 482 C312 508 288 508 282 482 L242 262 C234 218 254 182 300 182 Z" fill="url(#ca)"/>
+    <g stroke="#b9500f" stroke-width="5" stroke-linecap="round" opacity=".5" fill="none">
+      <path d="M254 252 C275 258 290 258 306 252"/><path d="M294 300 C316 306 332 306 346 298"/>
+      <path d="M262 340 C280 346 292 346 308 340"/><path d="M290 396 C304 400 316 400 326 394"/>
+    </g>
+    <path d="M258 230 C255 290 270 380 290 450" stroke="#fff" stroke-width="10" stroke-linecap="round" fill="none" opacity=".3"/>
   </g>
-  <g fill="#ffffff" opacity="0.75">
-    <circle cx="230" cy="212" r="18"/>
-    <circle cx="353" cy="188" r="14"/>
-    <circle cx="370" cy="302" r="10"/>
-  </g>
-  <text x="300" y="500" text-anchor="middle" font-size="46" fill="#b75d0d" font-family="Arial, sans-serif" font-weight="700">Carrot</text>
 </svg>
