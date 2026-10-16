@@ -32,7 +32,7 @@
   "price.best": "Best Price",
   "price.lowest": "Lowest Price",
   "product.add": "Add",
-  "product.addToCart": "Add to Cart",
+  "product.addToCart": "Added to cart",
   "product.soldOut": "Sold Out",
   "product.outOfStock": "Out of Stock",
   "product.onlyLeft": "Only {n} left",
@@ -96,5 +96,8 @@
   "unit.kg": "kg",
   "unit.piece": "piece",
   "unit.bunch": "bunch",
-  "cat.all": "All"
+  "cat.all": "All",
+  "board.title": "Today's rates",
+  "board.all": "See all vegetables",
+  "cart.view": "View cart"
 }

@@ -20,7 +20,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥬</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;600;700;800&family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -303,6 +303,148 @@
       .nav-search{order:3;max-width:none;flex-basis:100%}
       .nav-menu{top:100%}
     }
+
+    /* ======================================================================
+       DESIGN V2 - morning market.  Baloo Da 2 (shop-sign display, Bengali + Latin) over Noto Sans.
+       Ink/leaf green, marigold, slate. Flat shapes; one animation (the sun rising).
+    ====================================================================== */
+    :root{--ink:#12301b;--slate:#17301e;--marigold:#f4a624;--marigold-hi:#ffbb3d;--paper:#f2f6ee;--line:#d9e4d1;
+      --display:'Baloo Da 2','Noto Sans Bengali','Noto Sans Devanagari','Noto Sans',sans-serif}
+    body{background:var(--paper);color:#1b2a1f}
+    :focus-visible{outline:3px solid var(--marigold);outline-offset:2px;border-radius:6px}
+    .banner{background:var(--ink);color:#f3ecd2;font-weight:600;letter-spacing:.1px}
+    .banner strong{color:var(--marigold)}
+
+    .navbar{box-shadow:none;border-bottom:1px solid var(--line)}
+    .nav-logo{font-family:var(--display);font-size:1.55rem;font-weight:800;color:var(--ink);letter-spacing:-.01em;gap:8px;line-height:1}
+    .logo-mark{width:34px;height:34px;flex:none}
+    .nav-link{font-weight:600}
+    .nav-link:hover,.nav-link.active{color:var(--green-dark);background:#e3efdb}
+    .cart-badge{background:var(--marigold);color:var(--ink)}
+
+    .btn{border-radius:12px;font-weight:700}
+    .btn-gold{background:var(--marigold);color:var(--ink)} .btn-gold:hover{background:var(--marigold-hi)}
+    .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)} .btn-ghost:hover{background:rgba(255,255,255,.12)}
+    .btn-primary{background:var(--green)} .btn-primary:hover{background:var(--green-dark)}
+
+    /* HERO: slate rate board on a rising marigold sun */
+    .hero{position:relative;isolation:isolate;overflow:hidden;background:var(--green);color:#fff;padding:52px 0 60px}
+    .hero-sun{position:absolute;z-index:-1;border-radius:50%;background:var(--marigold);width:min(700px,110vw);aspect-ratio:1;right:-90px;bottom:-400px;animation:sunrise 1.6s cubic-bezier(.2,.75,.2,1) both}
+    @keyframes sunrise{from{transform:translateY(190px)}to{transform:none}}
+    @media (prefers-reduced-motion:reduce){.hero-sun{animation:none}}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px;align-items:center}
+    .hero .hero-copy{text-align:left}
+    .hero .hero-copy h1{font-family:var(--display);font-weight:800;font-size:clamp(3rem,8vw,5.2rem);line-height:.95;letter-spacing:-.02em;margin:18px 0 0}
+    .hero .hero-copy h1 .h1-sub{display:block;font-size:clamp(1.3rem,3.2vw,1.95rem);font-weight:600;line-height:1.15;letter-spacing:0;margin-top:14px;max-width:20ch}
+    .hero .hero-copy p{font-size:1.05rem;max-width:44ch;margin:18px 0 26px;opacity:.95}
+    .hero .hero-badge{animation:none;box-shadow:none;background:var(--marigold);color:var(--ink);font-weight:700;border-radius:8px;padding:6px 12px;margin:0;font-size:13px}
+    .hero .hero-btns{justify-content:flex-start}
+    .trust-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:26px;font-weight:600;font-size:14px}
+    .trust-list li::before{content:"✓";color:var(--marigold);font-weight:800;margin-right:7px}
+
+    .rate-board{background:var(--slate);color:#eef5e8;border-radius:18px;padding:20px 22px 14px;box-shadow:0 0 0 6px #b8844a,0 28px 50px -20px rgba(0,0,0,.6)}
+    .rb-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px}
+    .rb-head h2{font-family:var(--display);font-size:1.6rem;font-weight:800;line-height:1.1;color:#fff}
+    .rb-date{font-size:12.5px;color:#b9cdb0}
+    .rb-list{list-style:none}
+    .rb-row{display:grid;grid-template-columns:46px minmax(0,1fr) auto 36px;align-items:center;gap:12px;padding:9px 0;border-top:1px dashed rgba(238,245,232,.25)}
+    .rb-thumb{width:46px;height:46px;border-radius:12px;object-fit:cover;background:#fff}
+    .rb-row .prod-emoji{width:46px;height:46px;font-size:26px;background:#fff;border-radius:12px}
+    .rb-name{font-family:var(--display);font-weight:700;font-size:1.12rem;line-height:1.1}
+    .rb-bn{font-size:12.5px;color:#b9cdb0;line-height:1.2}
+    .rb-price{font-family:var(--display);font-weight:800;font-size:1.4rem;color:var(--marigold);white-space:nowrap;line-height:1}
+    .rb-price small{font-size:.72rem;font-weight:600;color:#cfe0c5;margin-left:1px}
+    .rb-add{width:36px;height:36px;border-radius:50%;background:var(--marigold);color:var(--ink);font-size:22px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
+    .rb-add:hover{background:var(--marigold-hi);transform:scale(1.08)}
+    .rb-skel .rb-thumb,.rb-skel .rb-skel-line{background:rgba(255,255,255,.12);animation:rbpulse 1.4s ease-in-out infinite}
+    .rb-skel .rb-skel-line{height:14px;border-radius:7px;grid-column:2/4}
+    @keyframes rbpulse{50%{opacity:.45}}
+    .rb-foot{border-top:1px dashed rgba(238,245,232,.25);margin-top:2px;padding:10px 0 2px;text-align:right}
+    .rb-foot button{background:none;color:var(--marigold);font-weight:700;font-size:14px;padding:4px 0}
+    .rb-foot button:hover{text-decoration:underline}
+
+    /* FEATURES: a ruled row, not a wall of cards */
+    .feature-grid{gap:0 32px}
+    .feature-card{background:transparent;box-shadow:none;border:0;border-top:3px solid var(--green);border-radius:0;padding:16px 2px 6px}
+    .feature-card .cc-ico{width:46px;height:46px;border-radius:50%;background:#fde7b4;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px}
+    .feature-card h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink);line-height:1.15}
+    .feature-card p{font-size:14px}
+
+    .sec-title{font-family:var(--display);font-size:clamp(1.7rem,3.6vw,2.3rem);font-weight:800;color:var(--ink);letter-spacing:-.01em;line-height:1.1}
+    .sec-sub{font-size:15.5px}
+    .section{padding:56px 0}
+
+    /* PRODUCTS */
+    .products-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px}
+    .prod-card{border:1.5px solid var(--line);box-shadow:none;border-radius:22px;background:#fff;transition:border-color var(--tr)}
+    .prod-card:hover{transform:none;box-shadow:none;border-color:var(--green)}
+    .prod-img{margin:8px 8px 0;border-radius:15px}
+    .prod-img img,.prod-card:hover .prod-img img{transition:none;transform:none}
+    .prod-info{padding:12px 15px 4px;gap:0}
+    .prod-bn{font-family:var(--display);font-size:14px;line-height:1.2;min-height:17px}
+    .prod-name{font-family:var(--display);font-weight:800;font-size:1.25rem;line-height:1.15;color:var(--ink)}
+    .prod-price{margin-top:6px;font-family:var(--display);font-weight:800;font-size:1.55rem;line-height:1;color:var(--green-dark)}
+    .prod-foot{padding:8px 12px 14px;gap:8px}
+    .prod-foot .btn{flex:1;border-radius:99px;padding:7px 12px}
+    .qty-wrap{border-radius:99px;border:1.5px solid var(--line)}
+    .qty-btn{width:30px;background:#fff}
+    .qty-btn:hover{background:var(--green)}
+    .qty-inp{width:30px;height:32px}
+    .badge-deal{background:var(--marigold);color:var(--ink);border-radius:8px;font-size:11.5px;padding:3px 9px}
+    .badge-oos{border-radius:8px} .badge-low{background:var(--marigold);color:var(--ink);border-radius:8px}
+    .cat-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+    .cat-tabs::-webkit-scrollbar{display:none}
+    .cat-btn{white-space:nowrap;border-width:1.5px;font-family:var(--display);font-size:15px;font-weight:600;padding:4px 16px}
+    .cat-btn.active,.cat-btn:hover{border-color:var(--ink);background:var(--ink);color:#fff}
+    .search-wrap input{border-width:1.5px;border-radius:12px}
+
+    .basket{border-radius:16px;border:1.5px solid var(--line)}
+    .basket h3{font-family:var(--display);font-size:1.2rem;color:var(--ink)}
+    .test-card{box-shadow:none;border:1.5px solid var(--line);border-radius:16px}
+
+    /* FOOTER */
+    .footer{background:var(--ink)}
+    .footer h3,.footer h4{font-family:var(--display)}
+    .footer h4{text-transform:none;letter-spacing:0;font-size:1.05rem;color:var(--marigold)}
+    .footer p a{display:inline;margin:0}
+
+    /* MOBILE CART BAR */
+    .cart-bar{position:fixed;left:12px;right:12px;bottom:12px;z-index:900;display:none;align-items:center;justify-content:space-between;gap:12px;background:var(--ink);color:#fff;border-radius:16px;padding:12px 18px;font-weight:700;font-size:15px;box-shadow:0 14px 30px -10px rgba(0,0,0,.55)}
+    .cart-bar.show{display:flex}
+    .cb-left{display:flex;align-items:center;gap:10px}
+    .cb-count{min-width:26px;height:26px;border-radius:13px;background:var(--marigold);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0 6px}
+    .cb-total{font-family:var(--display);font-size:1.3rem;color:var(--marigold)}
+
+    @media(max-width:900px){
+      .hero-grid{grid-template-columns:1fr;gap:34px}
+      .hero{padding:36px 0 44px}
+      .hero-sun{right:-30vw;bottom:-62vw}
+    }
+    @media(max-width:760px){
+      body.has-cart-bar{padding-bottom:86px}
+      body.has-cart-bar .fab-wa{bottom:92px}
+      body.has-cart-bar .fab-top{bottom:92px}
+    }
+    @media(min-width:761px){.cart-bar{display:none!important}}
+    @media(max-width:700px){
+      .nav-container{gap:8px 10px}
+      .nav-logo{font-size:1.3rem;gap:6px}.logo-mark{width:28px;height:28px}
+      .nav-actions{margin-left:auto}
+      .banner{font-size:12px;padding:7px 12px}
+      .fab-wa{width:46px;height:46px;left:12px;right:auto;bottom:16px}.fab-wa svg{width:24px;height:24px}
+      .fab-top{display:none}
+    }
+    @media(min-width:1130px){.featured-grid>:nth-child(6){display:none}}
+    @media(max-width:560px){
+      .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+      .prod-name{font-size:1.1rem}.prod-price{font-size:1.35rem}
+      .prod-foot{flex-direction:column;align-items:stretch}.qty-wrap{justify-content:space-between}
+      .qty-inp{flex:1;width:auto}
+      .rate-board{padding:16px 16px 10px}
+      .rb-row{grid-template-columns:42px minmax(0,1fr) auto 34px;gap:10px}
+      .rb-thumb,.rb-row .prod-emoji{width:42px;height:42px}
+      .section{padding:42px 0}
+    }
   </style>
 </head>
 <body>
@@ -313,7 +455,7 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-container">
-    <div class="nav-logo" onclick="showPage('home')">🥬 <span data-i18n="brand">Sokal Bela</span></div>
+    <div class="nav-logo" role="link" tabindex="0" onclick="showPage('home')" onkeydown="if(event.key==='Enter'){showPage('home')}"><svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="21" r="12.5" fill="#f4a624"/><path d="M3 31C9 20 22 17 37 22c-3 11-17 17-34 9z" fill="#2d7a3a"/><path d="M8 29c8-5 16-7 26-6" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" opacity=".75"/></svg><span data-i18n="brand">Sokal Bela</span></div>
     <div class="nav-search">
       <span class="search-ico">🔍</span>
       <input type="search" id="nav-search-input" data-i18n-placeholder="search.placeholder" placeholder="Search vegetables..." onkeydown="if(event.key==='Enter'){event.preventDefault();navSearch();}">
@@ -350,20 +492,28 @@
 <section id="home-page" class="page active">
 
   <div class="hero">
-    <div class="hero-inner">
-      <div class="hero-badge" data-i18n="hero.badge">Lowest Price Guaranteed | 20-30% Cheaper than Local Market</div>
-      <h1>🥬 <span data-i18n="brand">Sokal Bela</span><br><span data-i18n="hero.title">Fresh Local Vegetables — Delivered Fast</span></h1>
-      <p data-i18n="hero.sub">Farm-to-doorstep produce for Rampurhat households &amp; events. Quality guaranteed.</p>
-      <div class="trust-badges">
-        <span class="trust-badge">🌿 <span data-i18n="trust.fresh">100% Fresh</span></span>
-        <span class="trust-badge">🚚 <span data-i18n="trust.delivery">Same Day Delivery</span></span>
-        <span class="trust-badge">🌾 <span data-i18n="trust.farm">Farm Direct</span></span>
-        <span class="trust-badge">✅ <span data-i18n="trust.price">No Hidden Charges</span></span>
+    <div class="hero-sun" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <div class="hero-badge" data-i18n="hero.badge">Lowest Price Guaranteed | 20-30% Cheaper than Local Market</div>
+        <h1><span data-i18n="brand">Sokal Bela</span><span class="h1-sub" data-i18n="hero.title">Fresh Local Vegetables — Delivered Fast</span></h1>
+        <p data-i18n="hero.sub">Farm-to-doorstep produce for Rampurhat households &amp; events. Quality guaranteed.</p>
+        <div class="hero-btns">
+          <button class="btn btn-gold btn-lg" onclick="showPage('products')" data-i18n="hero.shop">Shop Now</button>
+          <button class="btn btn-ghost btn-lg" onclick="showPage('bulk')" data-i18n="hero.bulk">Bulk Orders</button>
+        </div>
+        <ul class="trust-list">
+          <li data-i18n="trust.fresh">100% Fresh</li>
+          <li data-i18n="trust.delivery">Same Day Delivery</li>
+          <li data-i18n="trust.farm">Farm Direct</li>
+          <li data-i18n="trust.price">No Hidden Charges</li>
+        </ul>
       </div>
-      <div class="hero-btns">
-        <button class="btn btn-white btn-lg" onclick="showPage('products')">🛒 <span data-i18n="hero.shop">Shop Now</span></button>
-        <button class="btn btn-lg" style="border:2px solid #fff;color:#fff;background:transparent" onclick="showPage('bulk')">📦 <span data-i18n="hero.bulk">Bulk Orders</span></button>
-      </div>
+      <aside class="rate-board" aria-labelledby="rb-title">
+        <div class="rb-head"><h2 id="rb-title" data-i18n="board.title">Today's rates</h2><span class="rb-date" id="board-date"></span></div>
+        <ul class="rb-list" id="board-list"></ul>
+        <div class="rb-foot"><button type="button" onclick="showPage('products')" data-i18n="board.all">See all vegetables</button></div>
+      </aside>
     </div>
   </div>
 
@@ -378,7 +528,6 @@
     </div>
   </div>
 
-  <div class="price-board">📅 <b>Today's rates</b> — <span id="pb-date"></span> · Prices are updated every morning as per market rate</div>
 
   <div class="section" style="padding-bottom:0">
     <div class="container">
@@ -392,7 +541,7 @@
     <div class="container">
       <h2 class="sec-title" data-i18n="products.featured">⭐ Featured Vegetables</h2>
       <p class="sec-sub" data-i18n="products.featuredSub">Freshly picked, available today</p>
-      <div class="products-grid" id="featured-grid"></div>
+      <div class="products-grid featured-grid" id="featured-grid"></div>
     </div>
   </div>
 
@@ -873,6 +1022,7 @@
 <a href="https://wa.me/917551858583?text=Hello%2C+I'd+like+to+order+from+Sokal+Bela" target="_blank" rel="noopener" class="fab-wa" aria-label="Chat on WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 0 1-4.267-1.234l-.305-.182-3.168.943.943-3.168-.182-.305A7.946 7.946 0 0 1 4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/></svg>
 </a>
+<button class="cart-bar" id="cart-bar" type="button" onclick="showPage('cart')"><span class="cb-left"><span class="cb-count" id="cb-count">0</span><span data-i18n="cart.view">View cart</span></span><span class="cb-total" id="cb-total">₹0</span></button>
 <button class="fab-top" id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
 
 <!-- TOAST CONTAINER -->
@@ -1183,7 +1333,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (window.I18N) {
     I18N.apply();
     I18N.onChange(() => {
-      renderFeatured(); renderProducts(); renderCatTabs(); renderCart(); renderCartCount(); renderBaskets();
+      setBoardDate(); updateCartBar(); renderFeatured(); renderProducts(); renderCatTabs(); renderCart(); renderCartCount(); renderBaskets();
       updateAuthNav(); updateCheckoutBtnLabel();
     });
   }
@@ -1232,8 +1382,7 @@ function orderBasket(i){
 }
 window.addEventListener("load",()=>{
   renderBaskets();
-  const d=document.getElementById("pb-date");
-  if(d) d.textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  setBoardDate(); renderBoard(); updateCartBar();
   const pin=document.getElementById("cust-pincode");
   if(pin) pin.addEventListener("input",()=>{
     const v=pin.value.trim(), out=document.getElementById("err-pincode");
@@ -1252,6 +1401,7 @@ function showPage(id) {
   if (el) { el.classList.add("active"); window.scrollTo({top:0,behavior:"smooth"}); }
   document.getElementById("nav-menu")?.classList.remove("open");
   document.getElementById("hamburger")?.classList.remove("open");
+  updateCartBar();
   document.querySelectorAll(".nav-link[data-page]").forEach(a =>
     a.classList.toggle("active", a.dataset.page === id)
   );
@@ -1678,9 +1828,51 @@ function renderSkeletons(cid, n) {
   el.innerHTML = Array(n).fill(`<div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-ln"></div><div class="skel skel-ln s"></div><div class="skel skel-btn"></div></div>`).join("");
 }
 
+/* Today's rates board (hero): first in-stock vegetables with name, Bengali name and price. */
+function renderBoard() {
+  const el = document.getElementById("board-list"); if (!el) return;
+  if (!products.length) {
+    el.innerHTML = Array(6).fill('<li class="rb-row rb-skel"><span class="rb-thumb"></span><span class="rb-skel-line"></span></li>').join("");
+    return;
+  }
+  el.innerHTML = products.filter(p => p.active !== false && p.stock > 0).slice(0, 7).map(p => {
+    const label = window.I18N ? I18N.formatPrice(p.price, p.unit) : ("₹" + p.price + "/" + p.unit);
+    const cut = label.indexOf("/");
+    const amount = cut > -1 ? label.slice(0, cut) : label, unit = cut > -1 ? label.slice(cut) : "";
+    const pic = window.VEG_IMAGES ? VEG_IMAGES.getVegImage(p) : "";
+    const fb = window.VEG_IMAGES ? VEG_IMAGES.getBundledImage(p) : "";
+    return `<li class="rb-row">
+      <img class="rb-thumb" src="${esc(pic)}" alt="" data-fallback="${esc(fb)}" data-e="${esc(emoji(p))}" onerror="vegImgError(this)">
+      <div><div class="rb-name">${esc(displayName(p))}</div><div class="rb-bn">${esc(p.bengaliName || p.hindiName || "")}</div></div>
+      <div class="rb-price">${esc(amount)}<small>${esc(unit)}</small></div>
+      <button type="button" class="rb-add" onclick="addToCart('${p.id}','b')" aria-label="${esc(t("product.add"))}: ${esc(displayName(p))}">+</button>
+    </li>`;
+  }).join("");
+}
+
+function setBoardDate() {
+  const el = document.getElementById("board-date"); if (!el) return;
+  const loc = { bn: "bn-IN", hi: "hi-IN" }[window.I18N?.lang] || "en-IN";
+  el.textContent = new Date().toLocaleDateString(loc, { weekday: "long", day: "numeric", month: "long" });
+}
+
+/* Floating cart bar (phones): shows items + total while shopping. */
+function updateCartBar() {
+  const bar = document.getElementById("cart-bar"); if (!bar) return;
+  const count = cart.reduce((n, i) => n + (Number(i.qty) || 0), 0);
+  const total = cart.reduce((n, i) => n + (Number(i.price) || 0) * (Number(i.qty) || 0), 0);
+  const hideOn = ["cart", "admin", "confirmation"].some(id => document.getElementById(id + "-page")?.classList.contains("active"));
+  const show = count > 0 && !hideOn;
+  bar.classList.toggle("show", show);
+  document.body.classList.toggle("has-cart-bar", show);
+  document.getElementById("cb-count").textContent = window.I18N ? I18N.localizeDigits(count) : count;
+  document.getElementById("cb-total").textContent = "₹" + (window.I18N ? I18N.localizeDigits(total) : total);
+}
+
 function renderFeatured() {
+  renderBoard();
   const el = document.getElementById("featured-grid"); if (!el) return;
-  el.innerHTML = products.slice(0,6).map(prodCard).join("");
+  el.innerHTML = products.slice(0,6).map(p => prodCard(p, "f")).join("");
 }
 
 function renderProducts() {
@@ -1689,7 +1881,7 @@ function renderProducts() {
   let list = products.filter(p => p.active !== false);
   if (curCat !== "All") list = list.filter(p => p.category === curCat);
   if (q) list = list.filter(p => [p.name,p.bengaliName,p.hindiName,p.displayName].some(n => (n||"").toLowerCase().includes(q)));
-  el.innerHTML = list.length ? list.map(prodCard).join("") : `<p style="grid-column:1/-1;color:var(--text2)">${esc(t("products.empty"))}</p>`;
+  el.innerHTML = list.length ? list.map(p => prodCard(p, "p")).join("") : `<p style="grid-column:1/-1;color:var(--text2)">${esc(t("products.empty"))}</p>`;
 }
 
 function displayName(p) {
@@ -1712,7 +1904,7 @@ function vegImgError(img) {
   img.replaceWith(div);
 }
 
-function prodCard(p) {
+function prodCard(p, ctx = "p") {
   const oos = p.stock <= 0, low = p.stock > 0 && p.stock < 5;
   const mapped = window.VEG_IMAGES ? VEG_IMAGES.getVegImage(p) : (p.imageUrl || "");
   // If the owner's own image fails to load, fall back to the bundled illustration, then the emoji.
@@ -1735,17 +1927,17 @@ function prodCard(p) {
     </div>
     <div class="prod-foot">
       <div class="qty-wrap">
-        <button class="qty-btn" onclick="chQty('${p.id}',-1)">−</button>
-        <input class="qty-inp" id="qty-${p.id}" type="number" value="1" min="1" max="${p.stock||999}">
-        <button class="qty-btn" onclick="chQty('${p.id}',1)">+</button>
+        <button class="qty-btn" onclick="chQty('${ctx}','${p.id}',-1)">−</button>
+        <input class="qty-inp" id="qty-${ctx}-${p.id}" type="number" value="1" min="1" max="${p.stock||999}">
+        <button class="qty-btn" onclick="chQty('${ctx}','${p.id}',1)">+</button>
       </div>
-      <button class="btn btn-primary btn-sm" ${oos?"disabled":""} onclick="addToCart('${p.id}')">${oos?esc(t("product.soldOut")):esc(t("product.add"))}</button>
+      <button class="btn btn-primary btn-sm" ${oos?"disabled":""} onclick="addToCart('${p.id}','${ctx}')">${oos?esc(t("product.soldOut")):esc(t("product.add"))}</button>
     </div>
   </div>`;
 }
 
-function chQty(id, d) {
-  const inp = document.getElementById("qty-"+id); if (!inp) return;
+function chQty(ctx, id, d) {
+  const inp = document.getElementById("qty-"+ctx+"-"+id); if (!inp) return;
   inp.value = Math.max(1,(parseInt(inp.value)||1)+d);
 }
 function filterProducts() { renderProducts(); }
@@ -1770,12 +1962,13 @@ function saveCartStorage(uid = currentUser?.uid || null) {
 function renderCartCount() {
   const badge = document.getElementById("cart-badge");
   if (badge) badge.textContent = cart.reduce((s,i)=>s+(Number(i.qty)||0),0);
+  updateCartBar();
 }
 
-function addToCart(id) {
+function addToCart(id, ctx = "p") {
   const p = products.find(x=>x.id===id); if (!p) return;
   if (p.stock <= 0 || p.active === false) { showToast("This product is currently unavailable.","error"); return; }
-  const requestedQty = parseInt(document.getElementById("qty-"+id)?.value)||1;
+  const requestedQty = parseInt(document.getElementById("qty-"+ctx+"-"+id)?.value)||1;
   const qty = Math.max(1, requestedQty);
   const ex = cart.find(x=>x.id===id);
   if (ex) ex.qty = Math.min(ex.qty + qty, p.stock || 999);
