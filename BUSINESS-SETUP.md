@@ -54,3 +54,10 @@ Owner (pricing, quotes, suppliers) · Shop helper (packing, counter) · Delivery
 - Owner WhatsApp number: `OWNER_WA`
 - Facebook link: `facebook.com`
 - Admin panel: open your site link followed by `#admin` (example: `yoursite.vercel.app/#admin`). The Admin link is hidden from customers.
+
+## 9. Product pictures
+- The picture always follows the product **name** (English, Bengali or Hindi). Potato gets the potato picture, Cauliflower gets the cauliflower picture, and so on. The Image URL stored in the database is ignored for any vegetable the app recognises.
+- Built-in pictures: potato, onion, tomato, green chilli, brinjal, spinach, leafy greens, cauliflower, cabbage, carrot, garlic, ginger, cucumber, lemon, okra, pumpkin, radish, capsicum, beetroot, bitter gourd, bottle gourd.
+- For anything else (for example mango), the Image URL you type in Admin is used, otherwise a neutral leaf picture.
+- Want your own photos to win over the built-in pictures? Set `PREFER_OWN_PHOTOS = true` at the top of `js/veg-images.js`.
+- The same vegetable saved several times (same name, unit and price) is shown once on the shop. Delete the extras in Admin to tidy the list.

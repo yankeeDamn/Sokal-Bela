@@ -32,7 +32,7 @@
   "price.best": "बेहतरीन कीमत",
   "price.lowest": "सबसे कम कीमत",
   "product.add": "जोड़ें",
-  "product.addToCart": "कार्ट में डालें",
+  "product.addToCart": "कार्ट में जोड़ा गया",
   "product.soldOut": "स्टॉक खत्म",
   "product.outOfStock": "स्टॉक में नहीं",
   "product.onlyLeft": "केवल {n} बचे",
@@ -96,5 +96,8 @@
   "unit.kg": "किलो",
   "unit.piece": "पीस",
   "unit.bunch": "गड्डी",
-  "cat.all": "सभी"
+  "cat.all": "सभी",
+  "board.title": "आज के भाव",
+  "board.all": "सभी सब्ज़ियाँ देखें",
+  "cart.view": "कार्ट देखें"
 }

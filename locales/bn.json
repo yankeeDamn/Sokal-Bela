@@ -32,7 +32,7 @@
   "price.best": "সেরা দাম",
   "price.lowest": "সবচেয়ে কম দাম",
   "product.add": "যোগ করুন",
-  "product.addToCart": "ঝুড়িতে যোগ করুন",
+  "product.addToCart": "ঝুড়িতে যোগ হয়েছে",
   "product.soldOut": "স্টক নেই",
   "product.outOfStock": "স্টক নেই",
   "product.onlyLeft": "মাত্র {n} বাকি",
@@ -96,5 +96,8 @@
   "unit.kg": "কেজি",
   "unit.piece": "পিস",
   "unit.bunch": "আঁটি",
-  "cat.all": "সব"
+  "cat.all": "সব",
+  "board.title": "আজকের দাম",
+  "board.all": "সব সবজি দেখুন",
+  "cart.view": "কার্ট দেখুন"
 }
