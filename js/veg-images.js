@@ -1,13 +1,18 @@
 /* Vegetable image mapping with reliable local fallbacks.
  *
- * Image priority for a product:
- *   1. Its own image set in Admin (imageUrl / image) - the owner's photo always wins.
- *   2. A bundled illustration matched by name (English, Bengali or Hindi).
- *   3. A neutral fallback illustration.
+ * Rule: the picture always matches the product NAME.
+ *   1. If the name is recognised (English, Bengali or Hindi), the built-in picture for that
+ *      vegetable is used - whatever image path is stored in the database. (Old data had e.g.
+ *      Cauliflower pointing at carrot.svg.)
+ *   2. Otherwise the Image URL set in Admin is used, if it is a real photo link.
+ *   3. Otherwise a neutral fallback picture.
+ *
+ * Want your own uploaded photos to win over the built-in pictures? Set PREFER_OWN_PHOTOS = true.
  */
 (function (global) {
   'use strict';
 
+  const PREFER_OWN_PHOTOS = false;
   const PUBLIC_BASE = '/public/images';
   const FALLBACK_IMG = `${PUBLIC_BASE}/veg-fallback.svg`;
 
@@ -30,6 +35,7 @@
     { keys: ['onion', 'peyaj', 'piyaj', 'পেঁয়াজ', 'প্যাঁজ', 'प्याज'], file: 'onion.svg' },
     { keys: ['brinjal', 'eggplant', 'aubergine', 'begun', 'baingan', 'বেগুন', 'बैंगन'], file: 'brinjal.svg' },
     { keys: ['spinach', 'palak', 'palong', 'পালং', 'পালংশাক', 'पालक'], file: 'spinach.svg' },
+    { keys: ['leafy greens', 'leafy green', 'greens', 'shak', 'saag', 'sag', 'শাক', 'साग'], file: 'leafy-greens.svg' },
     { keys: ['cauliflower', 'phulkopi', 'phulkopi', 'ফুলকপি', 'फूलगोभी', 'फूल गोभी'], file: 'cauliflower.svg' },
     { keys: ['cabbage', 'bandhakopi', 'bandhakopi', 'বাঁধাকপি', 'पत्ता गोभी', 'पत्तागोभी', 'बंद गोभी'], file: 'cabbage.svg' },
     { keys: ['carrot', 'gajar', 'গাজর', 'गाजर'], file: 'carrot.svg' },
@@ -74,7 +80,8 @@
   function haystack(product) {
     if (!product) return '';
     if (typeof product === 'string') return product;
-    return [product.name, product.bengaliName, product.hindiName, product.displayName, product.id]
+    return [product.name, product.nameEn, product.name_en, product.bengaliName, product.nameBn, product.name_bn,
+      product.hindiName, product.nameHi, product.name_hi, product.displayName, product.id]
       .filter(Boolean)
       .join(' ');
   }
@@ -95,14 +102,19 @@
     return '';
   }
 
+  /* A path inside /public/images is one of our own built-in pictures, not an owner's photo. */
+  function isBundledPath(url) {
+    return typeof url === 'string' && url.indexOf(PUBLIC_BASE + '/') === 0;
+  }
+
   function getVegImage(product) {
-    // 1. The owner's own image (set in Admin) always wins.
-    const own = product && typeof product === 'object'
+    const raw = product && typeof product === 'object'
       ? resolveLocalImage(product.imageUrl || product.image || (Array.isArray(product.images) ? product.images[0] : ''))
       : '';
-    if (own) return own;
-    // 2. Bundled illustration by name, 3. neutral fallback.
-    return findBundledImage(product) || FALLBACK_IMG;
+    const ownPhoto = raw && !isBundledPath(raw) ? raw : '';
+    if (PREFER_OWN_PHOTOS && ownPhoto) return ownPhoto;
+    // Picture that matches the name -> owner's photo for things we have no picture of -> neutral fallback.
+    return findBundledImage(product) || ownPhoto || FALLBACK_IMG;
   }
 
   /* The bundled illustration for a product, if there is one (used as the

@@ -808,11 +808,11 @@
               <div class="form-group"><label class="form-label">Category</label>
                 <select id="pf-cat" class="form-control">
                   <option>Root Vegetables</option><option>Leafy Greens</option>
-                  <option>Gourds</option><option>Others</option>
+                  <option>Gourds</option><option>Fruity Vegetables</option><option>Others</option>
                 </select>
               </div>
               <div class="form-group"><label class="form-label">Stock *</label><input type="number" id="pf-stock" class="form-control" min="0" required></div>
-              <div class="form-group"><label class="form-label">Image URL (optional)</label><input type="url" id="pf-img" class="form-control" placeholder="https://…"><small style="color:var(--text2)">Leave blank to use the built-in picture for this vegetable (matched by name).</small></div>
+              <div class="form-group"><label class="form-label">Image URL (optional)</label><input type="url" id="pf-img" class="form-control" placeholder="https://…"><small style="color:var(--text2)">Leave blank. For vegetables the app knows by name (potato, tomato, cauliflower…) the matching built-in picture is always used.</small></div>
               <div class="form-group"><label class="form-label">Emoji fallback</label><input type="text" id="pf-emoji" class="form-control" placeholder="🥔" maxlength="4"></div>
               <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="pf-active" checked> Active (visible to customers)</label></div>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -1605,7 +1605,7 @@ async function loadProducts() {
         const list = Array.isArray(data?.products) ? data.products : [];
         const catalogLike = list.some(p => p.bengaliName || p.hindiName || /potato|tomato|onion|vegetable|alu|brinjal/i.test(String(p.name||"")) || /Root|Leafy|Gourd/i.test(String(p.category||"")));
         if (data && data.success && list.length && catalogLike) {
-          products = list.map(normalizeProduct).filter(p => p.status !== "archived" && p.active !== false);
+          products = dedupeProducts(list.map(normalizeProduct).filter(p => p.status !== "archived" && p.active !== false));
           cart = sanitizeCart(cart);
           saveCartStorage();
           renderFeatured(); renderProducts(); renderCatTabs();
@@ -1615,13 +1615,35 @@ async function loadProducts() {
     } catch (apiErr) { console.warn("products API:", apiErr.message); }
     if (fbOk && db) {
       const snap = await withTimeout(db.collection("products").get(), 8000, "firestore products");
-      const mapped = snap.empty ? SEEDS : snap.docs.map(d => normalizeProduct({ id: d.id, ...d.data() }));
-      products = mapped.filter(p => p.status !== "archived" && p.active !== false);
+      const mapped = snap.empty ? SEEDS.map(normalizeProduct) : snap.docs.map(d => normalizeProduct({ id: d.id, ...d.data() }));
+      products = dedupeProducts(mapped.filter(p => p.status !== "archived" && p.active !== false));
     } else { products = SEEDS.map(normalizeProduct); }
   } catch (e) { console.warn(e); products = SEEDS.map(normalizeProduct); }
   cart = sanitizeCart(cart);
   saveCartStorage();
   renderFeatured(); renderProducts(); renderCatTabs();
+}
+
+/* Categories are sometimes stored as slugs ("fruity-vegetables"); show them as "Fruity Vegetables". */
+function prettyCategory(value) {
+  const c = String(value || "").trim();
+  if (!c) return "Others";
+  if (/^[a-z0-9]+([-_][a-z0-9]+)+$|^[a-z0-9]+$/.test(c)) {
+    return c.replace(/[-_]+/g, " ").replace(/\b\w/g, ch => ch.toUpperCase());
+  }
+  return c;
+}
+
+/* The same vegetable can exist several times in the database (same name, unit and price).
+   Show it once on the storefront - keep the entry with the most stock, then the lowest id. */
+function dedupeProducts(list) {
+  const best = new Map();
+  list.forEach(p => {
+    const key = [String(p.name).toLowerCase(), p.unit, p.price].join("|");
+    const cur = best.get(key);
+    if (!cur || p.stock > cur.stock || (p.stock === cur.stock && String(p.id) < String(cur.id))) best.set(key, p);
+  });
+  return list.filter(p => best.get([String(p.name).toLowerCase(), p.unit, p.price].join("|")) === p);
 }
 
 function normalizeProduct(raw = {}) {
@@ -1632,12 +1654,12 @@ function normalizeProduct(raw = {}) {
   return {
     id,
     productId: id,
-    name: String(raw.name || raw.productName || raw.product_name || raw.title || raw.itemName || raw.item_name || raw.name_en || raw.englishName || raw.productname || "").trim(),
-    bengaliName: raw.bengaliName || "",
-    hindiName: raw.hindiName || "",
+    name: String(raw.name || raw.nameEn || raw.productName || raw.product_name || raw.title || raw.itemName || raw.item_name || raw.name_en || raw.englishName || raw.productname || "").trim(),
+    bengaliName: raw.bengaliName || raw.nameBn || raw.name_bn || "",
+    hindiName: raw.hindiName || raw.nameHi || raw.name_hi || "",
     displayName: raw.displayName || "",
     description: String(raw.description || "").trim(),
-    category: raw.category || "Others",
+    category: prettyCategory(raw.category),
     price: Number(raw.price ?? raw.base_price ?? 0) || 0,
     unit: raw.unit || "kg",
     stock,
@@ -2704,7 +2726,10 @@ async function loadToForm(id) {
     document.getElementById("pf-desc").value=p.description||"";
     document.getElementById("pf-price").value=p.price||"";
     document.getElementById("pf-unit").value=p.unit||"kg";
-    document.getElementById("pf-cat").value=p.category||"Others";
+    const catSel=document.getElementById("pf-cat");
+    // a category that is not in the list (e.g. older data) is added so editing does not blank it
+    if(p.category && ![...catSel.options].some(o=>o.value===p.category)) catSel.add(new Option(p.category,p.category));
+    catSel.value=p.category||"Others";
     document.getElementById("pf-stock").value=p.stock??0;
     document.getElementById("pf-img").value=p.imageUrl||"";
     document.getElementById("pf-emoji").value=p.emoji||"";
