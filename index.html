@@ -422,6 +422,14 @@
     .hero{background:linear-gradient(135deg,#1e5a28,#2d7a3a)}
     .fab-wa{background:#25d366}
     @media(max-width:360px){.nav-container{padding-left:10px;padding-right:10px}.otp-input-row{gap:4px}.products-grid{gap:8px}}
+  
+    .faq-list{max-width:860px;margin:auto;display:grid;gap:12px}
+    .faq-list details{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px}
+    .faq-list summary{cursor:pointer;font-weight:700;color:var(--green-dark)}
+    .faq-list p{margin-top:10px;color:var(--text2)}
+    .feature-card,.contact-card{transition:transform .22s ease,box-shadow .22s ease}
+    .feature-card:hover,.contact-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+    @media(prefers-reduced-motion:reduce){.feature-card,.contact-card{transition:none;transform:none!important}}
   </style>
 </head>
 <body>
@@ -471,18 +479,18 @@
     <div class="hero-sun" aria-hidden="true"></div>
     <div class="container hero-grid">
       <div class="hero-copy">
-        <div class="hero-badge" data-i18n="hero.badge">Lowest Price Guaranteed | 20-30% Cheaper than Local Market</div>
+        <div class="hero-badge" data-i18n="hero.badge">🥬 Rampurhat • Birbhum • Local Farm Fresh</div>
         <h1><span data-i18n="brand">Sokal Bela</span><span class="h1-sub" data-i18n="hero.title">Fresh Local Vegetables — Delivered Fast</span></h1>
         <p data-i18n="hero.sub">Farm-to-doorstep produce for Rampurhat households &amp; events. Quality guaranteed.</p>
         <div class="hero-btns">
-          <button class="btn btn-gold btn-lg" onclick="showPage('products')" data-i18n="hero.shop">Shop Now</button>
-          <button class="btn btn-ghost btn-lg" onclick="showPage('bulk')" data-i18n="hero.bulk">Bulk Orders</button>
+          <button class="btn btn-gold btn-lg" onclick="showPage('products')" data-i18n="hero.shop">Shop Morning Fresh</button>
+          <button class="btn btn-ghost btn-lg" onclick="showPage('bulk')" data-i18n="hero.bulk">Bulk Event Booking</button>
         </div>
         <ul class="trust-list">
-          <li data-i18n="trust.fresh">100% Fresh</li>
-          <li data-i18n="trust.delivery">Same Day Delivery</li>
-          <li data-i18n="trust.farm">Farm Direct</li>
-          <li data-i18n="trust.price">No Hidden Charges</li>
+          <li>🌿 100% Fresh</li>
+          <li>⚡ 24/7 Emergency Delivery</li>
+          <li>🌾 Farm Direct</li>
+          
         </ul>
       </div>
       <aside class="rate-board" aria-labelledby="rb-title">
@@ -493,71 +501,60 @@
     </div>
   </div>
 
-  <div class="section" style="padding-bottom:0">
-    <div class="container">
-      <div class="feature-grid">
-        <div class="feature-card"><div class="cc-ico">🌅</div><h3 data-i18n="feature.morning.title">Fresh Morning Delivery</h3><p data-i18n="feature.morning.desc">Harvested at dawn, delivered to your door.</p></div>
-        <div class="feature-card"><div class="cc-ico">🚜</div><h3 data-i18n="feature.farmers.title">Directly from Farmers</h3><p data-i18n="feature.farmers.desc">Farm-fresh produce with zero middleman markup.</p></div>
-        <div class="feature-card"><div class="cc-ico">⚡</div><h3 data-i18n="feature.fast.title">Fast &amp; Easy Ordering</h3><p data-i18n="feature.fast.desc">1-tap ordering with instantly updated cart quantity selectors.</p></div>
-        <div class="feature-card"><div class="cc-ico">📞</div><h3 data-i18n="feature.whatsapp.title">WhatsApp Ordering</h3><p data-i18n="feature.whatsapp.desc">Quick support and direct ordering via WhatsApp button.</p></div>
-      </div>
-    </div>
-  </div>
 
-
-  <div class="section" style="padding-bottom:0">
+  <section class="section" aria-labelledby="featured-heading">
     <div class="container">
-      <h2 class="sec-title">🧺 Ready Baskets</h2>
-      <p class="sec-sub">Easy ordering: pick a basket and send it on WhatsApp. We confirm today's price before delivery.</p>
+      <h2 class="sec-title" id="featured-heading">🥬 Featured Produce</h2>
+      <p class="sec-sub">Fresh vegetables from Birbhum farmers, with clear per-unit prices and live stock updates.</p>
+      <div class="products-grid featured-grid" id="featured-grid" aria-live="polite"></div>
+      <h3 style="margin:32px 0 8px">🧺 Ready Baskets</h3>
+      <p class="sec-sub">Choose a basket and confirm today's market price with our team.</p>
       <div class="contact-grid" id="baskets-grid"></div>
     </div>
-  </div>
-
-  <div class="section" style="padding-bottom:0">
-    <div class="container">
-      <h2 class="sec-title" data-i18n="products.featured">⭐ Featured Vegetables</h2>
-      <p class="sec-sub" data-i18n="products.featuredSub">Freshly picked, available today</p>
-      <div class="products-grid featured-grid" id="featured-grid"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="container">
-      <h2 class="sec-title">💬 What Customers Say</h2>
-      <p class="sec-sub">Share your experience with us on WhatsApp. Customer stories will appear here with permission.</p>
-      <div class="contact-card"><p>We are collecting verified local customer feedback. Have a recent Sokal Bela delivery to review?</p><a href="#" data-contact-wa data-wa-text="Hello Sokal Bela! I would like to share feedback on my order.">Share feedback on WhatsApp</a></div></div></div></div>
-  </div>
-
-  <div class="section">
-    <div class="container">
-      <h2 class="sec-title">🧺 What We Do</h2>
+  </section>
+  <section class="section" style="background:var(--green-light)" aria-labelledby="how-heading">
+    <div class="container"><h2 class="sec-title" id="how-heading">How It Works</h2>
       <div class="contact-grid">
-        <div class="contact-card"><div class="cc-ico">🥬</div><h3>Daily Fresh Vegetables</h3><p>Order for home delivery or shop pickup</p></div>
-        <div class="contact-card"><div class="cc-ico">📦</div><h3>Bulk Orders</h3><p>Weddings, birthdays, annaprasan &amp; programs</p><a href="#" onclick="showPage('bulk');return false">Request a quote</a></div>
-        <div class="contact-card"><div class="cc-ico">🍛</div><h3>Catering</h3><p>Veg food for events, cooked &amp; served</p><a href="#" onclick="showPage('catering');return false">Plan your event</a></div>
-      </div>
-      <h2 class="sec-title" style="margin-top:36px">How Ordering Works</h2>
-      <div class="contact-grid">
-        <div class="contact-card"><div class="cc-ico">1️⃣</div><h3>Choose</h3><p>Pick vegetables, or fill the bulk / catering form</p></div>
-        <div class="contact-card"><div class="cc-ico">2️⃣</div><h3>Send</h3><p>Order goes to us on WhatsApp / Facebook / call</p></div>
-        <div class="contact-card"><div class="cc-ico">3️⃣</div><h3>We Confirm</h3><p>We confirm price, date and time with you</p></div>
-        <div class="contact-card"><div class="cc-ico">4️⃣</div><h3>Pay on Delivery</h3><p>Cash on Delivery or PhonePe after shop confirmation.</p></div>
+        <div class="contact-card"><div class="cc-ico">1️⃣</div><h3>Choose fresh produce</h3><p>Browse today's vegetables and choose quantities or an event request.</p></div>
+        <div class="contact-card"><div class="cc-ico">2️⃣</div><h3>Add to your basket</h3><p>Check your order, item pricing and delivery details.</p></div>
+        <div class="contact-card"><div class="cc-ico">3️⃣</div><h3>We confirm</h3><p>Our local team confirms availability, price and delivery timing.</p></div>
+        <div class="contact-card"><div class="cc-ico">4️⃣</div><h3>Receive &amp; pay</h3><p>Get your vegetables at home and pay cash or the agreed payment method.</p></div>
       </div>
     </div>
-  </div>
-
-  <div class="section" style="background:var(--green-light)">
-    <div class="container">
-      <h2 class="sec-title">📍 Find Us</h2>
-      <div class="contact-grid">
-        <div class="contact-card"><div class="cc-ico">📍</div><h3>Address</h3><p><span data-contact-address>Rampurhat, West Bengal 731224</span></p></div>
-        <div class="contact-card"><div class="cc-ico">📞</div><h3>Call / WhatsApp</h3><a href="#" data-contact-tel><span data-contact-phone>Call us</span></a></div>
-        <div class="contact-card"><div class="cc-ico">📘</div><h3>Facebook</h3><a href="https://www.facebook.com/" target="_blank" rel="noopener">Message us on Facebook</a></div>
-        <div class="contact-card"><div class="cc-ico">⏰</div><h3>Hours</h3><p>Open 24/7</p></div>
-        <div class="contact-card"><div class="cc-ico">🚚</div><h3>Delivery</h3><p>Free within 5 km<br>Min order ₹200</p></div>
+  </section>
+  <section class="section" aria-labelledby="why-heading">
+    <div class="container"><h2 class="sec-title" id="why-heading">Why Choose Sokal Bela?</h2>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="cc-ico">🚚</div><h3>Local same-day service</h3><p>Order locally and we'll confirm the quickest available delivery slot.</p></div>
+        <div class="feature-card"><div class="cc-ico">🌾</div><h3>Farm-direct produce</h3><p>We connect Birbhum growers with kitchens in Rampurhat.</p></div>
+        <div class="feature-card"><div class="cc-ico">⚡</div><h3>24/7 emergency orders</h3><p>Get in touch anytime for urgent vegetable requirements.</p></div>
+        <div class="feature-card"><div class="cc-ico">🎉</div><h3>Bulk event catering</h3><p>Fresh supplies and catering requests for weddings, birthdays and gatherings.</p></div>
       </div>
     </div>
-  </div>
+  </section>
+  <section class="section" style="background:var(--green-light)" aria-labelledby="reviews-heading">
+    <div class="container"><h2 class="sec-title" id="reviews-heading">Local Testimonials</h2>
+      <div class="contact-card"><p>Have you ordered from Sokal Bela? We welcome genuine Rampurhat customer feedback and publish testimonials with permission.</p>
+        <a href="#" data-contact-wa data-wa-text="Hello Sokal Bela! I'd like to share feedback on my order.">Share your experience via WhatsApp</a>
+      </div>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="faq-heading">
+    <div class="container"><h2 class="sec-title" id="faq-heading">Frequently Asked Questions</h2>
+      <div class="faq-list">
+        <details><summary>What is the minimum order?</summary><p>₹200. Delivery is free for orders of ₹300 or more within 5 km.</p></details>
+        <details><summary>Do you accept urgent orders?</summary><p>Yes, our team can be contacted 24/7. Actual delivery times depend on stock and local availability.</p></details>
+        <details><summary>Can I order for weddings or events?</summary><p>Yes. Use Bulk Event Booking or Catering to request a quotation for your date and guest count.</p></details>
+        <details><summary>How do I pay?</summary><p>Cash on delivery or a payment method confirmed with the store. No advance online payment is required at checkout.</p></details>
+      </div>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="final-heading" style="background:linear-gradient(135deg,#1e5a28,#2d7a3a);color:white">
+    <div class="container" style="text-align:center"><h2 class="sec-title" id="final-heading" style="color:white">Fresh, local and ready when you are.</h2>
+      <p>🥬 সকাল বেলা — from Birbhum farms to your Rampurhat doorstep.</p>
+      <div class="hero-btns" style="justify-content:center;margin-top:18px"><button class="btn btn-gold btn-lg" onclick="showPage('products')">Shop Morning Fresh</button><button class="btn btn-ghost btn-lg" onclick="showPage('bulk')">Bulk Event Booking</button></div>
+    </div>
+  </section>
 
 </section>
 
@@ -1174,7 +1171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* ========== PAGE NAV ========== */
-/* Catering request: saved to Firestore (shown in admin under Bulk Orders) and sent to owner on WhatsApp. */
+/* Catering request: saved to Firestore (shown in the event request queue) and sent to owner on WhatsApp. */
 async function handleCatering(e){
   e.preventDefault();
   const v=id=>document.getElementById(id).value.trim();
@@ -1182,7 +1179,7 @@ async function handleCatering(e){
   if(phone.length!==10){ showToast("Enter a valid 10-digit phone number","error"); return; }
   if(!/^[6-9]\d{9}$/.test(phone)){ showToast("Enter a valid 10-digit Indian mobile number","error"); return; }
   // Same shape as a bulk order (contactName / timestamp / items...) so it passes the Firestore
-  // rules and shows up in Admin → Bulk Orders next to the other event requests.
+  // rules and shows up in the event queue next to the other event requests.
   const stamp = (typeof fbOk!=="undefined"&&fbOk&&db) ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString();
   const d={customerId:currentUser?.uid||"guest",customerRole:normalizeRole(currentUserRole),
     contactName:v("cname"),phone,email:"",eventType:"Catering - "+v("ctype"),eventDate:v("cdate"),
@@ -1659,7 +1656,7 @@ function updateCartBar() {
   const bar = document.getElementById("cart-bar"); if (!bar) return;
   const count = cart.reduce((n, i) => n + (Number(i.qty) || 0), 0);
   const total = cart.reduce((n, i) => n + (Number(i.price) || 0) * (Number(i.qty) || 0), 0);
-  const hideOn = ["cart", "admin", "confirmation"].some(id => document.getElementById(id + "-page")?.classList.contains("active"));
+  const hideOn = ["cart", "confirmation"].some(id => document.getElementById(id + "-page")?.classList.contains("active"));
   const show = count > 0 && !hideOn;
   bar.classList.toggle("show", show);
   document.body.classList.toggle("has-cart-bar", show);
@@ -2091,7 +2088,7 @@ async function onPaymentOK(order, result) {
   showPage("payment-success");
   showToast("🎉 Payment successful! Order confirmed.","success");
   setCheckoutBusy(false);
-  notifyAdmin(order);
+  notifyStore(order);
 }
 
 async function onPaymentFailed(order, reason) {
@@ -2274,9 +2271,9 @@ async function saveOrderFS(d) {
   return { id: payload.orderId, items, ...payload };
 }
 
-/* Notify the admin: Firestore notification doc + optional WhatsApp alert. */
+/* Save a staff notification and optionally alert the store via WhatsApp. */
 const WA_NOTIFY_ENABLED = true; // set true to open a WhatsApp alert to the owner after each order
-async function notifyAdmin(order) {
+async function notifyStore(order) {
   const items = order.items.map(i=>`${i.name} x${i.qty}`).join(", ")||"—";
   if (fbOk && db && currentUser) {
     try {
@@ -2287,7 +2284,7 @@ async function notifyAdmin(order) {
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-    } catch (e) { console.error("Admin notification failed:", e); }
+    } catch (e) { console.error("Store notification failed:", e); }
   }
   if (WA_NOTIFY_ENABLED) setTimeout(()=>{ window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(`🛒 New Order ${order.orderNumber}!\nCustomer: ${order.customerName}\nPhone: ${order.phone}\nEmail: ${order.email||"—"}\nItems: ${items}\nTotal: ₹${order.total}\nPayment: ${order.paymentMethod}\nAddress: ${order.address}`)}`, "_blank"); }, 500);
 }
@@ -2307,7 +2304,7 @@ function onOrderOK(order) {
   showPage("confirmation");
   showToast("🎉 Order placed!","success");
   if (document.getElementById("orders-page")?.classList.contains("active")) loadMyOrders();
-  notifyAdmin(order);
+  notifyStore(order);
 }
 
 function showSuccessModal(order) {
@@ -2487,7 +2484,6 @@ window.resendEmailOtp=resendEmailOtp; window.togglePasswordLogin=togglePasswordL
 window.openAuthModal=openAuthModal; window.closeAuthModal=closeAuthModal; window.toggleAuthMode=toggleAuthMode;
 window.submitAuthForm=submitAuthForm; window.sendCustomerPasswordReset=sendCustomerPasswordReset; window.logoutUser=logoutUser;
 window.loadMyOrders=loadMyOrders;
-window.saveInlineEdit=saveInlineEdit; window.saveProduct=saveProduct;
 </script>
 </body>
 </html>
