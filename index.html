@@ -430,6 +430,10 @@
     .feature-card,.contact-card{transition:transform .22s ease,box-shadow .22s ease}
     .feature-card:hover,.contact-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
     @media(prefers-reduced-motion:reduce){.feature-card,.contact-card{transition:none;transform:none!important}}
+  
+    .prod-description{font-size:.82rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px}
+    .product-details-btn{border:0;background:transparent;color:var(--green-dark);font-weight:700;font-size:.84rem;text-align:left;padding:10px 0 0;text-decoration:underline}
+    .product-details-btn:hover{color:var(--green)}
   </style>
 </head>
 <body>
@@ -934,6 +938,19 @@
       &nbsp;•&nbsp;
       <a href="#" onclick="sendCustomerPasswordReset();return false;" style="color:var(--green)" data-i18n="auth.forgot">Forgot password?</a>
     </p>
+  </div>
+</div>
+
+
+<div class="modal-bg" id="product-detail-modal" style="display:none">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="product-detail-title">
+    <button type="button" id="product-detail-close" class="btn btn-outline btn-sm" onclick="closeProductDetails()" style="float:right" aria-label="Close product details">✕</button>
+    <h2 class="modal-title" id="product-detail-title"></h2>
+    <p id="product-detail-description"></p>
+    <p id="product-detail-price" style="font-size:1.3rem;font-weight:700;color:var(--green)"></p>
+    <p id="product-detail-stock" aria-live="polite"></p>
+    <p id="product-detail-eta"></p>
+    <p>Minimum order ₹200; free delivery on ₹300+ within 5 km.</p>
   </div>
 </div>
 
@@ -1721,6 +1738,8 @@ function prodCard(p, ctx = "p") {
       <div class="prod-bn">${esc(p.bengaliName || p.hindiName || "")}</div>
       <div class="prod-name">${esc(displayName(p))}</div>
       <div class="prod-price">${esc(priceLabel)}</div>
+      <div class="prod-description">${esc(p.description || "Fresh, seasonal produce sourced from regional growers.")}</div>
+      <button type="button" class="product-details-btn" onclick="openProductDetails(\'${esc(p.id)}\')">View details &amp; delivery info</button>
     </div>
     <div class="prod-foot">
       <div class="qty-wrap">
@@ -1733,9 +1752,27 @@ function prodCard(p, ctx = "p") {
   </div>`;
 }
 
+
+function openProductDetails(id) {
+  const p = products.find(item => item.id === id);
+  if (!p) return;
+  const setText = (key, value) => { document.getElementById(key).textContent = value; };
+  setText("product-detail-title", p.name + (p.bengaliName ? " / " + p.bengaliName : ""));
+  setText("product-detail-description", p.description || "Fresh, seasonal produce sourced from regional growers and checked before dispatch.");
+  setText("product-detail-price", "₹" + Number(p.price).toLocaleString("en-IN") + " per " + p.unit);
+  setText("product-detail-stock", p.stock > 0 ? (p.stock < 5 ? "Low stock: " + p.stock + " remaining" : "In stock") : "Currently unavailable");
+  setText("product-detail-eta", "Delivery timing is confirmed after checkout. Emergency requests accepted 24/7, subject to availability.");
+  document.getElementById("product-detail-modal").style.display = "flex";
+  document.getElementById("product-detail-close").focus();
+}
+function closeProductDetails() {
+  document.getElementById("product-detail-modal").style.display = "none";
+}
+
 function chQty(ctx, id, d) {
   const inp = document.getElementById("qty-"+ctx+"-"+id); if (!inp) return;
-  inp.value = Math.max(1,(parseInt(inp.value)||1)+d);
+  const p = products.find(item => item.id === id);
+  inp.value = Math.min(Math.max(1, p?.stock || 1), Math.max(1,(parseInt(inp.value)||1)+d));
 }
 function filterProducts() { renderProducts(); }
 
@@ -2481,6 +2518,7 @@ window.updCartQty=updCartQty; window.chQty=chQty; window.filterProducts=filterPr
 window.setCat=setCat; window.selectPay=selectPay; window.goCheckoutStep=goCheckoutStep;
 window.openCartDrawer=openCartDrawer; window.closeCartDrawer=closeCartDrawer;
 window.navSearch=navSearch; window.headerUserAction=headerUserAction; window.vegImgError=vegImgError;
+window.openProductDetails=openProductDetails; window.closeProductDetails=closeProductDetails;
 window.setAuthMethod=setAuthMethod; window.addBulkRow=addBulkRow;
 window.resendEmailOtp=resendEmailOtp; window.togglePasswordLogin=togglePasswordLogin;
 window.openAuthModal=openAuthModal; window.closeAuthModal=closeAuthModal; window.toggleAuthMode=toggleAuthMode;
