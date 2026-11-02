@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact Sokal Bela | Maa Tara Apartment, Rampurhat</title><meta name="description" content="Contact Sokal Belar Bazar - 24/7 in Rampurhat, West Bengal. Enquire about deliveries, fresh produce, bulk events and catering.">
+<link rel="canonical" href="https://sokal-bela.vercel.app/contact"><meta property="og:type" content="website"><meta property="og:title" content="Contact Sokal Bela | Maa Tara Apartment, Rampurhat">
+<meta property="og:description" content="Contact Sokal Belar Bazar - 24/7 in Rampurhat, West Bengal. Enquire about deliveries, fresh produce, bulk events and catering."><meta property="og:url" content="https://sokal-bela.vercel.app/contact">
+<meta property="og:image" content="https://sokal-bela.vercel.app/public/images/og-cover.png">
+<meta name="theme-color" content="#2d7a3a"><link rel="stylesheet" href="/public/info-pages.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A5%AC%3C/text%3E%3C/svg%3E"></head><body>
+<div class="announcement">🚚 Free delivery on orders ₹300+ within 5 km — Min order ₹200</div>
+<header><a class="logo" href="/">🥬 Sokal Bela / সকাল বেলা</a><nav aria-label="Primary"><a href="/">Shop</a><a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/faq.html">FAQ</a></nav></header>
+<main class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / contact</nav><article class="content"><h1>Contact Sokal Bela</h1><p class="lead">Questions about an order, seasonal vegetables or an upcoming event? We are here 24/7.</p>
+<div class="grid"><div class="tile"><h2>Store</h2><p><b>Sokal Belar Bazar - 24/7</b></p><p data-contact-address>Rampurhat, West Bengal 731224</p></div>
+<div class="tile"><h2>Call or WhatsApp</h2><p><a href="#" data-contact-tel data-contact-phone>Call Sokal Bela</a></p><p><a href="#" data-contact-wa data-wa-text="Hello Sokal Bela, I have a question.">Message on WhatsApp</a></p></div>
+<div class="tile"><h2>Delivery</h2><p>Minimum order ₹200. Free delivery on ₹300+ within 5 km. Delivery time confirmed by our team.</p></div></div>
+<h2>Send an inquiry</h2><p>We will use these details only to answer your question.</p>
+<form id="inquiry-form"><label for="name">Name *</label><input id="name" autocomplete="name" required minlength="2" maxlength="80">
+<label for="email">Email (or provide a phone number)</label><input id="email" type="email" autocomplete="email" maxlength="254">
+<label for="phone">Phone (or provide an email)</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="10" pattern="[6-9][0-9]{9}">
+<label for="message">Message *</label><textarea id="message" rows="5" required minlength="10" maxlength="2000" placeholder="Tell us about your question, order or event"></textarea>
+<div class="hp" aria-hidden="true"><label for="website">Leave this blank</label><input id="website" tabindex="-1" autocomplete="off"></div>
+<button id="submit" type="submit">Send inquiry</button><p class="notice" id="feedback" role="status" aria-live="polite"></p></form>
+<script>
+document.getElementById('inquiry-form').addEventListener('submit',async function(event){
+  event.preventDefault(); const form=event.currentTarget, feedback=document.getElementById('feedback'),btn=document.getElementById('submit');
+  const phone=document.getElementById('phone').value.replace(/\D/g,'');
+  const email=document.getElementById('email').value.trim();
+  if(!email&&!phone){feedback.textContent='Enter an email or a phone number.';feedback.className='notice error';return;}
+  if(phone&&!/^[6-9]\d{9}$/.test(phone)){feedback.textContent='Enter a valid Indian mobile number.';feedback.className='notice error';return;}
+  btn.disabled=true;feedback.textContent='Sending…';feedback.className='notice';
+  try{
+    const response=await fetch('/api/inquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      name:document.getElementById('name').value,email,phone,
+      message:document.getElementById('message').value,website:document.getElementById('website').value
+    })});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(result.error||'Could not send inquiry.');
+    feedback.textContent='Thank you! Your inquiry was received. Our Rampurhat team will respond using your contact details.';
+    feedback.className='notice ok';form.reset();
+  }catch(err){feedback.textContent=err.message+' You can also call the store directly.';feedback.className='notice error';}
+  finally{btn.disabled=false;}
+});
+</script></article></main>
+<footer><div class="inner"><div><strong>🥬 Sokal Belar Bazar - 24/7</strong><p data-contact-address>Rampurhat, West Bengal 731224</p><p>Open 24/7 • <a href="#" data-contact-tel data-contact-phone>Call Sokal Bela</a></p></div><nav aria-label="Policies"><a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund-delivery.html">Delivery &amp; refunds</a> · <a href="/faq.html">FAQ</a></nav></div></footer>
+<script src="/config/contact.js"></script></body></html>
