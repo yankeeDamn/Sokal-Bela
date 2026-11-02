@@ -4,7 +4,7 @@ const vm = require('node:vm');
 
 const html = fs.readFileSync('index.html', 'utf8');
 let checked = 0;
-for (const [tag, code] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+for (const [, tag, code] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
   if (/\bsrc\s*=/.test(tag) || /\btype\s*=\s*["']application\/ld\+json/.test(tag)) continue;
   if (code.trim()) { new vm.Script(code, { filename: 'index.html inline script #' + (++checked) }); }
 }
@@ -14,7 +14,7 @@ const checks = [
   [!html.includes('admin123'), 'No demo credentials in the storefront'],
   [!html.includes('7551858583'), 'Old phone number absent from public HTML'],
   [html.includes('config/contact.js'), 'Shared contact configuration imported'],
-  [html.includes('email-otp-inputs'), 'Email OTP verification UI present'],
+  [html.includes('signInWithEmailAndPassword') && !html.includes('auth-tab-phone'), 'Password login present without phone OTP'],
   [html.includes('id="featured-grid"') && html.includes('id="baskets-grid"'), 'Featured produce and baskets present']
 ];
 for (const [ok, message] of checks) {
@@ -25,6 +25,7 @@ const adminPage = fs.readFileSync('api/secure-admin-portal.js', 'utf8');
 const adminMatch = adminPage.match(/<script nonce="__NONCE__">([\s\S]*?)<\/script>/);
 if (!adminMatch) throw new Error('Admin inline script missing');
 new vm.Script(adminMatch[1].replace('__FIREBASE_CFG__', '{}'), { filename: 'admin portal inline JS' });
+if (!adminPage.includes('signInWithEmailAndPassword') || adminPage.includes("'/api/auth/verify-otp'")) throw new Error('Admin password login missing');
 const contactPage = fs.readFileSync('contact.html', 'utf8');
 for (const [, code] of contactPage.matchAll(/<script>([\s\S]*?)<\/script>/g)) {
   new vm.Script(code, { filename: 'contact form inline JS' });
