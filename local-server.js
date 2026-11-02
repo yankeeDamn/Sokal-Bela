@@ -37,7 +37,7 @@ app.all('/api/auth/:action', (req, res) => {
 app.all('/api/admin-data', (req, res) => require('./api/admin-data.js')(req, res));
 app.get('/secure-admin-portal', (req, res) => require('./api/secure-admin-portal.js')(req, res));
 app.use((req, res, next) => {
-  if (/^\/(?:admin(?:\.html|\.js)?|admin\/|api\/admin\/)/.test(req.path))
+  if (/^\/(?:admin(?:\.html|\.js)?|admin\/|api\/admin\/|lib\/|backend\/|scripts\/|node_modules\/|\.github\/)/.test(req.path))
     return res.status(404).send('Not found');
   next();
 });
