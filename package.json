@@ -7,7 +7,8 @@
     "dev": "npx nodemon local-server.js",
     "func:start": "cd backend/functions && npm run start",
     "test": "node --check local-server.js && node --check build.js && node --check js/veg-images.js && node --check js/i18n.js && node scripts/check-images.js && node scripts/check-matching.js",
-    "build": "node build.js"
+    "build": "node build.js",
+    "lint": "node scripts/check-inline.js && node --check api/auth/'[action].js' && node --check api/admin-data.js && node --check api/secure-admin-portal.js && node --check lib/server-auth.js && node --check config/contact.js"
   },
   "devDependencies": {
     "cors": "^2.8.6",
@@ -20,5 +21,8 @@
   },
   "engines": {
     "node": "24.x"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.4.0"
   }
 }
