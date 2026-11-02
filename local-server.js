@@ -32,7 +32,6 @@ app.use(limiter);
 app.use(express.json());
 // Vercel-compatible handlers so the same OTP path can be exercised locally.
 app.all('/api/auth/:action', (req, res) => {
-  req.query.action = req.params.action;
   return require('./api/auth/[action].js')(req, res);
 });
 app.all('/api/admin-data', (req, res) => require('./api/admin-data.js')(req, res));
