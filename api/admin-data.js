@@ -59,6 +59,28 @@ module.exports = async function handler(req, res) {
         emergency: orders.filter(o => o.emergency || o.isEmergency).length,
         bulk: bulk.length
       };
+
+      // Comparisons cover the latest seven calendar days versus the preceding seven.
+      // They reflect the retrieved sample; a truncated collection cannot give complete historical totals.
+      const now = Date.now(), dayMs = 86400000;
+      const dateValue = row => Date.parse(row.createdAt || row.timestamp || row.lastLoginAt || row.updatedAt || '') || 0;
+      const current = list => list.filter(row => dateValue(row) > now - 7*dayMs && dateValue(row) <= now);
+      const previous = list => list.filter(row => dateValue(row) > now - 14*dayMs && dateValue(row) <= now - 7*dayMs);
+      const sumRevenue = list => list.filter(row => toStatus(row.orderStatus || row.status) !== 'Cancelled')
+        .reduce((total,row) => total + numeric(row.total), 0);
+      const pending = list => list.filter(row =>
+        ['Pending','Confirmed','Out for Delivery'].includes(toStatus(row.orderStatus || row.status)));
+      const emergency = list => list.filter(row => row.emergency || row.isEmergency);
+      const changes = {
+        users:[current(users).length,previous(users).length],
+        orders:[current(orders).length,previous(orders).length],
+        revenue:[sumRevenue(current(orders)),sumRevenue(previous(orders))],
+        deliveries:[pending(current(orders)).length,pending(previous(orders)).length],
+        emergency:[emergency(current(orders)).length,emergency(previous(orders)).length],
+        bulk:[current(bulk).length,previous(bulk).length]
+      };
+      const trends = Object.fromEntries(Object.entries(changes).map(([key,[recent,prior]]) =>
+        [key, prior > 0 ? Math.round((recent-prior)/prior*100) : null]));
       const days = Array.from({length:7}, (_, i) => {
         const date = new Date(); date.setUTCDate(date.getUTCDate() - 6 + i);
         const day = date.toISOString().slice(0,10);
@@ -68,7 +90,7 @@ module.exports = async function handler(req, res) {
             .reduce((sum,o)=>sum+numeric(o.total),0) };
       });
       return res.status(200).json({
-        kpis, days, status: Object.fromEntries(STATUSES.map(s =>
+        kpis, trends, days, status: Object.fromEntries(STATUSES.map(s =>
           [s,orders.filter(o => toStatus(o.orderStatus || o.status) === s).length])),
         tables: {users, orders, bulk, products, payments, deliveries},
         logs, settings, truncated: [users,orders,bulk,products,payments,deliveries]
