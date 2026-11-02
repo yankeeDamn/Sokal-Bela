@@ -33,7 +33,7 @@ const skipDirs = new Set(['node_modules','dist','.git','.vercel']);
 const scan = dir => {
   for (const ent of fs.readdirSync(dir, { withFileTypes:true })) {
     if (ent.isDirectory()) { if (!skipDirs.has(ent.name)) scan(require('node:path').join(dir,ent.name)); continue; }
-    if (!/\.(?:js|html|css|json|md|xml|txt|yml|rules)$/.test(ent.name) || ent.name === 'package-lock.json') continue;
+    if (!/\.(?:js|html|css|json|md|xml|txt|yml|rules)$/.test(ent.name) || ['package-lock.json','check-inline.js'].includes(ent.name)) continue;
     const path = require('node:path').join(dir, ent.name);
     if (/755[\s.-]*185[\s.-]*8583|917551858583/.test(fs.readFileSync(path,'utf8')))
       throw new Error('Old contact number remains in '+path);
