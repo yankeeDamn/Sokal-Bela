@@ -1,6 +1,7 @@
 'use strict';
 const crypto = require('node:crypto');
 const gate = require('../lib/server-auth');
+const contact = require('../config/contact');
 
 module.exports = async function handler(req, res) {
   gate.setHeaders(res);
@@ -16,7 +17,9 @@ module.exports = async function handler(req, res) {
     projectId: process.env.FIREBASE_PROJECT_ID || ''
   }).replace(/</g, '\\u003c');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.status(200).end(page.replaceAll('__NONCE__', nonce).replace('__FIREBASE_CFG__', cfg));
+  res.status(200).end(page.replaceAll('__NONCE__', nonce).replace('__FIREBASE_CFG__', cfg)
+    .replaceAll('__CONTACT_PHONE__', contact.displayPhone)
+    .replaceAll('__CONTACT_ADDRESS__', contact.address));
 };
 const page = String.raw`<!doctype html>
 <html lang="en">
@@ -52,7 +55,10 @@ dialog{background:var(--card);color:var(--ink);border:1px solid var(--line);bord
 @keyframes shimmer{to{background-position:-200% 0}}@media(prefers-reduced-motion:reduce){.skeleton{animation:none}}
 @media(max-width:850px){.layout{grid-template-columns:1fr}aside{position:relative;padding:12px}aside h2{margin:5px 0}aside nav{display:flex;overflow-x:auto;gap:5px}aside button{white-space:nowrap;width:auto}.two{grid-template-columns:1fr}}
 @media(max-width:450px){.auth{margin:16px 12px;padding:18px}.form-grid{grid-template-columns:1fr}main{padding:15px}}
-</style></head>
+
+.donut{height:170px;width:170px;border-radius:50%;margin:10px auto 20px;position:relative}
+.donut:after{content:"";position:absolute;inset:26px;border-radius:50%;background:var(--card)}
+  </style></head>
 <body>
 <section class="auth" id="login">
 <h1>🥬 Sokal Bela</h1><p>Authorized store operations sign-in</p>
@@ -157,12 +163,31 @@ function render(){
 }
 function overview(){
   const labels={users:'Total Users',orders:'Total Orders',revenue:'Revenue',deliveries:'Pending Deliveries',emergency:'24/7 Emergency Orders',bulk:'Bulk Event Inquiries'};
-  const cards=Object.entries(labels).map(([k,label])=>'<div class="card"><div class="label">'+label+'</div><b class="number">'+(k==='revenue'?money(data.kpis[k]):data.kpis[k])+'</b></div>').join('');
+  const cards=Object.entries(labels).map(([k,label])=>{
+    const trend=data.trends?.[k];
+    const change=trend===null||trend===undefined?'No comparison available':(trend>0?'↑ ':trend<0?'↓ ':'→ ')+Math.abs(trend)+'% vs previous 7 days';
+    return '<div class="card"><div class="label">'+label+'</div><b class="number">'+
+      (k==='revenue'?money(data.kpis[k]):data.kpis[k])+'</b><small>'+safe(change)+'</small></div>';
+  }).join('');
   const max=Math.max(1,...data.days.map(x=>x.sales));
-  const bars=data.days.map(x=>'<div title="'+safe(x.day)+' • '+money(x.sales)+'"><b style="height:'+Math.max(2,Math.round(x.sales/max*140))+'px"></b>'+safe(x.day.slice(-5))+'</div>').join('');
-  const status=Object.entries(data.status).map(([s,n])=>'<li>'+safe(s)+': <b>'+n+'</b></li>').join('');
-  $('content').innerHTML='<div class="kpis">'+cards+'</div><div class="two"><div class="card"><h2>Sales · last 7 days</h2><div class="bars" role="img" aria-label="Daily sales bar chart">'+bars+'</div></div><div class="card"><h2>Order statuses</h2><ul>'+status+'</ul></div></div>'+
-  (data.truncated?'<p role="note">Displaying a capped sample of the latest 250 records per collection.</p>':'');
+  const bars=data.days.map(x=>'<div title="'+safe(x.day)+' • '+money(x.sales)+'"><b data-bar-height="'+
+    Math.max(2,Math.round(x.sales/max*140))+'"></b>'+safe(x.day.slice(-5))+'</div>').join('');
+  const total=Object.values(data.status).reduce((s,n)=>s+Number(n),0);
+  const colors=['#2d7a3a','#f4a624','#70a9f3','#86b995','#e53935'];
+  const status=Object.entries(data.status).map(([name,n],i)=>'<li><span class="dot" data-color="'+i+'"></span>'+safe(name)+': <b>'+n+'</b></li>').join('');
+  $('content').innerHTML='<div class="kpis">'+cards+'</div><div class="two"><div class="card"><h2>Sales · last 7 days</h2>'+
+    '<div class="bars" role="img" aria-label="Daily sales bar chart">'+bars+'</div></div><div class="card">'+
+    '<h2>Order statuses</h2><div class="donut" id="donut" role="img" aria-label="Order status breakdown"></div><ul>'+status+'</ul></div></div>'+
+    (data.truncated?'<p role="note">KPI calculations and exports use up to 250 records per collection. Historical percentages may be incomplete.</p>':'');
+  document.querySelectorAll('[data-bar-height]').forEach(el=>{el.style.height=el.dataset.barHeight+'px';});
+  document.querySelectorAll('[data-color]').forEach(el=>{el.style.background=colors[Number(el.dataset.color)]||colors[0];});
+  let pct=0;
+  const segments=Object.values(data.status).map((n,i)=>{
+    const start=pct;pct+=total?Number(n)/total*100:0;
+    return colors[i%colors.length]+' '+start+'% '+pct+'%';
+  });
+  $('donut').style.background=total?'conic-gradient('+segments.join(',')+')':'var(--line)';
+  $('donut').setAttribute('aria-label',total+' orders: '+Object.entries(data.status).map(([name,n])=>name+' '+n).join(', '));
 }
 function renderTable(){
   const fields=tableFields(section),rows=filtered(),start=pageNum*15,visible=rows.slice(start,start+15);
@@ -221,8 +246,8 @@ $('product-form').addEventListener('submit',async e=>{
 });
 function settings(){
   const s=data.settings||{};
-  $('content').innerHTML='<form id="settings-form" class="card"><h2>Store settings</h2><p>Contact, payment and delivery number: <strong>+91 7001867903</strong></p>'+
-    '<div class="field"><label for="address">Store address</label><input id="address" required value="'+safe(s.address||'Maa Tara Apartment, 1 TRDA Bypass Choaphuka, Choa Poka, Rampurhat, West Bengal 731224')+'"></div>'+
+  $('content').innerHTML='<form id="settings-form" class="card"><h2>Store settings</h2><p>Contact, payment and delivery number: <strong>__CONTACT_PHONE__</strong></p>'+
+    '<div class="field"><label for="address">Store address</label><input id="address" required value="'+safe(s.address||'__CONTACT_ADDRESS__')+'"></div>'+
     '<div class="form-grid"><div class="field"><label for="minimum">Minimum order (₹)</label><input id="minimum" type="number" value="'+safe(s.minOrder||200)+'" min="200"></div>'+
     '<div class="field"><label for="free">Free delivery threshold (₹)</label><input id="free" type="number" min="300" value="'+safe(s.freeDeliveryAt||300)+'"></div></div>'+
     '<p>Free delivery within 5 km. Open 24/7.</p><button class="primary">Save settings</button></form>';
