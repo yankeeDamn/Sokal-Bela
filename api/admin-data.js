@@ -1,5 +1,6 @@
 'use strict';
 const gate = require('../lib/server-auth');
+const contact = require('../config/contact');
 const STATUSES = ['Pending', 'Confirmed', 'Out for Delivery', 'Delivered', 'Cancelled'];
 function clean(value) {
   if (value && typeof value.toDate === 'function') return value.toDate().toISOString();
@@ -132,13 +133,13 @@ module.exports = async function handler(req, res) {
     }
     if (req.method === 'PATCH' && action === 'settings') {
       const input = req.body || {};
-      const phone = '7001867903';
+      const phone = contact.phone;
       const settings = {
         phone, deliveryPhone: phone, paymentPhone: phone,
         address: String(input.address || '').trim().slice(0,300),
-        minOrder: Math.max(200, numeric(input.minOrder)),
-        freeDeliveryAt: Math.max(300, numeric(input.freeDeliveryAt)),
-        freeDeliveryRadiusKm: 5, updatedAt: new Date()
+        minOrder: Math.max(contact.minimumOrder, numeric(input.minOrder)),
+        freeDeliveryAt: Math.max(contact.freeDeliveryAt, numeric(input.freeDeliveryAt)),
+        freeDeliveryRadiusKm: contact.freeDeliveryRadiusKm, updatedAt: new Date()
       };
       await db.collection('storeConfig').doc('main').set(settings, { merge: true });
       await audit(db, admin, 'settings.update', 'main');
