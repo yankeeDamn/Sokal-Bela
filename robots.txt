@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /secure-admin-portal
+Disallow: /api/
+Sitemap: https://sokal-bela.vercel.app/sitemap.xml
