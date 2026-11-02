@@ -107,7 +107,7 @@ $('request-form').addEventListener('submit',async e=>{
     const idToken=await credential.user.getIdToken(true);
     await api('/api/auth/session',{method:'POST',body:JSON.stringify({idToken,purpose:'admin'})});
     $('password').value='';await load();
-  } catch(err) { await firebase.auth().signOut().catch(()=>{}); error('Sign-in failed. Check your credentials and administrator access.'); }
+  } catch(err) { await api('/api/auth/logout',{method:'POST',body:'{}'}).catch(()=>{}); await firebase.auth().signOut().catch(()=>{}); error(err.message === 'Forbidden' ? 'Administrator access is not configured for this account. Check the admin role and allowlist.' : 'Sign-in or dashboard loading failed. Check your credentials, connection and server configuration.'); }
   finally {$('send').disabled=false;}
 });
 $('reset-password').addEventListener('click',async()=>{
@@ -120,7 +120,7 @@ function adminUi(){ $('login').classList.add('hidden');$('panel').classList.remo
 async function load(){
   $('skeleton').classList.remove('hidden');
   try{data=await api('/api/admin-data');adminUi();render();lastInput=Date.now();}
-  catch(e){toast(e.message);if(e.message==='Forbidden'){await signOut();}}
+  catch(e){if($('panel').classList.contains('hidden')) throw e; toast(e.message);if(e.message==='Forbidden'){await signOut();error('Your session expired or administrator access is unavailable.');}}
   finally{$('skeleton').classList.add('hidden');}
 }
 async function signOut(){await api('/api/auth/logout',{method:'POST',body:'{}'}).catch(()=>{});await firebase.auth().signOut().catch(()=>{});$('panel').classList.add('hidden');$('login').classList.remove('hidden');$('password').value='';error('');}
