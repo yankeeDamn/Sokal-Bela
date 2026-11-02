@@ -100,7 +100,7 @@ async function getVerifiedUser(req) {
 }
 
 function isAdminUser(user) {
-  return !!user && (user.role === 'Admin' || user.email === 'yankeecpp90@gmail.com');
+  return !!user && user.role === 'admin' && (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase()).includes(String(user.email || '').toLowerCase());
 }
 
 // Razorpay checkout signature: HMAC_SHA256(order_id + "|" + payment_id, secret)

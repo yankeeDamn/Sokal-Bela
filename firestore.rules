@@ -20,7 +20,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return tokenRole("Admin") || profileRole("Admin");
+      return tokenRole("admin");
     }
 
     function isSeller() {
@@ -188,12 +188,7 @@ service cloud.firestore {
         request.resource.data.uid == userId &&
         request.resource.data.email is string &&
         request.resource.data.displayName is string &&
-        request.resource.data.role in ["Customer", "Seller", "Admin"] &&
-        (
-          request.resource.data.role == "Customer" ||
-          request.auth.token.email == "yankeecpp90@gmail.com" ||
-          tokenRole("Admin")
-        ) &&
+        request.resource.data.role == "Customer" &&
         request.resource.data.createdAt is timestamp &&
         request.resource.data.updatedAt is timestamp &&
         request.resource.data.lastLoginAt is timestamp;

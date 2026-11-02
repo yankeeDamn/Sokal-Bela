@@ -1,259 +1,71 @@
-# Sokal Bela - Local Vegetable Delivery Web App
+# Sokal Belar Bazar - 24/7
 
-> **Update:** Online payment is disabled. Orders are confirmed by WhatsApp/call and paid on delivery or at the shop. Bulk orders and Catering are supported. See `BUSINESS-SETUP.md`. The Razorpay sections below are kept for reference only and are no longer used.
+A vanilla HTML, CSS and JavaScript storefront for fresh vegetables, ready baskets, deliveries and event/catering inquiries in Rampurhat, Birbhum. Public deployment: https://sokal-bela.vercel.app/
 
-A modern web application for local vegetable delivery service in Kolkata, featuring an intuitive shopping experience and comprehensive admin dashboard.
+> **Deployment status:** The secure email OTP and admin migration is developed on a feature branch. It is not production-ready until the deployment environment is configured, the pull request is reviewed, and live end-to-end checks are completed.
 
-## 🌟 Features
+## Stack
 
-### Customer Features
-- **Product Catalog**: Browse fresh vegetables with search and category filtering
-- **Shopping Cart**: Add/remove items, update quantities, and view order summary
-- **Easy Checkout**: Simple order placement with customer details
-- **Responsive Design**: Mobile-friendly interface that works on all devices
-- **Real-time Updates**: Live inventory and pricing information
+- **Frontend:** Vanilla HTML5, CSS3, JavaScript; Firebase browser SDK for Firestore and phone/password legacy login.
+- **Backend (Vercel):** Node.js 24 serverless functions in \`api/\`.
+- **Database and identity:** Firebase Firestore and Firebase Authentication. Server functions use \`firebase-admin\`.
+- **Email OTP:** Resend HTTP API, with server-generated codes and Firestore-backed challenge hashes.
+- **Other services:** Optional Razorpay Cloud Functions (online checkout is currently disabled); WhatsApp link-based ordering.
+- **Build:** \`node build.js\` copies public assets into \`dist/\`, with server/admin legacy assets excluded. Vercel uses \`vercel.json\`; Firebase Hosting is a legacy alternative and does not automatically provide the new Vercel OTP APIs.
+- **CI:** \`.github/workflows/storefront-checks.yml\` runs lint, smoke scripts, build, and checks for public admin asset leakage.
 
-### Admin Features
-- **Secure Dashboard**: Password-protected admin access
-- **Order Management**: View and manage customer orders
-- **Inventory Control**: Add, update, and manage product inventory
-- **Sales Analytics**: Track total orders and revenue
-- **Real-time Notifications**: Firebase-powered push notifications
+## Run
 
-## 🛠️ Tech Stack
+Requires Node.js 24 and npm.
 
-- **Frontend**: Vanilla JavaScript, HTML5, CSS3
-- **Database**: Firebase Firestore
-- **Authentication**: Firebase Auth
-- **Notifications**: Firebase Cloud Messaging
-- **Payments**: Razorpay (UPI, credit/debit cards, net banking, wallets) via Firebase Cloud Functions
-- **Hosting**: Can be deployed to Firebase Hosting or any static hosting service
-
-## 📁 Project Structure
-
-```
-Sokal Bela/
-├── index.html              # Main customer-facing HTML (incl. payment success/failure pages)
-├── admin.html              # Admin dashboard HTML
-├── app.js                  # Main customer application logic
-├── admin.js                # Admin dashboard logic
-├── style.css               # Styling and responsive design
-├── firebase-config.js      # Firebase configuration
-├── db-operations.js        # Database operations
-├── notifications.js        # Push notification handling
-├── razorpay-integration.js # Razorpay checkout module (frontend)
-├── local-server.js         # Local Express development server
-├── backend/
-│   └── functions/          # Firebase Cloud Functions (Razorpay payment APIs)
-│       ├── index.js        #   create-payment-order / verify-payment / webhook
-│       └── package.json
-├── .env.example            # Environment variables template
-├── package.json            # Project dependencies and npm scripts
-├── firebase.json           # Firebase configuration (incl. /api/** → functions rewrite)
-├── firestore.rules         # Firestore security rules (incl. payments collection)
-├── storage.rules           # Firebase Storage security rules
-└── .firebaserc             # Firebase project configuration
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Web browser (Chrome, Firefox, Safari, Edge)
-- Python 3.x (for local development server) or any HTTP server
-- Node.js & npm (for Firebase CLI and functions emulator)
-- Firebase account (for database functionality)
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
+\`\`\`bash
+git clone https://github.com/yankeeDamn/Sokal-Bela.git
 cd Sokal-Bela
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Set up environment variables:
-   - Copy `.env.example` to `.env` (or configure as needed)
-   - Update with your Firebase project credentials if using Firebase directly
-
-4. Set up Firebase:
-   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
-   - Enable Firestore Database
-   - Enable Authentication
-   - Update `firebase-config.js` with your Firebase configuration
-   - (Optional) For Cloud Messaging notifications, set up Firebase Cloud Messaging in your project
-
-### Running the Application
-
-#### Option 1: Local Development Server (Recommended)
-
-The project includes a local Express server for development:
-
-```bash
-# Start the local development server
+cp .env.example .env
+npm run lint
+npm test
+npm run build
 npm start
+\`\`\`
 
-# Or with auto-reload on file changes
-npm run dev
-```
+The storefront is at http://localhost:3000. The isolated operations portal is at http://localhost:3000/secure-admin-portal.
 
-Then open `http://localhost:3000` in your browser.
+The OTP, contact form, and operations portal **require** a configured Firebase Admin service account and email provider. The browser and server Firebase configurations must refer to the same Firebase project. Local service-account credentials stay in \`.env\` (which is ignored by Git); do not commit them.
 
-The server provides:
-- CORS-enabled API for testing
-- Static file serving for the frontend
-- Mock in-memory database for local development
-- Rate limiting for API endpoints
+## Admin authentication
 
-#### Option 2: Python HTTP Server
+1. Set \`ADMIN_EMAILS\` to the comma-separated approved admin email addresses.
+2. Set \`FIREBASE_SERVICE_ACCOUNT_JSON\`, \`OTP_HASH_SECRET\`, \`RESEND_API_KEY\`, \`EMAIL_FROM\`, and public Firebase config variables in Vercel.
+3. Enable Firebase Email/Password and custom-token Authentication support as appropriate for your project, verify your sending domain with Resend, and deploy the Vercel functions.
+4. Open \`/secure-admin-portal\` directly. It is intentionally absent from the public site's navigation and sitemap.
+5. Enter an approved email, receive a six-digit email OTP, and verify it. Session cookies are \`Secure\` and \`HttpOnly\`. The operations API enforces admin allowlist, Firebase claims, and 15-minute inactivity window.
 
-```bash
-python -m http.server 8080
-```
+There is **no sample admin password**. A standard customer's sign-in cannot grant access to the admin API. The separate login document is publicly reachable by design, but **dashboard data is not**.
 
-Then open `http://localhost:8080` in your browser.
+## Store contact and delivery policy
 
-#### Option 3: VS Code Live Server
-1. Install the Live Server extension in VS Code
-2. Right-click on `index.html` or `admin.html`
-3. Select "Open with Live Server"
+The single source of truth for the storefront's contact number and standard delivery thresholds is \`config/contact.js\`. The current number is +91 7001867903, WhatsApp is https://wa.me/917001867903, minimum order ₹200, and free delivery on ₹300+ within 5 km. Store operations are available for inquiries 24/7; delivery timing is confirmed individually.
 
-#### Option 4: Any Static Server
-You can use any static file server like:
-- Node.js `http-server`
-- PHP built-in server
-- Apache/Nginx
+## Customer-facing pages
 
-### npm Scripts
+The main SPA \`index.html\` contains Home, Products, Cart/Checkout, My Orders, Order Confirmation, Payment Success/Failure (legacy), Bulk Orders, and Catering. Standalone pages are \`about.html\`, \`contact.html\`, \`faq.html\`, \`terms.html\`, \`privacy.html\`, \`refund-delivery.html\` and \`404.html\`.
 
-The following npm scripts are available:
+## API routes
 
-- `npm start` - Start the local Express development server on port 3000
-- `npm run dev` - Start the development server with auto-reload using nodemon
-- `npm run func:start` - Start Firebase Cloud Functions emulator (if backend/functions exists)
+Vercel: \`GET /api/health\`, \`GET /api/products\` (currently a safe fallback), \`POST /api/auth/request-otp\`, \`POST /api/auth/verify-otp\`, \`POST /api/auth/session\`, \`POST /api/auth/logout\`, \`POST /api/inquiry\`, \`GET/PATCH/POST/DELETE /api/admin-data\` (action-scoped and protected), and \`GET /api/secure-admin-portal\` (login page). Other \`/api/*\` routes default to 404.
 
-## 💳 Razorpay Payment Gateway
+The local mock server also retains development-only product, order, bulk-request, review and payment endpoints. Consult \`local-server.js\` before using these; mock responses are not production records. Firebase Cloud Functions in \`backend/functions/index.js\` retain optional payment routes: \`create-payment-order\`, \`verify-payment\`, \`payment-status\`, \`razorpay-webhook\`, \`products\`, and \`health\`.
 
-Online payments (UPI, credit/debit cards, net banking, wallets) are handled by Razorpay with a Firebase Cloud Functions backend. Payment methods are enabled/disabled in the [Razorpay Dashboard](https://dashboard.razorpay.com/) → Settings → Payment Methods; Checkout shows them automatically.
+## Deployment and security notes
 
-### Flow
+- Deploy the Vercel branch preview first, set required environment variables, test OTP through a real Resend verified sender, and then review/merge the pull request.
+- Deploy the updated \`firestore.rules\` to Firebase. Existing legacy administrator custom claims and profile roles may require an intentional migration; no automatic privilege escalation is allowed.
+- Do not put Firebase Admin service-account JSON, email API keys, OTP HMAC secrets, or payment secrets into browser code.
+- The Firebase **web** API key in \`config/firebase-public.js\` is public by design. Restrict it in Google Cloud/Firebase settings as appropriate.
+- A noindex, unlinked URL is **not a security boundary**. Every sensitive operation is gated on the server.
+- The admin dashboard currently reads up to 250 records per collection. Totals and trend percentages are **sample-based** when datasets exceed that limit.
+- The product manager currently accepts validated HTTPS image URLs. Server-side image uploads and storage workflow are still pending.
+- Real email delivery, live order write/read, payments, and Lighthouse/mobile accessibility must be tested in a connected staging or production environment before release.
 
-1. Customer places an order → saved to Firestore with `paymentStatus: "pending"`.
-2. Frontend calls `POST /api/create-payment-order` → backend creates a Razorpay order.
-3. Razorpay Checkout popup opens (UPI / cards / net banking / wallets).
-4. On payment, the signature is verified server-side via `POST /api/verify-payment` (HMAC-SHA256) and the payment is stored in the Firestore **`payments`** collection (`paymentId`, `orderId`, `amount`, `customerId`, `paymentStatus`, `paymentMethod`, `createdAt`).
-5. A `POST /api/razorpay-webhook` endpoint handles `payment.captured` / `payment.failed` as the authoritative async fallback.
-6. A `POST /api/payment-status` endpoint records cancellation/timeout/failure updates from the UI.
-6. The customer lands on the **Payment Success** or **Payment Failure** page (with retry).
-
-### Setup (production)
-
-```bash
-cd backend/functions && npm install
-
-# Set secrets (recommended)
-firebase functions:secrets:set RAZORPAY_KEY_ID
-firebase functions:secrets:set RAZORPAY_KEY_SECRET
-firebase functions:secrets:set RAZORPAY_WEBHOOK_SECRET
-# Browser origins allowed to call the API cross-origin (comma-separated).
-# Not needed when the frontend is served from Firebase Hosting (same-origin /api/** rewrite).
-firebase functions:secrets:set ALLOWED_ORIGINS   # e.g. https://sokal-bela-store.web.app,https://sokal-bela-store.firebaseapp.com
-
-firebase deploy --only functions,hosting,firestore:rules,storage
-```
-
-In the Razorpay Dashboard, add a webhook pointing to
-`https://<region>-<project>.cloudfunctions.net/api/razorpay-webhook`
-with the same `RAZORPAY_WEBHOOK_SECRET`, subscribing to `payment.captured` and `payment.failed`.
-
-Set your **publishable** key ID in `index.html` (`RZP_KEY`) — it's used as a fallback when the backend is unreachable. The key **secret** must never appear in frontend code.
-
-### Local development
-
-Copy `.env.example` to `.env`, fill in your `rzp_test_*` keys, then `npm start`. The local server uses the real Razorpay API when keys are present and falls back to mock payments otherwise.
-
-## 🔐 Authentication & Roles
-
-The app now uses Firebase Authentication for customer and admin access.
-
-- Customers can sign up/login from the customer auth modal in `index.html`.
-- Admin dashboard access requires a Firebase user with role `Admin`.
-- Supported roles: `Customer`, `Seller`, `Admin` (stored in `users/{uid}` and/or custom claims).
-
-To bootstrap the first admin, sign in with your trusted admin email once and ensure `users/{uid}.role = "Admin"` (or set custom claim `role=Admin`).
-
-## 📱 Features Overview
-
-### Home Page
-- Hero section with call-to-action
-- Featured vegetables showcase
-- Store information and contact details
-
-### Products Page
-- Complete vegetable catalog
-- Search functionality
-- Category filtering
-- Add to cart functionality
-
-### Shopping Cart
-- View selected items
-- Update quantities
-- Remove items
-- Order summary
-- Checkout form
-
-### Admin Dashboard
-- Order management table
-- Inventory management
-- Sales statistics
-- Product CRUD operations
-
-## 🌐 Deployment
-
-### Firebase Hosting
-1. Install Firebase CLI: `npm install -g firebase-tools`
-2. Initialize Firebase: `firebase init hosting`
-3. Deploy: `firebase deploy`
-
-### Other Hosting Options
-- Netlify
-- Vercel
-- GitHub Pages
-- Any static hosting service
-
-## 🔜 Next Steps & Improvements
-
-Recommended enhancements for production:
-
-- **Role setup**: Create admin/seller users in Firebase Auth and assign roles (`users/{uid}.role`)
-- **Environment config**: Use proper environment variable management instead of hardcoded Firebase credentials
-- **Testing & CI**: Add unit tests for core functions and setup CI pipeline (currently using npm-publish-github-packages workflow)
-- **Accessibility & performance**: Run Lighthouse, optimize images, and ensure mobile accessibility
-- **Backend API**: Consider deploying actual backend/functions for scalable payment processing
-- **Error handling**: Add comprehensive error logging and user feedback for failed operations
-
-## 📞 Contact Information
-
-- **Store Location**: Main Market, Salt Lake, Kolkata - 700064
-- **Phone**: +91 98765 43210
-- **Hours**: Monday-Sunday, 7:00 AM - 9:00 PM
-- **Delivery**: Free delivery within 5km (Minimum order ₹200)
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🙏 Acknowledgments
-
-- Built with ❤️ for local vegetable vendors
-- Images from Unsplash
-- Firebase for backend services 
+See \`IMPLEMENTATION-REPORT.md\` for the audit, change summary and manual test checklist.

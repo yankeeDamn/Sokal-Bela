@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sokal Bela — Fresh Local Vegetables | Rampurhat, Birbhum</title>
-  <meta name="description" content="Order fresh local vegetables online from Sokal Bela, Rampurhat. Farm-to-door delivery, bulk orders for weddings &amp; events. Call +91 7551858583.">
+  <meta name="description" content="Farm-direct fresh vegetables in Rampurhat, Birbhum. Home delivery, family baskets, and bulk event catering.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://sokal-bela.vercel.app/">
   <meta property="og:title" content="Sokal Bela — Fresh Local Vegetables | Rampurhat">
-  <meta property="og:description" content="Order fresh local vegetables online. Farm-to-door delivery in Rampurhat. Call +91 7551858583.">
+  <meta property="og:description" content="Fresh local produce for Rampurhat households and events.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sokal-bela.vercel.app/">
   <meta property="og:image" content="https://sokal-bela.vercel.app/public/images/og-cover.png">
@@ -178,35 +178,6 @@
     .bulk-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
     .bulk-row select,.bulk-row input{flex:1}
     .bulk-row .bqty{flex:0 0 80px}
-
-    /* ADMIN */
-    .admin-login-wrap{max-width:390px;margin:50px auto}
-    .admin-tabs{display:flex;gap:3px;border-bottom:2px solid var(--border);margin-bottom:22px;flex-wrap:wrap}
-    .atab{padding:9px 16px;font-weight:600;font-size:14px;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:var(--tr);border-radius:var(--radius-sm) var(--radius-sm) 0 0}
-    .atab.active{color:var(--green);border-bottom-color:var(--green)}
-    .atab-content{display:none}
-    .atab-content.active{display:block}
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px}
-    .stat-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;text-align:center}
-    .stat-val{font-size:1.9rem;font-weight:800;color:var(--green)}
-    .stat-lbl{font-size:12px;color:var(--text2);margin-top:3px}
-    .stat-card.warn .stat-val{color:var(--orange)}
-    .table-wrap{overflow-x:auto;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow)}
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    th{background:var(--green-light);color:var(--green);font-weight:700;padding:11px 13px;text-align:left;white-space:nowrap}
-    td{padding:9px 13px;border-bottom:1px solid var(--border);vertical-align:middle}
-    tr:last-child td{border-bottom:none}
-    tr:hover td{background:#fafafa}
-    .sbadge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700}
-    .sp{background:#fff3cd;color:#7a5000}
-    .sc{background:#d4edda;color:#155724}
-    .so{background:#cce5ff;color:#004085}
-    .sd{background:#d4edda;color:#1e5a28}
-    .sx{background:#f8d7da;color:#721c24}
-    .scod{background:#e2e3e5;color:#383d41}
-    .spaid{background:#d4edda;color:#155724}
-    .low-stock-row td{background:#fff8e1!important}
-    .admin-form{max-width:480px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:24px}
 
     /* FOOTER */
     .footer{background:var(--green-dark);color:#fff;padding:46px 16px 18px}
@@ -445,12 +416,30 @@
       .rb-thumb,.rb-row .prod-emoji{width:42px;height:42px}
       .section{padding:42px 0}
     }
+  
+    .otp-input-row{display:flex;gap:7px;margin:8px 0}
+    .otp-input-row input{width:calc((100% - 35px)/6);min-width:0;max-width:56px;border:1px solid var(--border);border-radius:9px;text-align:center;font-size:1.35rem;font-weight:700;padding:10px 0;background:#fff;color:var(--text)}
+    .hero{background:linear-gradient(135deg,#1e5a28,#2d7a3a)}
+    .fab-wa{background:#25d366}
+    @media(max-width:360px){.nav-container{padding-left:10px;padding-right:10px}.otp-input-row{gap:4px}.products-grid{gap:8px}}
+  
+    .faq-list{max-width:860px;margin:auto;display:grid;gap:12px}
+    .faq-list details{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px}
+    .faq-list summary{cursor:pointer;font-weight:700;color:var(--green-dark)}
+    .faq-list p{margin-top:10px;color:var(--text2)}
+    .feature-card,.contact-card{transition:transform .22s ease,box-shadow .22s ease}
+    .feature-card:hover,.contact-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+    @media(prefers-reduced-motion:reduce){.feature-card,.contact-card{transition:none;transform:none!important}}
+  
+    .prod-description{font-size:.82rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px}
+    .product-details-btn{border:0;background:transparent;color:var(--green-dark);font-weight:700;font-size:.84rem;text-align:left;padding:10px 0 0;text-decoration:underline}
+    .product-details-btn:hover{color:var(--green)}
   </style>
 </head>
 <body>
 
 <!-- DELIVERY BANNER -->
-<div class="banner" data-i18n="banner.delivery">🚚 Free delivery on orders ₹300+ within 5 km | Min order ₹200 | Mon–Sun 7AM–9PM</div>
+<div class="banner" data-i18n="banner.delivery">🚚 Free delivery on orders ₹300+ within 5 km — Min order ₹200</div>
 
 <!-- NAVBAR -->
 <nav class="navbar">
@@ -475,14 +464,14 @@
       <li><a href="#" class="nav-link" data-page="products" data-i18n="nav.products">Products</a></li>
       <li><a href="#" class="nav-link" data-page="bulk" data-i18n="nav.bulk">Bulk Orders</a></li>
       <li><a href="#" class="nav-link" data-page="catering" data-i18n="nav.catering">Catering</a></li>
+      <li><a href="/about.html" class="nav-link">About</a></li><li><a href="/contact.html" class="nav-link">Contact</a></li>
       <li><a href="#" class="nav-link" data-page="cart">🛒 <span data-i18n="nav.cart">Cart</span></a></li>
       <li><a href="#" class="nav-link" data-page="orders" id="nav-orders-link" style="display:none">📦 <span data-i18n="nav.orders">My Orders</span></a></li>
       <li id="nav-login-item"><a href="#" class="nav-link" onclick="openAuthModal('login');return false;" data-i18n="nav.login">Login</a></li>
       <li id="nav-signup-item"><a href="#" class="nav-link" onclick="openAuthModal('signup');return false;" data-i18n="nav.signup">Sign Up</a></li>
       <li id="nav-user-item" style="display:none"><a href="#" class="nav-link user-chip" id="nav-user-label" onclick="showPage('orders');return false;">Hi</a></li>
       <li id="nav-logout-item" style="display:none"><a href="#" class="nav-link" onclick="logoutUser();return false;" data-i18n="nav.logout">Logout</a></li>
-      <li><a href="#" class="nav-link" data-page="admin" data-i18n="nav.admin">Admin</a></li>
-    </ul>
+      </ul>
   </div>
 </nav>
 
@@ -495,18 +484,18 @@
     <div class="hero-sun" aria-hidden="true"></div>
     <div class="container hero-grid">
       <div class="hero-copy">
-        <div class="hero-badge" data-i18n="hero.badge">Lowest Price Guaranteed | 20-30% Cheaper than Local Market</div>
+        <div class="hero-badge" data-i18n="hero.badge">🥬 Rampurhat • Birbhum • Local Farm Fresh</div>
         <h1><span data-i18n="brand">Sokal Bela</span><span class="h1-sub" data-i18n="hero.title">Fresh Local Vegetables — Delivered Fast</span></h1>
         <p data-i18n="hero.sub">Farm-to-doorstep produce for Rampurhat households &amp; events. Quality guaranteed.</p>
         <div class="hero-btns">
-          <button class="btn btn-gold btn-lg" onclick="showPage('products')" data-i18n="hero.shop">Shop Now</button>
-          <button class="btn btn-ghost btn-lg" onclick="showPage('bulk')" data-i18n="hero.bulk">Bulk Orders</button>
+          <button class="btn btn-gold btn-lg" onclick="showPage('products')" data-i18n="hero.shop">Shop Morning Fresh</button>
+          <button class="btn btn-ghost btn-lg" onclick="showPage('bulk')" data-i18n="hero.bulk">Bulk Event Booking</button>
         </div>
         <ul class="trust-list">
-          <li data-i18n="trust.fresh">100% Fresh</li>
-          <li data-i18n="trust.delivery">Same Day Delivery</li>
-          <li data-i18n="trust.farm">Farm Direct</li>
-          <li data-i18n="trust.price">No Hidden Charges</li>
+          <li>🌿 100% Fresh</li>
+          <li>⚡ 24/7 Emergency Delivery</li>
+          <li>🌾 Farm Direct</li>
+          
         </ul>
       </div>
       <aside class="rate-board" aria-labelledby="rb-title">
@@ -517,91 +506,60 @@
     </div>
   </div>
 
-  <div class="section" style="padding-bottom:0">
-    <div class="container">
-      <div class="feature-grid">
-        <div class="feature-card"><div class="cc-ico">🌅</div><h3 data-i18n="feature.morning.title">Fresh Morning Delivery</h3><p data-i18n="feature.morning.desc">Harvested at dawn, delivered to your door.</p></div>
-        <div class="feature-card"><div class="cc-ico">🚜</div><h3 data-i18n="feature.farmers.title">Directly from Farmers</h3><p data-i18n="feature.farmers.desc">Farm-fresh produce with zero middleman markup.</p></div>
-        <div class="feature-card"><div class="cc-ico">⚡</div><h3 data-i18n="feature.fast.title">Fast &amp; Easy Ordering</h3><p data-i18n="feature.fast.desc">1-tap ordering with instantly updated cart quantity selectors.</p></div>
-        <div class="feature-card"><div class="cc-ico">📞</div><h3 data-i18n="feature.whatsapp.title">WhatsApp Ordering</h3><p data-i18n="feature.whatsapp.desc">Quick support and direct ordering via WhatsApp button.</p></div>
-      </div>
-    </div>
-  </div>
 
-
-  <div class="section" style="padding-bottom:0">
+  <section class="section" aria-labelledby="featured-heading">
     <div class="container">
-      <h2 class="sec-title">🧺 Ready Baskets</h2>
-      <p class="sec-sub">Easy ordering: pick a basket and send it on WhatsApp. We confirm today's price before delivery.</p>
+      <h2 class="sec-title" id="featured-heading">🥬 Featured Produce</h2>
+      <p class="sec-sub">Fresh vegetables from Birbhum farmers, with clear per-unit prices and live stock updates.</p>
+      <div class="products-grid featured-grid" id="featured-grid" aria-live="polite"></div>
+      <h3 style="margin:32px 0 8px">🧺 Ready Baskets</h3>
+      <p class="sec-sub">Choose a basket and confirm today's market price with our team.</p>
       <div class="contact-grid" id="baskets-grid"></div>
     </div>
-  </div>
-
-  <div class="section" style="padding-bottom:0">
-    <div class="container">
-      <h2 class="sec-title" data-i18n="products.featured">⭐ Featured Vegetables</h2>
-      <p class="sec-sub" data-i18n="products.featuredSub">Freshly picked, available today</p>
-      <div class="products-grid featured-grid" id="featured-grid"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="container">
-      <h2 class="sec-title">💬 What Customers Say</h2>
-      <p class="sec-sub">Trusted by families across Rampurhat &nbsp;<small style="color:var(--text2)">(replace with real reviews)</small></p>
-      <div class="test-grid">
-        <div class="test-card">
-          <div class="stars">★★★★★</div>
-          <p class="test-text">"Vegetables are always fresh and delivered within 2 hours. Prices are very reasonable!"</p>
-          <div class="test-auth">Priya Dey</div>
-          <div class="test-loc">Rampurhat, Birbhum</div>
-        </div>
-        <div class="test-card">
-          <div class="stars">★★★★★</div>
-          <p class="test-text">"Best bulk order service for my daughter's wedding. Everything was perfectly arranged."</p>
-          <div class="test-auth">Ramesh Mondal</div>
-          <div class="test-loc">Nalhati, Birbhum</div>
-        </div>
-        <div class="test-card">
-          <div class="stars">★★★★☆</div>
-          <p class="test-text">"Love the Bengali names on the website! Makes it easy to order exactly what I need."</p>
-          <div class="test-auth">Sumita Ghosh</div>
-          <div class="test-loc">Sainthia, Birbhum</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="container">
-      <h2 class="sec-title">🧺 What We Do</h2>
+  </section>
+  <section class="section" style="background:var(--green-light)" aria-labelledby="how-heading">
+    <div class="container"><h2 class="sec-title" id="how-heading">How It Works</h2>
       <div class="contact-grid">
-        <div class="contact-card"><div class="cc-ico">🥬</div><h3>Daily Fresh Vegetables</h3><p>Order for home delivery or shop pickup</p></div>
-        <div class="contact-card"><div class="cc-ico">📦</div><h3>Bulk Orders</h3><p>Weddings, birthdays, annaprasan &amp; programs</p><a href="#" onclick="showPage('bulk');return false">Request a quote</a></div>
-        <div class="contact-card"><div class="cc-ico">🍛</div><h3>Catering</h3><p>Veg food for events, cooked &amp; served</p><a href="#" onclick="showPage('catering');return false">Plan your event</a></div>
-      </div>
-      <h2 class="sec-title" style="margin-top:36px">How Ordering Works</h2>
-      <div class="contact-grid">
-        <div class="contact-card"><div class="cc-ico">1️⃣</div><h3>Choose</h3><p>Pick vegetables, or fill the bulk / catering form</p></div>
-        <div class="contact-card"><div class="cc-ico">2️⃣</div><h3>Send</h3><p>Order goes to us on WhatsApp / Facebook / call</p></div>
-        <div class="contact-card"><div class="cc-ico">3️⃣</div><h3>We Confirm</h3><p>We confirm price, date and time with you</p></div>
-        <div class="contact-card"><div class="cc-ico">4️⃣</div><h3>Pay on Delivery</h3><p>Cash on Delivery or PhonePe after shop confirmation.</p></div>
+        <div class="contact-card"><div class="cc-ico">1️⃣</div><h3>Choose fresh produce</h3><p>Browse today's vegetables and choose quantities or an event request.</p></div>
+        <div class="contact-card"><div class="cc-ico">2️⃣</div><h3>Add to your basket</h3><p>Check your order, item pricing and delivery details.</p></div>
+        <div class="contact-card"><div class="cc-ico">3️⃣</div><h3>We confirm</h3><p>Our local team confirms availability, price and delivery timing.</p></div>
+        <div class="contact-card"><div class="cc-ico">4️⃣</div><h3>Receive &amp; pay</h3><p>Get your vegetables at home and pay cash or the agreed payment method.</p></div>
       </div>
     </div>
-  </div>
-
-  <div class="section" style="background:var(--green-light)">
-    <div class="container">
-      <h2 class="sec-title">📍 Find Us</h2>
-      <div class="contact-grid">
-        <div class="contact-card"><div class="cc-ico">📍</div><h3>Address</h3><p>Choy Fuko, Rampurhat<br>Birbhum – 731224</p></div>
-        <div class="contact-card"><div class="cc-ico">📞</div><h3>Call / WhatsApp</h3><a href="tel:+917551858583">+91 7551858583</a></div>
-        <div class="contact-card"><div class="cc-ico">📘</div><h3>Facebook</h3><a href="https://www.facebook.com/" target="_blank" rel="noopener">Message us on Facebook</a></div>
-        <div class="contact-card"><div class="cc-ico">⏰</div><h3>Hours</h3><p>Monday – Sunday<br>7:00 AM – 9:00 PM</p></div>
-        <div class="contact-card"><div class="cc-ico">🚚</div><h3>Delivery</h3><p>Free within 5 km<br>Min order ₹200</p></div>
+  </section>
+  <section class="section" aria-labelledby="why-heading">
+    <div class="container"><h2 class="sec-title" id="why-heading">Why Choose Sokal Bela?</h2>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="cc-ico">🚚</div><h3>Local same-day service</h3><p>Order locally and we'll confirm the quickest available delivery slot.</p></div>
+        <div class="feature-card"><div class="cc-ico">🌾</div><h3>Farm-direct produce</h3><p>We connect Birbhum growers with kitchens in Rampurhat.</p></div>
+        <div class="feature-card"><div class="cc-ico">⚡</div><h3>24/7 emergency orders</h3><p>Get in touch anytime for urgent vegetable requirements.</p></div>
+        <div class="feature-card"><div class="cc-ico">🎉</div><h3>Bulk event catering</h3><p>Fresh supplies and catering requests for weddings, birthdays and gatherings.</p></div>
       </div>
     </div>
-  </div>
+  </section>
+  <section class="section" style="background:var(--green-light)" aria-labelledby="reviews-heading">
+    <div class="container"><h2 class="sec-title" id="reviews-heading">Local Testimonials</h2>
+      <div class="contact-card"><p>Have you ordered from Sokal Bela? We welcome genuine Rampurhat customer feedback and publish testimonials with permission.</p>
+        <a href="#" data-contact-wa data-wa-text="Hello Sokal Bela! I'd like to share feedback on my order.">Share your experience via WhatsApp</a>
+      </div>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="faq-heading">
+    <div class="container"><h2 class="sec-title" id="faq-heading">Frequently Asked Questions</h2>
+      <div class="faq-list">
+        <details><summary>What is the minimum order?</summary><p>₹200. Delivery is free for orders of ₹300 or more within 5 km.</p></details>
+        <details><summary>Do you accept urgent orders?</summary><p>Yes, our team can be contacted 24/7. Actual delivery times depend on stock and local availability.</p></details>
+        <details><summary>Can I order for weddings or events?</summary><p>Yes. Use Bulk Event Booking or Catering to request a quotation for your date and guest count.</p></details>
+        <details><summary>How do I pay?</summary><p>Cash on delivery or a payment method confirmed with the store. No advance online payment is required at checkout.</p></details>
+      </div>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="final-heading" style="background:linear-gradient(135deg,#1e5a28,#2d7a3a);color:white">
+    <div class="container" style="text-align:center"><h2 class="sec-title" id="final-heading" style="color:white">Fresh, local and ready when you are.</h2>
+      <p>🥬 সকাল বেলা — from Birbhum farms to your Rampurhat doorstep.</p>
+      <div class="hero-btns" style="justify-content:center;margin-top:18px"><button class="btn btn-gold btn-lg" onclick="showPage('products')">Shop Morning Fresh</button><button class="btn btn-ghost btn-lg" onclick="showPage('bulk')">Bulk Event Booking</button></div>
+    </div>
+  </section>
 
 </section>
 
@@ -755,7 +713,7 @@
           <button class="btn btn-primary" onclick="showPage('home')">Continue Shopping</button>
           <button class="btn btn-outline" onclick="showPage('products')">Browse Products</button>
         </div>
-        <p style="font-size:13px;color:var(--text2);margin-top:14px">Queries: <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a></p>
+        <p style="font-size:13px;color:var(--text2);margin-top:14px">Queries: <a href="#" data-contact-tel style="color:var(--green)"><span data-contact-phone>Call us</span></a></p>
       </div>
     </div>
   </div>
@@ -774,7 +732,7 @@
           <button class="btn btn-primary" onclick="showPage('home')">Continue Shopping</button>
           <button class="btn btn-outline" onclick="showPage('products')">Browse Products</button>
         </div>
-        <p style="font-size:13px;color:var(--text2);margin-top:14px">Queries: <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a></p>
+        <p style="font-size:13px;color:var(--text2);margin-top:14px">Queries: <a href="#" data-contact-tel style="color:var(--green)"><span data-contact-phone>Call us</span></a></p>
       </div>
     </div>
   </div>
@@ -793,7 +751,7 @@
           <button class="btn btn-primary" onclick="showPage('cart')">Back to Cart</button>
           <button class="btn btn-outline" onclick="showPage('products')">Continue Shopping</button>
         </div>
-        <p style="font-size:13px;color:var(--text2);margin-top:14px">Call <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a> to confirm Cash on Delivery or PhonePe transfer.</p>
+        <p style="font-size:13px;color:var(--text2);margin-top:14px">Call <a href="#" data-contact-tel style="color:var(--green)"><span data-contact-phone>Call us</span></a> to confirm Cash on Delivery or PhonePe transfer.</p>
       </div>
     </div>
   </div>
@@ -867,116 +825,6 @@
   </div>
 </section>
 
-<!-- ====== ADMIN PAGE ====== -->
-<section id="admin-page" class="page">
-  <div class="section">
-    <div class="container">
-
-      <div id="admin-login-wrap" class="admin-login-wrap">
-        <div class="card card-body">
-          <h2 style="margin-bottom:18px;color:var(--green)">🔐 Admin Login</h2>
-          <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
-            <div class="form-group"><label class="form-label">Email</label><input type="email" id="admin-email" class="form-control" required></div>
-            <div class="form-group"><label class="form-label">Password</label><input type="password" id="admin-pass" class="form-control" required></div>
-            <div id="admin-err" style="color:var(--red);font-size:13px;margin-bottom:10px;display:none"></div>
-            <button type="submit" class="btn btn-primary btn-full" id="admin-login-btn">Login</button>
-          </form>
-          <p style="margin-top:10px;font-size:13px;text-align:center">
-            <a href="#" onclick="doForgotPw();return false" style="color:var(--green)">Forgot password?</a>
-          </p>
-        </div>
-      </div>
-
-      <div id="admin-dash" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
-          <h2 style="color:var(--green)">📊 Admin Dashboard</h2>
-          <button class="btn btn-outline btn-sm" onclick="doAdminLogout()">Logout</button>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-val" id="st-tot">0</div><div class="stat-lbl">Total Orders</div></div>
-          <div class="stat-card"><div class="stat-val" id="st-today">0</div><div class="stat-lbl">Today's Orders</div></div>
-          <div class="stat-card"><div class="stat-val" id="st-rev">₹0</div><div class="stat-lbl">Total Revenue</div></div>
-          <div class="stat-card"><div class="stat-val" id="st-trev">₹0</div><div class="stat-lbl">Today's Revenue</div></div>
-          <div class="stat-card"><div class="stat-val" id="st-prods">0</div><div class="stat-lbl">Products</div></div>
-          <div class="stat-card warn"><div class="stat-val" id="st-low">0</div><div class="stat-lbl">Low Stock</div></div>
-        </div>
-
-        <div class="admin-tabs">
-          <div class="atab active" data-tab="orders">📦 Orders</div>
-          <div class="atab" data-tab="bulk">📋 Bulk Orders</div>
-          <div class="atab" data-tab="inventory">🏪 Inventory</div>
-          <div class="atab" data-tab="addprod">➕ Add Product</div>
-        </div>
-
-        <!-- Orders Tab -->
-        <div class="atab-content active" id="tab-orders">
-          <div class="table-wrap">
-            <table><thead><tr><th>ID</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>💬</th></tr></thead>
-            <tbody id="orders-tbody"></tbody></table>
-          </div>
-          <div id="ord-loading" style="text-align:center;padding:36px"><div class="spinner"></div></div>
-          <div id="ord-empty" style="text-align:center;padding:36px;display:none;color:var(--text2)">No orders yet.</div>
-        </div>
-
-        <!-- Bulk Tab -->
-        <div class="atab-content" id="tab-bulk">
-          <div class="table-wrap">
-            <table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Event</th><th>Date</th><th>Guests</th><th>Status</th><th>💬</th></tr></thead>
-            <tbody id="bulk-tbody"></tbody></table>
-          </div>
-          <div id="bulk-loading" style="text-align:center;padding:36px"><div class="spinner"></div></div>
-          <div id="bulk-empty" style="text-align:center;padding:36px;display:none;color:var(--text2)">No bulk orders yet.</div>
-        </div>
-
-        <!-- Inventory Tab -->
-        <div class="atab-content" id="tab-inventory">
-          <div class="table-wrap">
-            <table><thead><tr><th>Product</th><th>বাংলা</th><th>Category</th><th>Price</th><th>Unit</th><th>Stock</th><th>Active</th><th>Edit</th></tr></thead>
-            <tbody id="inv-tbody"></tbody></table>
-          </div>
-        </div>
-
-        <!-- Add Product Tab -->
-        <div class="atab-content" id="tab-addprod">
-          <div class="admin-form">
-            <h3 id="pf-title" style="margin-bottom:14px">➕ Add New Product</h3>
-            <form id="prod-form" onsubmit="saveProduct(event)">
-              <input type="hidden" id="pf-id">
-              <div class="form-group"><label class="form-label">English Name *</label><input type="text" id="pf-name" class="form-control" required></div>
-              <div class="form-group"><label class="form-label">Bengali Name</label><input type="text" id="pf-bn" class="form-control"></div>
-              <div class="form-group"><label class="form-label">Hindi Name</label><input type="text" id="pf-hi" class="form-control"></div>
-              <div class="form-group"><label class="form-label">Description</label><textarea id="pf-desc" class="form-control" rows="3" placeholder="Fresh farm-picked vegetables"></textarea></div>
-              <div class="form-group"><label class="form-label">Price (₹) *</label><input type="number" id="pf-price" class="form-control" min="0" step="0.5" required></div>
-              <div class="form-group"><label class="form-label">Unit</label>
-                <select id="pf-unit" class="form-control">
-                  <option value="kg">kg</option><option value="piece">piece</option>
-                  <option value="bunch">bunch</option><option value="500g">500g</option>
-                </select>
-              </div>
-              <div class="form-group"><label class="form-label">Category</label>
-                <select id="pf-cat" class="form-control">
-                  <option>Root Vegetables</option><option>Leafy Greens</option>
-                  <option>Gourds</option><option>Fruity Vegetables</option><option>Others</option>
-                </select>
-              </div>
-              <div class="form-group"><label class="form-label">Stock *</label><input type="number" id="pf-stock" class="form-control" min="0" required></div>
-              <div class="form-group"><label class="form-label">Image URL (optional)</label><input type="url" id="pf-img" class="form-control" placeholder="https://…"><small style="color:var(--text2)">Leave blank. For vegetables the app knows by name (potato, tomato, cauliflower…) the matching built-in picture is always used.</small></div>
-              <div class="form-group"><label class="form-label">Emoji fallback</label><input type="text" id="pf-emoji" class="form-control" placeholder="🥔" maxlength="4"></div>
-              <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="pf-active" checked> Active (visible to customers)</label></div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <button type="submit" class="btn btn-primary">Save Product</button>
-                <button type="button" class="btn btn-outline" onclick="resetProdForm()">Clear</button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-      </div><!-- /admin-dash -->
-    </div>
-  </div>
-</section>
-
 </main>
 
 <!-- FOOTER -->
@@ -986,20 +834,21 @@
       <div>
         <h3>🥬 Sokal Bela</h3>
         <p style="margin-bottom:12px">সকাল বেলা — "Morning Time". Fresh local vegetables from Rampurhat, delivered fast to your doorstep.</p>
-        <a href="https://wa.me/917551858583?text=Hello%2C+I'd+like+to+order+from+Sokal+Bela" target="_blank" rel="noopener" class="btn btn-wa btn-sm" style="display:inline-flex">💬 Chat on WhatsApp</a>
+        <a href="#" data-contact-wa data-wa-text="Hello, I'd like to order from Sokal Bela" target="_blank" rel="noopener" class="btn btn-wa btn-sm" style="display:inline-flex">💬 Chat on WhatsApp</a>
       </div>
       <div>
         <h4>Contact</h4>
-        <p>📞 <a href="tel:+917551858583">+91 7551858583</a></p>
-        <p>📍 Choy Fuko, Rampurhat<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Birbhum – 731224, WB</p>
-        <p>⏰ Mon–Sun, 7AM–9PM</p>
+        <p>📞 <a href="#" data-contact-tel><span data-contact-phone>Call us</span></a></p>
+        <p>📍 <span data-contact-address>Rampurhat, West Bengal 731224</span></p>
+        <p>⏰ Open 24/7</p>
       </div>
       <div>
         <h4>Quick Links</h4>
         <a href="#" onclick="showPage('products');return false">🥦 Products</a>
         <a href="#" onclick="showPage('bulk');return false">📦 Bulk Orders</a>
         <a href="#" onclick="showPage('cart');return false">🛒 My Cart</a>
-        <a href="https://wa.me/917551858583" target="_blank" rel="noopener">💬 WhatsApp Us</a>
+        <a href="#" data-contact-wa target="_blank" rel="noopener">💬 WhatsApp Us</a>
+<a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/faq.html">FAQ</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a><a href="/refund-delivery.html">Refund &amp; Delivery</a>
       </div>
       <div>
         <h4>Our Location</h4>
@@ -1019,7 +868,7 @@
 </footer>
 
 <!-- FLOATING BUTTONS -->
-<a href="https://wa.me/917551858583?text=Hello%2C+I'd+like+to+order+from+Sokal+Bela" target="_blank" rel="noopener" class="fab-wa" aria-label="Chat on WhatsApp">
+<a href="#" data-contact-wa data-wa-text="Hello, I'd like to order from Sokal Bela" target="_blank" rel="noopener" class="fab-wa" aria-label="Chat on WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 0 1-4.267-1.234l-.305-.182-3.168.943.943-3.168-.182-.305A7.946 7.946 0 0 1 4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/></svg>
 </a>
 <button class="cart-bar" id="cart-bar" type="button" onclick="showPage('cart')"><span class="cb-left"><span class="cb-count" id="cb-count">0</span><span data-i18n="cart.view">View cart</span></span><span class="cb-total" id="cb-total">₹0</span></button>
@@ -1041,19 +890,31 @@
     </div>
     <form id="auth-form" onsubmit="submitAuthForm(event)">
       <div id="auth-email-pane">
-        <div class="form-group">
-          <label class="form-label" data-i18n="auth.email">Email</label>
-          <input type="email" id="auth-email" class="form-control" autocomplete="email">
+        <div class="form-group"><label class="form-label" for="auth-email">Email address</label>
+          <input type="email" id="auth-email" class="form-control" autocomplete="email" maxlength="254" required></div>
+        <div id="auth-email-otp-wrap" style="display:none">
+          <label class="form-label">Enter six-digit email OTP</label>
+          <div class="otp-input-row" id="email-otp-inputs">
+            <input aria-label="OTP digit 1" inputmode="numeric" autocomplete="one-time-code" maxlength="1">
+            <input aria-label="OTP digit 2" inputmode="numeric" maxlength="1">
+            <input aria-label="OTP digit 3" inputmode="numeric" maxlength="1">
+            <input aria-label="OTP digit 4" inputmode="numeric" maxlength="1">
+            <input aria-label="OTP digit 5" inputmode="numeric" maxlength="1">
+            <input aria-label="OTP digit 6" inputmode="numeric" maxlength="1">
+          </div>
+          <p id="email-otp-timer" role="status" style="margin:8px 0;color:var(--text2)"></p>
+          <button id="email-otp-resend" type="button" class="btn btn-outline btn-sm" onclick="resendEmailOtp()" disabled>Resend OTP</button>
         </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="auth.password">Password</label>
-          <input type="password" id="auth-pass" class="form-control" autocomplete="current-password" minlength="6">
+        <div id="auth-password-wrap" style="display:none">
+          <div class="form-group"><label class="form-label" for="auth-pass">Password</label>
+            <input type="password" id="auth-pass" class="form-control" autocomplete="current-password" minlength="6"></div>
+          <div class="form-group" id="auth-confirm-wrap" style="display:none">
+            <label class="form-label" for="auth-pass-confirm">Confirm Password</label>
+            <input type="password" id="auth-pass-confirm" class="form-control" autocomplete="new-password" minlength="6"></div>
         </div>
-        <div class="form-group" id="auth-confirm-wrap" style="display:none">
-          <label class="form-label" data-i18n="auth.confirm">Confirm Password</label>
-          <input type="password" id="auth-pass-confirm" class="form-control" autocomplete="new-password" minlength="6">
-        </div>
+        <button class="btn btn-outline btn-sm" id="auth-password-toggle" type="button" onclick="togglePasswordLogin()" style="margin:4px 0 14px">Use password instead</button>
       </div>
+      
       <div id="auth-phone-pane" style="display:none">
         <div class="form-group">
           <label class="form-label" data-i18n="auth.phone">Phone Number</label>
@@ -1080,6 +941,19 @@
   </div>
 </div>
 
+
+<div class="modal-bg" id="product-detail-modal" style="display:none">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="product-detail-title">
+    <button type="button" id="product-detail-close" class="btn btn-outline btn-sm" onclick="closeProductDetails()" style="float:right" aria-label="Close product details">✕</button>
+    <h2 class="modal-title" id="product-detail-title"></h2>
+    <p id="product-detail-description"></p>
+    <p id="product-detail-price" style="font-size:1.3rem;font-weight:700;color:var(--green)"></p>
+    <p id="product-detail-stock" aria-live="polite"></p>
+    <p id="product-detail-eta"></p>
+    <p>Minimum order ₹200; free delivery on ₹300+ within 5 km.</p>
+  </div>
+</div>
+
 <!-- ORDER SUCCESS MODAL -->
 <div class="modal-bg" id="success-modal" style="display:none">
   <div class="modal-box" style="text-align:center">
@@ -1087,7 +961,7 @@
     <h2 class="modal-title" data-i18n="success.title">Order Placed!</h2>
     <p id="success-msg" style="color:var(--text2);margin-bottom:6px"></p>
     <p style="font-size:14px;font-weight:600;color:var(--green)" data-i18n="success.eta">Estimated morning delivery: 7 AM – 11 AM</p>
-    <p style="font-size:13px;color:var(--text2)">We'll call to confirm delivery. Queries: <a href="tel:+917551858583" style="color:var(--green)">+91 7551858583</a></p>
+    <p style="font-size:13px;color:var(--text2)">We'll call to confirm delivery. Queries: <a href="#" data-contact-tel style="color:var(--green)"><span data-contact-phone>Call us</span></a></p>
     <div class="modal-acts" style="justify-content:center">
       <a class="btn btn-wa" id="success-wa" href="#" target="_blank" rel="noopener" data-i18n="success.trackWa">Track on WhatsApp</a>
       <button class="btn btn-primary" onclick="closeSuccessModal()" data-i18n="success.continue">Continue Shopping</button>
@@ -1107,27 +981,12 @@
   </div>
 </aside>
 
-<!-- EDIT PRODUCT MODAL -->
-<div class="modal-bg" id="edit-modal" style="display:none">
-  <div class="modal-box">
-    <h3 class="modal-title">✏️ Quick Edit Product</h3>
-    <form id="edit-prod-form" onsubmit="saveInlineEdit(event)">
-      <input type="hidden" id="ep-id">
-      <div class="form-group"><label class="form-label">Price (₹)</label><input type="number" id="ep-price" class="form-control" min="0" step="0.5"></div>
-      <div class="form-group"><label class="form-label">Stock</label><input type="number" id="ep-stock" class="form-control" min="0"></div>
-      <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="ep-active"> Active</label></div>
-      <div class="modal-acts">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <!-- Firebase after first paint so a slow/blocked CDN cannot leave a blank page -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="config/contact.js"></script>
+<script src="config/firebase-public.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/veg-images.js"></script>
 <!-- ======================================================
@@ -1138,18 +997,9 @@
 if (typeof t !== 'function') { window.t = function (key) { return key; }; }
 
 /* ========== CONFIG ========== */
-const FIREBASE_CFG = {
-  apiKey: "AIzaSyBKqJH8EWddXthZZao7lpFZhU2d5Z65Mbw",
-  authDomain: "sokal-bela-store.firebaseapp.com",
-  projectId: "sokal-bela-store",
-  storageBucket: "sokal-bela-store.firebasestorage.app",
-  messagingSenderId: "461746078421",
-  appId: "1:461746078421:web:76d7e15bd0c179a6ba985c",
-  measurementId: "G-QH41QC1D8X"
-};
-const ADMIN_EMAIL  = "yankeecpp90@gmail.com";
-const OWNER_WA     = "917551858583";
-const ROLES = { CUSTOMER: "Customer", SELLER: "Seller", ADMIN: "Admin" };
+const FIREBASE_CFG = window.SOKAL_FIREBASE_CONFIG;
+const OWNER_WA     = SOKAL_CONTACT.whatsappDigits;
+const ROLES = { CUSTOMER: "Customer", SELLER: "Seller" };
 const ORDER_STATUSES = ["Pending","Confirmed","Packed","OutForDelivery","Delivered","Cancelled","ReturnRequested","Returned"];
 const PAYMENT_STATUSES = {
   PENDING: "Pending",
@@ -1192,12 +1042,10 @@ let checkoutStep = 1;
 let authMethod = "email";
 let phoneConfirmResult = null;
 let recaptchaVerifier = null;
-let adminUser = null;
 let orderInFlight = false; // duplicate-submission guard
 let paymentFlowActive = false;
 let paymentWatchdog = null;
 let lastPaymentCtx = null;
-let unsubOrders = null, unsubBulk = null, unsubInventory = null;
 
 /* ========== PRODUCT EMOJIS ========== */
 const EMOJIS = {potato:"🥔",onion:"🧅",tomato:"🍅",brinjal:"🍆",cauliflower:"🥦",
@@ -1228,7 +1076,6 @@ const SEEDS = [
 function parseRole(role) {
   const value = String(role || "").trim().toLowerCase();
   if (!value) return null;
-  if (value === "admin") return ROLES.ADMIN;
   if (value === "seller") return ROLES.SELLER;
   if (value === "customer") return ROLES.CUSTOMER;
   return null;
@@ -1311,10 +1158,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const nav = document.getElementById("nav-menu");
   if (ham && nav) ham.addEventListener("click", () => { ham.classList.toggle("open"); nav.classList.toggle("open"); });
 
-  document.querySelectorAll(".atab").forEach(t =>
-    t.addEventListener("click", () => switchTab(t.dataset.tab))
-  );
-
   window.addEventListener("scroll", () =>
     document.getElementById("back-top").classList.toggle("vis", scrollY > 300)
   );
@@ -1340,7 +1183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* ========== PAGE NAV ========== */
-/* Catering request: saved to Firestore (shown in admin under Bulk Orders) and sent to owner on WhatsApp. */
+/* Catering request: saved to Firestore (shown in the event request queue) and sent to owner on WhatsApp. */
 async function handleCatering(e){
   e.preventDefault();
   const v=id=>document.getElementById(id).value.trim();
@@ -1348,7 +1191,7 @@ async function handleCatering(e){
   if(phone.length!==10){ showToast("Enter a valid 10-digit phone number","error"); return; }
   if(!/^[6-9]\d{9}$/.test(phone)){ showToast("Enter a valid 10-digit Indian mobile number","error"); return; }
   // Same shape as a bulk order (contactName / timestamp / items...) so it passes the Firestore
-  // rules and shows up in Admin → Bulk Orders next to the other event requests.
+  // rules and shows up in the event queue next to the other event requests.
   const stamp = (typeof fbOk!=="undefined"&&fbOk&&db) ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString();
   const d={customerId:currentUser?.uid||"guest",customerRole:normalizeRole(currentUserRole),
     contactName:v("cname"),phone,email:"",eventType:"Catering - "+v("ctype"),eventDate:v("cdate"),
@@ -1392,42 +1235,26 @@ window.addEventListener("load",()=>{
       out.style.display = outside ? "block" : "none";
     }
   });
-  if(location.hash==="#admin") showPage("admin");
 });
 
 function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const el = document.getElementById(id + "-page");
-  if (el) { el.classList.add("active"); window.scrollTo({top:0,behavior:"smooth"}); }
+  if (!el) return;
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  el.classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
   document.getElementById("nav-menu")?.classList.remove("open");
   document.getElementById("hamburger")?.classList.remove("open");
-  updateCartBar();
   document.querySelectorAll(".nav-link[data-page]").forEach(a =>
     a.classList.toggle("active", a.dataset.page === id)
   );
-  if (id !== "admin") {
-    if (unsubOrders) { unsubOrders(); unsubOrders = null; }
-    if (unsubBulk) { unsubBulk(); unsubBulk = null; }
-    if (unsubInventory) { unsubInventory(); unsubInventory = null; }
-  }
   if (id === "cart") renderCart();
   if (id === "products") { renderProducts(); renderCatTabs(); }
   if (id === "bulk") initBulkRows();
   if (id === "orders") loadMyOrders();
-  if (id === "admin") {
-    const loginWrap = document.getElementById("admin-login-wrap");
-    const dash = document.getElementById("admin-dash");
-    if (hasRole(ROLES.ADMIN)) {
-      if (loginWrap) loginWrap.style.display = "none";
-      if (dash) dash.style.display = "block";
-      startAdminListeners();
-    } else {
-      if (loginWrap) loginWrap.style.display = "block";
-      if (dash) dash.style.display = "none";
-      if (currentUser && !hasRole(ROLES.ADMIN)) showToast("Admin access is restricted.","error");
-    }
-  }
-  }
+  updateCartBar();
+}
+
 
   function updateAuthNav() {
     const loginItem = document.getElementById("nav-login-item");
@@ -1436,7 +1263,6 @@ function showPage(id) {
     const logoutItem = document.getElementById("nav-logout-item");
     const userLabel = document.getElementById("nav-user-label");
     const ordersLink = document.getElementById("nav-orders-link");
-    const adminLink = document.querySelector('.nav-link[data-page="admin"]');
 
     const signedIn = !!currentUser;
     if (loginItem) loginItem.style.display = signedIn ? "none" : "";
@@ -1450,7 +1276,6 @@ function showPage(id) {
     }
     const userBtn = document.getElementById("nav-user-btn");
     if (userBtn) userBtn.setAttribute("aria-label", signedIn ? (currentUser?.email || currentUser?.phoneNumber || "Profile") : t("nav.login"));
-    if (adminLink) adminLink.parentElement.style.display = (location.hash === "#admin") ? "" : "none";
   }
 
   async function ensureUserProfile(user) {
@@ -1458,7 +1283,7 @@ function showPage(id) {
     const ref = db.collection("users").doc(user.uid);
     const tokenResult = await user.getIdTokenResult().catch(() => null);
     const claimRole = parseRole(tokenResult?.claims?.role);
-    const fallbackRole = user.email === ADMIN_EMAIL ? ROLES.ADMIN : ROLES.CUSTOMER;
+    const fallbackRole = ROLES.CUSTOMER;
     const snap = await ref.get();
 
     if (!snap.exists) {
@@ -1476,7 +1301,7 @@ function showPage(id) {
       return role;
     }
 
-    const role = claimRole || parseRole(snap.data()?.role) || fallbackRole;
+    const role = claimRole || fallbackRole;
     await ref.set({
       email: user.email || snap.data()?.email || "",
       phoneNumber: user.phoneNumber || snap.data()?.phoneNumber || "",
@@ -1489,221 +1314,203 @@ function showPage(id) {
   }
 
   async function syncAuthState(user) {
+    const previous = currentUser?.uid || null;
     currentUser = user || null;
-    adminUser = null;
-    currentUserRole = null;
-
+    currentUserRole = ROLES.CUSTOMER;
     if (currentUser) {
-      try {
-        const role = await ensureUserProfile(currentUser);
-        currentUserRole = normalizeRole(role);
-        if (currentUserRole === ROLES.ADMIN) adminUser = currentUser;
-      } catch (err) {
-        console.error("Failed to sync user profile:", err);
-        currentUserRole = currentUser.email === ADMIN_EMAIL ? ROLES.ADMIN : ROLES.CUSTOMER;
-        if (currentUserRole === ROLES.ADMIN) adminUser = currentUser;
-      }
+      try { await ensureUserProfile(currentUser); }
+      catch (err) { console.warn("Profile sync failed:", err.message); }
     }
-
     const guestCart = loadCartStorage(null);
     const userCart = loadCartStorage(currentUser?.uid || null);
     if (currentUser) {
       cart = mergeCartItems(userCart, guestCart);
       if (guestCart.length) localStorage.removeItem(getCartStorageKey(null));
-    } else {
-      cart = guestCart;
-    }
-    saveCartStorage();
+    } else { cart = guestCart; }
+    if (previous !== (currentUser?.uid || null)) saveCartStorage();
     renderCartCount();
     if (document.getElementById("cart-page")?.classList.contains("active")) renderCart();
     if (currentUser) {
       const emailField = document.getElementById("cust-email");
       if (emailField && !emailField.value) emailField.value = currentUser.email || "";
-      const phoneField = document.getElementById("cust-phone");
-      const phoneDigits = String(currentUser.phoneNumber || "").replace(/\D/g, "").slice(-10);
-      if (phoneField && !phoneField.value && phoneDigits.length === 10) phoneField.value = phoneDigits;
     }
-    updateAuthNav();
-    closeAuthModal();
-
-    if (document.getElementById("admin-page")?.classList.contains("active")) {
-      if (hasRole(ROLES.ADMIN)) {
-        showDash();
-        startAdminListeners();
-      } else {
-        doAdminLogout(true);
-      }
-    }
+    updateAuthNav(); closeAuthModal();
   }
 
+
+  let emailOtpEmail = "", emailOtpExpiry = 0, emailOtpResendAt = 0, usePassword = false;
+  function otpInputs() { return [...document.querySelectorAll("#email-otp-inputs input")]; }
+  let otpInputsReady = false;
+  function setupOtpInputs() {
+    if (otpInputsReady) return;
+    otpInputsReady = true;
+    const inputs = otpInputs();
+    inputs.forEach((input,i) => {
+      input.addEventListener("input", () => {
+        input.value = input.value.replace(/\D/g, "").slice(-1);
+        if (input.value && i < 5) inputs[i + 1].focus();
+      });
+      input.addEventListener("keydown", e => {
+        if (e.key === "Backspace" && !input.value && i > 0) inputs[i - 1].focus();
+      });
+      input.addEventListener("paste", e => {
+        e.preventDefault();
+        const digits = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+        [...digits].forEach((digit,j) => { inputs[j].value = digit; });
+        inputs[Math.min(digits.length, 5)].focus();
+      });
+    });
+    setInterval(() => {
+      const panel = document.getElementById("auth-email-otp-wrap");
+      if (!panel || panel.style.display === "none") return;
+      const remain = Math.max(0, Math.ceil((emailOtpExpiry - Date.now()) / 1000));
+      const cooldown = Math.max(0, Math.ceil((emailOtpResendAt - Date.now()) / 1000));
+      const timer = document.getElementById("email-otp-timer");
+      timer.textContent = remain ? "Expires in " + Math.floor(remain/60) + ":" +
+        String(remain % 60).padStart(2,"0") : "Code expired. Request another.";
+      const resend = document.getElementById("email-otp-resend");
+      resend.disabled = cooldown > 0;
+      resend.textContent = cooldown ? "Resend in " + cooldown + "s" : "Resend OTP";
+    }, 1000);
+  }
   function openAuthModal(mode = "login") {
     const modal = document.getElementById("auth-modal");
     if (!modal) return;
+    setupOtpInputs();
     modal.style.display = "flex";
-    const title = document.getElementById("auth-modal-title");
-    const submit = document.getElementById("auth-submit-btn");
-    const toggleLabel = document.getElementById("auth-toggle-label");
-    const toggleLink = document.getElementById("auth-toggle-link");
-    const confirmWrap = document.getElementById("auth-confirm-wrap");
-    const passInput = document.getElementById("auth-pass");
-
     modal.dataset.mode = mode;
-    if (mode === "signup") {
-      if (title) title.textContent = t("auth.signupTitle");
-      if (submit) submit.textContent = t("auth.signup");
-      if (toggleLabel) toggleLabel.textContent = t("auth.haveAccount");
-      if (toggleLink) toggleLink.textContent = t("auth.login");
-      if (confirmWrap) confirmWrap.style.display = authMethod === "email" ? "block" : "none";
-      if (passInput) passInput.setAttribute("autocomplete", "new-password");
-    } else {
-      if (title) title.textContent = t("auth.loginTitle");
-      if (submit) submit.textContent = authMethod === "phone" ? (phoneConfirmResult ? t("auth.verifyOtp") : t("auth.sendOtp")) : t("auth.login");
-      if (toggleLabel) toggleLabel.textContent = t("auth.newCustomer");
-      if (toggleLink) toggleLink.textContent = t("auth.createAccount");
-      if (confirmWrap) confirmWrap.style.display = "none";
-      if (passInput) passInput.setAttribute("autocomplete", "current-password");
-    }
+    usePassword = mode === "signup";
+    emailOtpEmail = ""; emailOtpExpiry = 0;
+    document.getElementById("auth-email").readOnly = false;
+    document.getElementById("auth-email-otp-wrap").style.display = "none";
     document.getElementById("auth-err").style.display = "none";
-    setAuthMethod(authMethod, true);
+    document.getElementById("auth-modal-title").textContent = mode === "signup" ? "Create account" : "Sign in with email OTP";
+    document.getElementById("auth-toggle-label").textContent = mode === "signup" ? "Already registered?" : "New customer?";
+    document.getElementById("auth-toggle-link").textContent = mode === "signup" ? "Log in" : "Create account";
+    setAuthMethod("email", true);
   }
-
   function setAuthMethod(method, keepValues) {
     authMethod = method === "phone" ? "phone" : "email";
     document.getElementById("auth-tab-email")?.classList.toggle("active", authMethod === "email");
     document.getElementById("auth-tab-phone")?.classList.toggle("active", authMethod === "phone");
-    const emailPane = document.getElementById("auth-email-pane");
-    const phonePane = document.getElementById("auth-phone-pane");
-    const emailLinks = document.getElementById("auth-email-links");
-    if (emailPane) emailPane.style.display = authMethod === "email" ? "block" : "none";
-    if (phonePane) phonePane.style.display = authMethod === "phone" ? "block" : "none";
-    if (emailLinks) emailLinks.style.display = authMethod === "email" ? "block" : "none";
-    const emailInput = document.getElementById("auth-email");
-    const passInput = document.getElementById("auth-pass");
-    if (emailInput) emailInput.required = authMethod === "email";
-    if (passInput) passInput.required = authMethod === "email";
-    const submit = document.getElementById("auth-submit-btn");
-    const mode = document.getElementById("auth-modal")?.dataset?.mode || "login";
-    if (submit) {
-      if (authMethod === "phone") submit.textContent = phoneConfirmResult ? t("auth.verifyOtp") : t("auth.sendOtp");
-      else submit.textContent = mode === "signup" ? t("auth.signup") : t("auth.login");
-    }
-    if (!keepValues) {
-      phoneConfirmResult = null;
-      const otpWrap = document.getElementById("auth-otp-wrap");
-      if (otpWrap) otpWrap.style.display = "none";
-    }
+    document.getElementById("auth-email-pane").style.display = authMethod === "email" ? "block" : "none";
+    document.getElementById("auth-phone-pane").style.display = authMethod === "phone" ? "block" : "none";
+    document.getElementById("auth-email-links").style.display = authMethod === "email" ? "block" : "none";
+    document.getElementById("auth-email").required = authMethod === "email";
+    document.getElementById("auth-password-wrap").style.display = usePassword ? "block" : "none";
+    document.getElementById("auth-confirm-wrap").style.display = usePassword &&
+      document.getElementById("auth-modal").dataset.mode === "signup" ? "block" : "none";
+    document.getElementById("auth-pass").required = authMethod === "email" && usePassword;
+    document.getElementById("auth-password-toggle").textContent = usePassword ? "Use email OTP instead" : "Use password instead";
+    document.getElementById("auth-submit-btn").textContent = authMethod === "phone" ?
+      (phoneConfirmResult ? "Verify phone OTP" : "Send phone OTP") :
+      usePassword ? (document.getElementById("auth-modal").dataset.mode === "signup" ? "Create account" : "Sign in") :
+      (emailOtpEmail ? "Verify email OTP" : "Send email OTP");
+    if (!keepValues) { phoneConfirmResult = null; document.getElementById("auth-otp-wrap").style.display = "none"; }
   }
-
-  function closeAuthModal() {
-    const modal = document.getElementById("auth-modal");
-    if (modal) modal.style.display = "none";
+  function togglePasswordLogin() {
+    usePassword = !usePassword;
+    emailOtpEmail = "";
+    document.getElementById("auth-email-otp-wrap").style.display = "none";
+    setAuthMethod("email", true);
   }
-
+  function closeAuthModal() { document.getElementById("auth-modal").style.display = "none"; }
   function toggleAuthMode() {
-    const current = document.getElementById("auth-modal")?.dataset?.mode || "login";
-    openAuthModal(current === "signup" ? "login" : "signup");
+    const mode = document.getElementById("auth-modal").dataset.mode;
+    openAuthModal(mode === "signup" ? "login" : "signup");
   }
-
   function authFriendlyError(err) {
-    const msg = String(err?.message || err || "Authentication failed");
-    return msg.replace("Firebase: ", "").replace(/\(auth\/[^)]+\)\.?/g, "").trim();
+    return String(err?.message || err || "Authentication failed").replace("Firebase: ", "")
+      .replace(/\(auth\/[^)]+\)\.?/g, "").trim();
   }
-
   async function ensureRecaptcha() {
-    if (!auth) throw new Error("Authentication is unavailable right now.");
+    if (!auth) throw new Error("Authentication is unavailable.");
     if (recaptchaVerifier) return recaptchaVerifier;
     recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
     await recaptchaVerifier.render();
     return recaptchaVerifier;
   }
-
+  async function otpFetch(action, payload) {
+    const response = await fetch("/api/auth/" + action, {
+      method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "Authentication request failed.");
+    return result;
+  }
+  async function resendEmailOtp() {
+    if (Date.now() < emailOtpResendAt) return;
+    await sendEmailOtp().catch(err => {
+      const error = document.getElementById("auth-err");
+      error.textContent = authFriendlyError(err); error.style.display = "block";
+    });
+  }
+  async function sendEmailOtp() {
+    const email = document.getElementById("auth-email").value.trim().toLowerCase();
+    if (!/^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new Error("Enter a valid email address.");
+    await otpFetch("request-otp", { email, purpose:"customer" });
+    emailOtpEmail = email; emailOtpExpiry = Date.now() + 300000; emailOtpResendAt = Date.now() + 30000;
+    const emailInput = document.getElementById("auth-email");
+    emailInput.readOnly = true;
+    otpInputs().forEach(i => { i.value = ""; });
+    document.getElementById("auth-email-otp-wrap").style.display = "block";
+    document.getElementById("auth-submit-btn").textContent = "Verify email OTP";
+    otpInputs()[0].focus();
+    showToast("If eligible, a code has been emailed.", "success");
+  }
   async function submitAuthForm(e) {
     e.preventDefault();
-    if (!auth) { showToast("Authentication is unavailable right now.","error"); return; }
-
-    const modal = document.getElementById("auth-modal");
-    const mode = modal?.dataset?.mode || "login";
     const errEl = document.getElementById("auth-err");
-    const submitBtn = document.getElementById("auth-submit-btn");
-    errEl.style.display = "none";
-    submitBtn.disabled = true;
-
+    const btn = document.getElementById("auth-submit-btn");
+    errEl.style.display = "none"; btn.disabled = true;
     try {
-      if (authMethod === "phone") {
-        const phone = document.getElementById("auth-phone").value.replace(/\D/g, "");
-        if (!/^[6-9]\d{9}$/.test(phone)) {
-          errEl.textContent = "Enter a valid 10-digit Indian mobile number.";
-          errEl.style.display = "block";
-          submitBtn.disabled = false;
-          return;
-        }
-        if (!phoneConfirmResult) {
-          const verifier = await ensureRecaptcha();
-          phoneConfirmResult = await auth.signInWithPhoneNumber("+91" + phone, verifier);
-          document.getElementById("auth-otp-wrap").style.display = "block";
-          submitBtn.textContent = t("auth.verifyOtp");
-          showToast("OTP sent to +91 " + phone, "success");
-          return;
-        }
-        const code = document.getElementById("auth-otp").value.trim();
-        if (!/^\d{6}$/.test(code)) {
-          errEl.textContent = "Enter the 6-digit OTP.";
-          errEl.style.display = "block";
-          submitBtn.disabled = false;
-          return;
-        }
-        await phoneConfirmResult.confirm(code);
-        phoneConfirmResult = null;
-        showToast("Logged in successfully.","success");
-      } else {
-        const email = document.getElementById("auth-email").value.trim().toLowerCase();
-        const pass = document.getElementById("auth-pass").value;
-        const confirm = document.getElementById("auth-pass-confirm").value;
-        if (!email || !pass) {
-          errEl.textContent = "Email and password are required.";
-          errEl.style.display = "block";
-          submitBtn.disabled = false;
-          return;
-        }
-        if (mode === "signup" && pass !== confirm) {
-          errEl.textContent = "Passwords do not match.";
-          errEl.style.display = "block";
-          submitBtn.disabled = false;
-          return;
-        }
-        if (mode === "signup" && pass.length < 6) {
-          errEl.textContent = "Password must be at least 6 characters.";
-          errEl.style.display = "block";
-          submitBtn.disabled = false;
-          return;
-        }
-        if (mode === "signup") {
-          await auth.createUserWithEmailAndPassword(email, pass);
-          showToast("Account created successfully.","success");
+      const mode = document.getElementById("auth-modal").dataset.mode || "login";
+      if (authMethod === "email" && !usePassword) {
+        if (!auth) throw new Error("Firebase Authentication is unavailable.");
+        if (!emailOtpEmail) {
+          await sendEmailOtp();
         } else {
-          await auth.signInWithEmailAndPassword(email, pass);
-          showToast("Logged in successfully.","success");
+          if (Date.now() >= emailOtpExpiry) throw new Error("Code expired. Request another.");
+          const code = otpInputs().map(i => i.value).join("");
+          if (!/^\d{6}$/.test(code)) throw new Error("Enter all six digits.");
+          const result = await otpFetch("verify-otp", { email:emailOtpEmail, code, purpose:"customer" });
+          await auth.signInWithCustomToken(result.customToken);
+          await otpFetch("session", { idToken:await auth.currentUser.getIdToken(), purpose:"customer" });
+          showToast("Signed in successfully.", "success");
+          emailOtpEmail = "";
+          document.getElementById("auth-email").readOnly = false;
+          closeAuthModal();
         }
+      } else if (authMethod === "phone") {
+        if (!auth) throw new Error("Phone authentication is unavailable.");
+        const phone = document.getElementById("auth-phone").value.replace(/\D/g,"");
+        if (!/^[6-9]\d{9}$/.test(phone)) throw new Error("Enter a valid Indian mobile number.");
+        if (!phoneConfirmResult) {
+          phoneConfirmResult = await auth.signInWithPhoneNumber("+91" + phone, await ensureRecaptcha());
+          document.getElementById("auth-otp-wrap").style.display = "block";
+          btn.textContent = "Verify phone OTP";
+        } else {
+          const code = document.getElementById("auth-otp").value.trim();
+          if (!/^\d{6}$/.test(code)) throw new Error("Enter a six-digit code.");
+          await phoneConfirmResult.confirm(code);
+          phoneConfirmResult = null;
+        }
+      } else {
+        if (!auth) throw new Error("Authentication is unavailable.");
+        const email = document.getElementById("auth-email").value.trim().toLowerCase();
+        const password = document.getElementById("auth-pass").value;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || password.length < 6)
+          throw new Error("Enter a valid email and password of at least six characters.");
+        if (mode === "signup") {
+          if (password !== document.getElementById("auth-pass-confirm").value) throw new Error("Passwords do not match.");
+          await auth.createUserWithEmailAndPassword(email, password);
+        } else await auth.signInWithEmailAndPassword(email, password);
+        showToast("Signed in successfully.", "success");
       }
-
-      const form = document.getElementById("auth-form");
-      if (form) form.reset();
-      if (document.getElementById("orders-page")?.classList.contains("active")) loadMyOrders();
     } catch (err) {
-      errEl.textContent = authFriendlyError(err);
-      errEl.style.display = "block";
-      showToast(authFriendlyError(err), "error");
-      if (authMethod === "phone") {
-        phoneConfirmResult = null;
-        try { recaptchaVerifier?.clear(); } catch (_) {}
-        recaptchaVerifier = null;
-      }
-    } finally {
-      submitBtn.disabled = false;
-      if (authMethod === "phone" && !phoneConfirmResult) {
-        submitBtn.textContent = t("auth.sendOtp");
-      }
-    }
+      errEl.textContent = authFriendlyError(err); errEl.style.display = "block";
+    } finally { btn.disabled = false; }
   }
   async function sendCustomerPasswordReset() {
     if (!auth) { showToast("Authentication is unavailable right now.","error"); return; }
@@ -1718,13 +1525,13 @@ function showPage(id) {
   }
 
   async function logoutUser() {
+    await fetch("/api/auth/logout", { method:"POST", credentials:"same-origin" }).catch(() => {});
     if (auth) {
       try { await auth.signOut(); } catch (err) { console.error(err); }
     }
     if (!auth) {
       currentUser = null;
       currentUserRole = null;
-      adminUser = null;
       cart = loadCartStorage(null);
       updateAuthNav();
       renderCartCount();
@@ -1861,7 +1668,7 @@ function updateCartBar() {
   const bar = document.getElementById("cart-bar"); if (!bar) return;
   const count = cart.reduce((n, i) => n + (Number(i.qty) || 0), 0);
   const total = cart.reduce((n, i) => n + (Number(i.price) || 0) * (Number(i.qty) || 0), 0);
-  const hideOn = ["cart", "admin", "confirmation"].some(id => document.getElementById(id + "-page")?.classList.contains("active"));
+  const hideOn = ["cart", "confirmation"].some(id => document.getElementById(id + "-page")?.classList.contains("active"));
   const show = count > 0 && !hideOn;
   bar.classList.toggle("show", show);
   document.body.classList.toggle("has-cart-bar", show);
@@ -1924,6 +1731,8 @@ function prodCard(p, ctx = "p") {
       <div class="prod-bn">${esc(p.bengaliName || p.hindiName || "")}</div>
       <div class="prod-name">${esc(displayName(p))}</div>
       <div class="prod-price">${esc(priceLabel)}</div>
+      <div class="prod-description">${esc(p.description || "Fresh, seasonal produce sourced from regional growers.")}</div>
+      <button type="button" class="product-details-btn" onclick="openProductDetails(\'${esc(p.id)}\')">View details &amp; delivery info</button>
     </div>
     <div class="prod-foot">
       <div class="qty-wrap">
@@ -1936,9 +1745,27 @@ function prodCard(p, ctx = "p") {
   </div>`;
 }
 
+
+function openProductDetails(id) {
+  const p = products.find(item => item.id === id);
+  if (!p) return;
+  const setText = (key, value) => { document.getElementById(key).textContent = value; };
+  setText("product-detail-title", p.name + (p.bengaliName ? " / " + p.bengaliName : ""));
+  setText("product-detail-description", p.description || "Fresh, seasonal produce sourced from regional growers and checked before dispatch.");
+  setText("product-detail-price", "₹" + Number(p.price).toLocaleString("en-IN") + " per " + p.unit);
+  setText("product-detail-stock", p.stock > 0 ? (p.stock < 5 ? "Low stock: " + p.stock + " remaining" : "In stock") : "Currently unavailable");
+  setText("product-detail-eta", "Delivery timing is confirmed after checkout. Emergency requests accepted 24/7, subject to availability.");
+  document.getElementById("product-detail-modal").style.display = "flex";
+  document.getElementById("product-detail-close").focus();
+}
+function closeProductDetails() {
+  document.getElementById("product-detail-modal").style.display = "none";
+}
+
 function chQty(ctx, id, d) {
   const inp = document.getElementById("qty-"+ctx+"-"+id); if (!inp) return;
-  inp.value = Math.max(1,(parseInt(inp.value)||1)+d);
+  const p = products.find(item => item.id === id);
+  inp.value = Math.min(Math.max(1, p?.stock || 1), Math.max(1,(parseInt(inp.value)||1)+d));
 }
 function filterProducts() { renderProducts(); }
 
@@ -2293,7 +2120,7 @@ async function onPaymentOK(order, result) {
   showPage("payment-success");
   showToast("🎉 Payment successful! Order confirmed.","success");
   setCheckoutBusy(false);
-  notifyAdmin(order);
+  notifyStore(order);
 }
 
 async function onPaymentFailed(order, reason) {
@@ -2476,9 +2303,9 @@ async function saveOrderFS(d) {
   return { id: payload.orderId, items, ...payload };
 }
 
-/* Notify the admin: Firestore notification doc + optional WhatsApp alert. */
+/* Save a staff notification and optionally alert the store via WhatsApp. */
 const WA_NOTIFY_ENABLED = true; // set true to open a WhatsApp alert to the owner after each order
-async function notifyAdmin(order) {
+async function notifyStore(order) {
   const items = order.items.map(i=>`${i.name} x${i.qty}`).join(", ")||"—";
   if (fbOk && db && currentUser) {
     try {
@@ -2489,7 +2316,7 @@ async function notifyAdmin(order) {
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-    } catch (e) { console.error("Admin notification failed:", e); }
+    } catch (e) { console.error("Store notification failed:", e); }
   }
   if (WA_NOTIFY_ENABLED) setTimeout(()=>{ window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(`🛒 New Order ${order.orderNumber}!\nCustomer: ${order.customerName}\nPhone: ${order.phone}\nEmail: ${order.email||"—"}\nItems: ${items}\nTotal: ₹${order.total}\nPayment: ${order.paymentMethod}\nAddress: ${order.address}`)}`, "_blank"); }, 500);
 }
@@ -2509,7 +2336,7 @@ function onOrderOK(order) {
   showPage("confirmation");
   showToast("🎉 Order placed!","success");
   if (document.getElementById("orders-page")?.classList.contains("active")) loadMyOrders();
-  notifyAdmin(order);
+  notifyStore(order);
 }
 
 function showSuccessModal(order) {
@@ -2664,324 +2491,6 @@ async function handleBulk(e) {
   finally{ btn.disabled=false; btn.textContent="Send Request 📩"; }
 }
 
-/* ========== ADMIN AUTH ========== */
-async function handleAdminLogin(e) {
-  e.preventDefault();
-  const email=document.getElementById("admin-email").value.trim();
-  const pass=document.getElementById("admin-pass").value;
-  const errEl=document.getElementById("admin-err");
-  const btn=document.getElementById("admin-login-btn");
-  errEl.style.display="none"; btn.disabled=true; btn.textContent="Logging in…";
-  try {
-    if(!auth) throw new Error("Firebase Auth unavailable");
-    const c = await auth.signInWithEmailAndPassword(email, pass);
-    await syncAuthState(c.user);
-    if (!hasRole(ROLES.ADMIN)) { await auth.signOut(); throw new Error("Not authorized as admin."); }
-    adminUser=c.user; showDash(); startAdminListeners();
-    showToast("Admin login successful.","success");
-  } catch(e) { errEl.textContent=authFriendlyError(e); errEl.style.display="block"; }
-  finally{ btn.disabled=false; btn.textContent="Login"; }
-}
-async function doAdminLogout(onlyUi = false) {
-  if (!onlyUi) {
-    try{if(auth)await auth.signOut();}catch{}
-  }
-  adminUser=null;
-  if(unsubOrders){unsubOrders();unsubOrders=null;}
-  if(unsubBulk){unsubBulk();unsubBulk=null;}
-  if(unsubInventory){unsubInventory();unsubInventory=null;}
-  document.getElementById("admin-dash").style.display="none";
-  document.getElementById("admin-login-wrap").style.display="block";
-  document.getElementById("admin-email").value=""; document.getElementById("admin-pass").value="";
-  if (!onlyUi) showToast("Logged out.","info");
-}
-async function doForgotPw() {
-  const email=document.getElementById("admin-email").value.trim()||ADMIN_EMAIL;
-  if(!auth){showToast("Auth unavailable.","error");return;}
-  try{ await auth.sendPasswordResetEmail(email); showToast("Password reset email sent to "+email,"success"); }
-  catch(e){ showToast(authFriendlyError(e),"error"); }
-}
-function showDash() {
-  if (!hasRole(ROLES.ADMIN)) {
-    showToast("Admin access is restricted.","error");
-    doAdminLogout(true);
-    return;
-  }
-  document.getElementById("admin-login-wrap").style.display="none";
-  document.getElementById("admin-dash").style.display="block";
-}
-
-/* ========== ADMIN DATA ========== */
-function startAdminListeners() {
-  if (!requireRole(ROLES.ADMIN, "Only admins can access the dashboard.")) {
-    doAdminLogout(true);
-    return;
-  }
-  if(!fbOk||!db){showToast("Firestore unavailable.","error");return;}
-  loadOrdersRT(); loadBulkRT(); loadInventoryRT();
-}
-
-function loadOrdersRT() {
-  const tbody=document.getElementById("orders-tbody");
-  const loading=document.getElementById("ord-loading");
-  const empty=document.getElementById("ord-empty");
-  if (!tbody || !loading || !empty) return;
-  if(unsubOrders) unsubOrders();
-  const bindSnapshot = (queryRef) => queryRef.onSnapshot(snap=>{
-    loading.style.display="none";
-    const orders=snap.docs.map(d=>{
-      const data = d.data() || {};
-      return {
-        id:d.id,
-        ...data,
-        orderStatus: normalizeOrderStatus(data.orderStatus || data.status),
-        status: normalizeOrderStatus(data.orderStatus || data.status),
-        paymentStatus: data.paymentStatus || PAYMENT_STATUSES.PENDING
-      };
-    });
-    empty.style.display=orders.length?"none":"block";
-    tbody.innerHTML=orders.map(orderRow).join("");
-    calcStats(orders);
-  }, err=>{ loading.style.display="none"; console.error(err); });
-  try {
-    unsubOrders = bindSnapshot(db.collection("orders").orderBy("createdAt","desc"));
-  } catch (err) {
-    unsubOrders = bindSnapshot(db.collection("orders").orderBy("timestamp","desc"));
-  }
-}
-
-function orderRow(o) {
-  const oid = String(o.id || o.orderId || "");
-  const orderStatus = normalizeOrderStatus(o.orderStatus || o.status);
-  const dt = o.createdAt?.seconds ? new Date(o.createdAt.seconds*1000).toLocaleDateString("en-IN")
-    : (o.timestamp?.seconds ? new Date(o.timestamp.seconds*1000).toLocaleDateString("en-IN") : "—");
-  const normalizedPayment = String(o.paymentStatus || PAYMENT_STATUSES.PENDING).toLowerCase();
-  const pc = normalizedPayment.includes("paid") ? "spaid" : normalizedPayment.includes("failed") ? "sx" : "sp";
-  const sc = {Pending:"sp",Confirmed:"sc",Packed:"so",OutForDelivery:"so",Delivered:"sd",Cancelled:"sx",ReturnRequested:"sx",Returned:"sx"}[orderStatus] || "sp";
-  return `<tr>
-    <td><small>${oid.slice(-6).toUpperCase()}</small></td>
-    <td>${esc(o.customerName||"")}</td>
-    <td>${esc(o.phone||"")}</td>
-    <td style="max-width:150px;white-space:normal;font-size:12px">${esc(o.itemsSummary||"")}</td>
-    <td><strong>₹${o.total||0}</strong></td>
-    <td><span class="sbadge ${pc}">${esc(o.paymentStatus||"")}</span></td>
-    <td><select class="form-control" style="font-size:12px;padding:4px 8px" onchange="updOrderStatus('${oid}',this.value,'${esc(o.customerName||"")}','${esc(o.phone||"")}')">
-      ${ORDER_STATUSES.map(s=>`<option value="${s}"${orderStatus===s?" selected":""}>${s}</option>`).join("")}
-    </select></td>
-    <td style="white-space:nowrap;font-size:12px">${dt}</td>
-    <td><button class="btn btn-outline btn-sm" onclick="waCustomer('${oid}','${esc(o.phone||"")}','${esc(o.customerName||"")}','${esc(orderStatus||"")}')">💬</button></td>
-  </tr>`;
-}
-
-async function updOrderStatus(id,status,name,phone) {
-  if (!requireRole(ROLES.ADMIN, "Only admins can update order status.")) return;
-  if (!ORDER_STATUSES.includes(status)) { showToast("Invalid order status.","error"); return; }
-  try {
-    await db.collection("orders").doc(id).update({
-      orderStatus:status,
-      status,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showToast("Status → "+status,"success");
-    if(status==="Confirmed"&&phone) {
-      const sid=id.slice(-6).toUpperCase();
-      window.open(`https://wa.me/91${phone.replace(/\D/g,"")}?text=${encodeURIComponent(`✅ Your Sokal Bela order #${sid} is confirmed! Expected delivery within 2-4 hours. — Sokal Bela +91 7551858583`)}`, "_blank");
-    }
-  } catch(e){ showToast("Failed to update.","error"); }
-}
-
-function waCustomer(id,phone,name,status) {
-  if(!phone) return;
-  const sid=id.slice(-6).toUpperCase();
-  window.open(`https://wa.me/91${phone.replace(/\D/g,"")}?text=${encodeURIComponent(`Hello ${name}, your Sokal Bela order #${sid} is: ${status}. Call +91 7551858583 for queries.`)}`, "_blank");
-}
-
-function calcStats(orders) {
-  const today = new Date().toLocaleDateString("en-IN");
-  const tod   = orders.filter(o => o.timestamp?.seconds ? new Date(o.timestamp.seconds*1000).toLocaleDateString("en-IN")===today : false);
-  const revenueOrders = orders.filter(o => {
-    const status = normalizeOrderStatus(o.orderStatus || o.status).toLowerCase();
-    return status !== "cancelled" && status !== "returned";
-  });
-  const todayRevenueOrders = tod.filter(o => {
-    const status = normalizeOrderStatus(o.orderStatus || o.status).toLowerCase();
-    return status !== "cancelled" && status !== "returned";
-  });
-  document.getElementById("st-tot").textContent   = orders.length;
-  document.getElementById("st-today").textContent = tod.length;
-  document.getElementById("st-rev").textContent   = "₹"+revenueOrders.reduce((s,o)=>s+(o.total||0),0);
-  document.getElementById("st-trev").textContent  = "₹"+todayRevenueOrders.reduce((s,o)=>s+(o.total||0),0);
-}
-
-function loadBulkRT() {
-  const tbody=document.getElementById("bulk-tbody");
-  const loading=document.getElementById("bulk-loading");
-  const empty=document.getElementById("bulk-empty");
-  if (!tbody || !loading || !empty) return;
-  if(unsubBulk) unsubBulk();
-  unsubBulk = db.collection("bulkOrders").orderBy("timestamp","desc").onSnapshot(snap=>{
-    loading.style.display="none";
-    const list=snap.docs.map(d=>({id:d.id,...d.data()}));
-    empty.style.display=list.length?"none":"block";
-    tbody.innerHTML=list.map(b=>`<tr>
-      <td><small>${b.id.slice(-6).toUpperCase()}</small></td>
-      <td>${esc(b.contactName||"")}</td>
-      <td>${esc(b.phone||"")}</td>
-      <td>${esc(b.eventType||"")}</td>
-      <td>${esc(b.eventDate||"")}</td>
-      <td>${b.guestCount||0}</td>
-      <td><select class="form-control" style="font-size:12px;padding:4px 8px" onchange="updBulkStatus('${b.id}',this.value)">
-        ${["new","contacted","quoted","confirmed","cancelled"].map(s=>`<option${b.status===s?" selected":""}>${s}</option>`).join("")}
-      </select></td>
-      <td>${b.phone?`<button class="btn btn-wa btn-sm" onclick="window.open('https://wa.me/91${esc(b.phone.replace(/\D/g,''))}','_blank')">💬</button>`:"—"}</td>
-    </tr>`).join("");
-  }, err=>{ loading.style.display="none"; console.error(err); });
-}
-
-async function updBulkStatus(id,status) {
-  if (!requireRole(ROLES.ADMIN, "Only admins can update bulk requests.")) return;
-  try{ await db.collection("bulkOrders").doc(id).update({status}); showToast("Bulk status updated.","success"); }
-  catch(e){ showToast("Failed.","error"); }
-}
-
-function loadInventoryRT() {
-  const tbody=document.getElementById("inv-tbody");
-  if (!tbody) return;
-  if (unsubInventory) unsubInventory();
-  unsubInventory = db.collection("products").onSnapshot(snap=>{
-    const list=snap.docs.map(d=>normalizeProduct({id:d.id,...d.data()}));
-    products=list.filter(p=>p.active!==false && p.status!=="archived");
-    document.getElementById("st-prods").textContent = list.length;
-    document.getElementById("st-low").textContent   = list.filter(p=>Number(p.stock||0)<5).length;
-    tbody.innerHTML=list.map(p=>`<tr class="${(p.stock||0)<5?"low-stock-row":""}">
-      <td>${esc(p.name||"")}</td>
-      <td>${esc(p.bengaliName||"")}</td>
-      <td>${esc(p.category||"")}</td>
-      <td>₹${p.price||0}</td>
-      <td>${esc(p.unit||"")}</td>
-      <td><strong style="color:${(p.stock||0)<5?"var(--red)":"inherit"}">${p.stock??0}</strong></td>
-      <td><span style="color:${p.active===false?"var(--red)":"var(--green)"};font-weight:700">${p.active===false?"Off":"On"} (${esc(p.status)})</span></td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="openEditModal('${p.id}',${p.price},${p.stock},${p.active!==false})">✏️</button>
-        <button class="btn btn-outline btn-sm" onclick="loadToForm('${p.id}')">📝</button>
-      </td>
-    </tr>`).join("");
-  }, (err) => {
-    console.error(err);
-    showToast("Failed to load inventory.","error");
-  });
-}
-
-/* EDIT MODAL */
-function openEditModal(id,price,stock,active) {
-  if (!requireRole(ROLES.ADMIN, "Only admins can edit products.")) return;
-  document.getElementById("ep-id").value=id;
-  document.getElementById("ep-price").value=price;
-  document.getElementById("ep-stock").value=stock;
-  document.getElementById("ep-active").checked=active;
-  document.getElementById("edit-modal").style.display="flex";
-}
-function closeEditModal(){ document.getElementById("edit-modal").style.display="none"; }
-async function saveInlineEdit(e) {
-  e.preventDefault();
-  if (!requireRole(ROLES.ADMIN, "Only admins can edit products.")) return;
-  const id=document.getElementById("ep-id").value;
-  const price=parseFloat(document.getElementById("ep-price").value);
-  const stock=Math.max(0, parseInt(document.getElementById("ep-stock").value));
-  const active=document.getElementById("ep-active").checked;
-  if (!id || !Number.isFinite(price) || price < 0) { showToast("Provide valid product details.","error"); return; }
-  const status = active ? (stock > 0 ? "active" : "out_of_stock") : "inactive";
-  try{
-    await db.collection("products").doc(id).set({
-      productId: id,
-      price,
-      stock,
-      active,
-      status,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    showToast("Updated!","success");
-    closeEditModal();
-  }
-  catch(e){ showToast("Failed.","error"); }
-}
-
-async function loadToForm(id) {
-  if (!requireRole(ROLES.ADMIN, "Only admins can edit products.")) return;
-  switchTab("addprod");
-  try {
-    const doc=await db.collection("products").doc(id).get(); if(!doc.exists) return;
-    const p=normalizeProduct({ id, ...doc.data() });
-    document.getElementById("pf-id").value=id;
-    document.getElementById("pf-name").value=p.name||"";
-    document.getElementById("pf-bn").value=p.bengaliName||"";
-    document.getElementById("pf-hi").value=p.hindiName||"";
-    document.getElementById("pf-desc").value=p.description||"";
-    document.getElementById("pf-price").value=p.price||"";
-    document.getElementById("pf-unit").value=p.unit||"kg";
-    const catSel=document.getElementById("pf-cat");
-    // a category that is not in the list (e.g. older data) is added so editing does not blank it
-    if(p.category && ![...catSel.options].some(o=>o.value===p.category)) catSel.add(new Option(p.category,p.category));
-    catSel.value=p.category||"Others";
-    document.getElementById("pf-stock").value=p.stock??0;
-    document.getElementById("pf-img").value=p.imageUrl||"";
-    document.getElementById("pf-emoji").value=p.emoji||"";
-    document.getElementById("pf-active").checked=p.active!==false;
-    document.getElementById("pf-title").textContent="✏️ Edit Product";
-  } catch(e){ showToast("Failed to load product.","error"); }
-}
-
-async function saveProduct(e) {
-  e.preventDefault();
-  if (!requireRole(ROLES.ADMIN, "Only admins can add or update products.")) return;
-  if (!db) { showToast("Firestore is unavailable.","error"); return; }
-  const eid=document.getElementById("pf-id").value;
-  const stock = Math.max(0, parseInt(document.getElementById("pf-stock").value) || 0);
-  const active = document.getElementById("pf-active").checked;
-  const status = active ? (stock > 0 ? "active" : "out_of_stock") : "inactive";
-  const data={
-    name:document.getElementById("pf-name").value.trim(),
-    bengaliName:document.getElementById("pf-bn").value.trim(),
-    hindiName:document.getElementById("pf-hi").value.trim(),
-    description:document.getElementById("pf-desc").value.trim(),
-    category:document.getElementById("pf-cat").value,
-    price:parseFloat(document.getElementById("pf-price").value),
-    stock,
-    imageUrl:document.getElementById("pf-img").value.trim(),
-    sellerId: currentUser?.uid || "",
-    status,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-
-    // backward-compatible fields used by the existing UI
-    productId: eid || "",
-    unit:document.getElementById("pf-unit").value,
-    emoji:document.getElementById("pf-emoji").value.trim(),
-    active
-  };
-  if(!data.name||!Number.isFinite(data.price)||data.price<0){showToast("Valid name and price required.","error");return;}
-  if(!data.category){showToast("Category is required.","error");return;}
-  try{
-    if(eid) {
-      data.productId = eid;
-      await db.collection("products").doc(eid).set(data, { merge: true });
-    } else {
-      const ref = db.collection("products").doc();
-      data.productId = ref.id;
-      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      await ref.set(data);
-    }
-    showToast(eid?"Product updated!":"Product added!","success");
-    resetProdForm();
-  }catch(e){showToast("Failed to save product.","error");console.error(e);}
-}
-function resetProdForm(){document.getElementById("prod-form").reset();document.getElementById("pf-id").value="";document.getElementById("pf-title").textContent="➕ Add New Product";}
-
-/* ADMIN TAB */
-function switchTab(id) {
-  document.querySelectorAll(".atab").forEach(t=>t.classList.toggle("active",t.dataset.tab===id));
-  document.querySelectorAll(".atab-content").forEach(c=>c.classList.toggle("active",c.id==="tab-"+id));
-}
-
 /* UI HELPERS */
 function showLoading(){ document.getElementById("loading-ov").style.display="flex"; }
 function hideLoading(){ document.getElementById("loading-ov").style.display="none"; }
@@ -3002,15 +2511,12 @@ window.updCartQty=updCartQty; window.chQty=chQty; window.filterProducts=filterPr
 window.setCat=setCat; window.selectPay=selectPay; window.goCheckoutStep=goCheckoutStep;
 window.openCartDrawer=openCartDrawer; window.closeCartDrawer=closeCartDrawer;
 window.navSearch=navSearch; window.headerUserAction=headerUserAction; window.vegImgError=vegImgError;
+window.openProductDetails=openProductDetails; window.closeProductDetails=closeProductDetails;
 window.setAuthMethod=setAuthMethod; window.addBulkRow=addBulkRow;
+window.resendEmailOtp=resendEmailOtp; window.togglePasswordLogin=togglePasswordLogin;
 window.openAuthModal=openAuthModal; window.closeAuthModal=closeAuthModal; window.toggleAuthMode=toggleAuthMode;
 window.submitAuthForm=submitAuthForm; window.sendCustomerPasswordReset=sendCustomerPasswordReset; window.logoutUser=logoutUser;
 window.loadMyOrders=loadMyOrders;
-window.handleAdminLogin=handleAdminLogin; window.doAdminLogout=doAdminLogout; window.doForgotPw=doForgotPw;
-window.updOrderStatus=updOrderStatus; window.updBulkStatus=updBulkStatus; window.waCustomer=waCustomer;
-window.openEditModal=openEditModal; window.closeEditModal=closeEditModal; window.loadToForm=loadToForm;
-window.resetProdForm=resetProdForm; window.switchTab=switchTab; window.closeSuccessModal=closeSuccessModal;
-window.saveInlineEdit=saveInlineEdit; window.saveProduct=saveProduct;
 </script>
 </body>
 </html>

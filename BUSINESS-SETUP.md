@@ -9,7 +9,7 @@
 
 ## 2. Order flow (no online payment)
 1. Customer orders on the website, WhatsApp, Facebook message, or phone.
-2. The website opens a ready-made WhatsApp message to +91 7551858583.
+2. The website opens a ready-made WhatsApp message to +91 7001867903.
 3. You confirm price, delivery time and address by call/WhatsApp.
 4. Customer pays cash or UPI on delivery or at the shop.
 5. Mark the order Delivered in the Admin panel.
@@ -24,7 +24,7 @@ For bulk and catering, take a small advance in cash/UPI directly (your choice) t
 
 ## 4. Daily routine
 - Early morning: buy from the mandi, update prices/stock in Admin.
-- 7 AM to 9 PM: shop open, check WhatsApp and Admin orders.
+- 24/7: shop available, check WhatsApp and Admin orders.
 - Afternoon: pack and dispatch deliveries.
 - Evening: log bulk/catering enquiries and next-day needs.
 - Weekly: check stock wastage, top-selling items, repeat customers.
@@ -53,7 +53,7 @@ Owner (pricing, quotes, suppliers) · Shop helper (packing, counter) · Delivery
 - Delivery pincodes: `DELIVERY_PINCODES`
 - Owner WhatsApp number: `OWNER_WA`
 - Facebook link: `facebook.com`
-- Admin panel: open your site link followed by `#admin` (example: `yoursite.vercel.app/#admin`). The Admin link is hidden from customers.
+- Admin panel: open your site link followed by `/secure-admin-portal` (example: `yoursite.vercel.app/#admin`). The secure operations portal is hosted separately from the customer-facing storefront.
 
 ## 9. Product pictures
 - The picture always follows the product **name** (English, Bengali or Hindi). Potato gets the potato picture, Cauliflower gets the cauliflower picture, and so on. The Image URL stored in the database is ignored for any vegetable the app recognises.

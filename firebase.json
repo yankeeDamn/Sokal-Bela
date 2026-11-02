@@ -1,5 +1,7 @@
 {
-  "functions": { "source": "backend/functions" },
+  "functions": {
+    "source": "backend/functions"
+  },
   "firestore": {
     "rules": "firestore.rules"
   },
@@ -9,21 +11,52 @@
   "hosting": {
     "public": ".",
     "ignore": [
-      "firebase.json", "**/.*", "**/node_modules/**", "backend/**", "api/**", "scripts/**",
-      "*.zip", "*.md", "*.rules", "package.json", "package-lock.json",
-      "local-server.js", "build.js", "vercel.json"
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "backend/**",
+      "api/**",
+      "scripts/**",
+      "*.zip",
+      "*.md",
+      "*.rules",
+      "package.json",
+      "package-lock.json",
+      "local-server.js",
+      "build.js",
+      "vercel.json",
+      "admin.html",
+      "admin.js",
+      "app.js",
+      "lib/**"
     ],
     "rewrites": [
-      { "source": "/api/**", "function": { "functionId": "api", "region": "asia-south1" } },
-      { "source": "/admin", "destination": "/admin.html" },
-      { "source": "/admin/**", "destination": "/admin.html" },
-      { "source": "**", "destination": "/index.html" }
+      {
+        "source": "/api/**",
+        "function": {
+          "functionId": "api",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   },
   "emulators": {
-    "functions": { "port": 5001 },
-    "firestore": { "port": 8081 },
-    "hosting": { "port": 5000 },
-    "ui": { "enabled": true, "port": 4000 }
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8081
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    }
   }
 }

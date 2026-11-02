@@ -1,0 +1,31 @@
+name: Storefront checks
+on:
+  push:
+    branches: [feat/security-otp-storefront-20261103]
+  pull_request:
+    branches: [main]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies without changing lockfile
+        run: npm install --no-package-lock
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Verify private assets not in published output
+        run: |
+          test -f dist/index.html
+          test ! -f dist/admin.html
+          test ! -f dist/admin.js
+          test ! -d dist/lib
+          ! grep -qi 'id="admin-page"' dist/index.html
