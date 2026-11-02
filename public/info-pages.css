@@ -1,0 +1,18 @@
+:root{--green:#2d7a3a;--forest:#1e5a28;--mint:#e8f5ea;--gold:#f4a624;--ink:#1b2e20;--muted:#526459;--bg:#f7faf7;--line:#dce7de}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+a{color:var(--green)}a:hover{text-decoration:underline}button,input,textarea{font:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+header{background:var(--forest);color:white;padding:14px max(18px,calc((100vw - 1080px)/2));display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap}
+header .logo{font-weight:800;font-size:1.32rem;color:white;text-decoration:none}header nav{display:flex;gap:16px;flex-wrap:wrap}header nav a{color:white;text-decoration:none;font-weight:600}
+.announcement{background:var(--mint);color:var(--forest);text-align:center;font-size:14px;padding:8px}
+.container{max-width:1080px;margin:auto;padding:30px 20px}.breadcrumb{font-size:14px;margin:0 0 24px;color:var(--muted)}.breadcrumb a{color:var(--muted)}
+h1{font-size:clamp(2rem,6vw,3.3rem);line-height:1.2;margin:10px 0 18px;color:var(--forest)}
+h2{font-size:1.5rem;color:var(--forest);margin-top:30px}.lead{font-size:1.2rem;max-width:75ch}
+main{min-height:60vh}.content{background:white;border:1px solid var(--line);border-radius:20px;padding:clamp(18px,4vw,40px);box-shadow:0 4px 25px #11341c09}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.tile{background:var(--mint);padding:18px;border-radius:14px}
+.callout{background:var(--mint);border-left:4px solid var(--green);padding:14px 18px;border-radius:8px}form{max-width:680px}
+label{display:block;font-weight:700;margin:12px 0 5px}input,textarea{width:100%;border:1px solid #a6b9a9;border-radius:10px;padding:12px;background:white;color:var(--ink)}
+button{background:var(--green);color:white;border:0;padding:12px 22px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:12px}button:disabled{opacity:.6}
+.hp{position:absolute;left:-9999px}.notice{min-height:32px;margin-top:10px}.ok{color:var(--green)}.error{color:#be2626}
+details{margin:14px 0;padding:14px 18px;border-radius:10px;border:1px solid var(--line)}summary{cursor:pointer;font-weight:700}
+footer{background:var(--forest);color:#fff;margin-top:45px;padding:30px 20px}footer .inner{max-width:1080px;margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}footer a{color:#e6f6e9}
