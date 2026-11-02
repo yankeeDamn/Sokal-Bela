@@ -62,13 +62,10 @@ dialog{background:var(--card);color:var(--ink);border:1px solid var(--line);bord
 <body>
 <section class="auth" id="login">
 <h1>🥬 Sokal Bela</h1><p>Authorized store operations sign-in</p>
-<form id="request-form"><label for="email">Email address</label><input id="email" type="email" autocomplete="email" required maxlength="254">
-<p><button class="primary" type="submit" id="send">Send verification code</button></p></form>
-<form id="verify-form" class="hidden">
-<p>Enter the six-digit code sent to your email.</p><div class="otp" id="otp-boxes">
-<input inputmode="numeric" autocomplete="one-time-code" aria-label="Digit 1" maxlength="1"><input inputmode="numeric" aria-label="Digit 2" maxlength="1"><input inputmode="numeric" aria-label="Digit 3" maxlength="1"><input inputmode="numeric" aria-label="Digit 4" maxlength="1"><input inputmode="numeric" aria-label="Digit 5" maxlength="1"><input inputmode="numeric" aria-label="Digit 6" maxlength="1"></div>
-<p id="countdown" role="status"></p><button class="primary" type="submit">Verify and sign in</button>
-<button id="resend" class="secondary" type="button" disabled>Resend OTP</button></form>
+<form id="request-form"><label for="email">Email address</label><input id="email" type="email" autocomplete="username" required maxlength="254">
+<label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
+<p><button class="primary" type="submit" id="send">Sign in</button></p></form>
+<button class="secondary" id="reset-password" type="button">Forgot password?</button>
 <p id="auth-error" role="alert"></p>
 </section>
 <div class="layout hidden" id="panel">
@@ -97,34 +94,26 @@ const sections = ['overview','orders','bulk','users','products','payments','deli
 const titles = {overview:'Overview',orders:'Daily Orders',bulk:'Bulk Event Inquiries',users:'Users',products:'Products',payments:'Payments',deliveries:'Deliveries',settings:'Store Settings',activity:'Recent Activity'};
 const $ = id => document.getElementById(id), safe = x => String(x == null ? '' : x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let data = null, section = 'overview', keyword = '', sortKey = '', descending = false, pageNum = 0, productId = '', expiry = 0, resendAt = 0, timer = null, lastInput = Date.now();
-const keys = Array.from(document.querySelectorAll('#otp-boxes input'));
+
 const api = (url, options) => fetch(url, {credentials:'same-origin',...options,headers:{'Content-Type':'application/json',...(options?.headers||{})}})
   .then(async response => { const result = await response.json().catch(()=>({})); if(!response.ok) throw new Error(result.error||'Request failed'); return result; });
 function toast(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),4000);}
 function error(msg){$('auth-error').textContent=msg;}
-function tick(){const remain=Math.max(0,Math.ceil((expiry-Date.now())/1000)), cooldown=Math.max(0,Math.ceil((resendAt-Date.now())/1000));
-  $('countdown').textContent=remain?'Code expires in '+Math.floor(remain/60)+':'+String(remain%60).padStart(2,'0'):'Code expired. Request another.';
-  $('resend').disabled=cooldown>0;$('resend').textContent=cooldown?'Resend in '+cooldown+'s':'Resend OTP';}
-keys.forEach((input,i)=>{
-  input.addEventListener('input',()=>{input.value=input.value.replace(/\D/g,'').slice(-1);if(input.value&&i<5)keys[i+1].focus();});
-  input.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!input.value&&i>0)keys[i-1].focus();});
-  input.addEventListener('paste',e=>{e.preventDefault();const text=e.clipboardData.getData('text').replace(/\D/g,'').slice(0,6);[...text].forEach((n,j)=>keys[j].value=n);keys[Math.min(text.length,5)].focus();});
-});
-async function send(){error('');const email=$('email').value.trim().toLowerCase();if(!$('email').checkValidity())return error('Enter a valid email address.');
-  $('send').disabled=true;try{await api('/api/auth/request-otp',{method:'POST',body:JSON.stringify({email,purpose:'admin'})});
-    expiry=Date.now()+300000;resendAt=Date.now()+30000;keys.forEach(k=>k.value='');$('request-form').classList.add('hidden');$('verify-form').classList.remove('hidden');keys[0].focus();tick();
-  }catch(e){error(e.message);}finally{$('send').disabled=false;}}
-$('request-form').addEventListener('submit',e=>{e.preventDefault();send();});
-$('resend').addEventListener('click',send);
-$('verify-form').addEventListener('submit',async e=>{
-  e.preventDefault();error('');const code=keys.map(k=>k.value).join('');if(!/^\d{6}$/.test(code))return error('Enter all six digits.');
-  try{const email=$('email').value.trim().toLowerCase();
-    const result=await api('/api/auth/verify-otp',{method:'POST',body:JSON.stringify({email,code,purpose:'admin'})});
-    await firebase.auth().signInWithCustomToken(result.customToken);
-    const idToken=await firebase.auth().currentUser.getIdToken();
+$('request-form').addEventListener('submit',async e=>{
+  e.preventDefault();error('');$('send').disabled=true;
+  try {
+    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+    const credential=await firebase.auth().signInWithEmailAndPassword($('email').value.trim(),$('password').value);
+    const idToken=await credential.user.getIdToken(true);
     await api('/api/auth/session',{method:'POST',body:JSON.stringify({idToken,purpose:'admin'})});
-    await load();
-  }catch(err){error(err.message);}
+    $('password').value='';await load();
+  } catch(err) { await firebase.auth().signOut().catch(()=>{}); error('Sign-in failed. Check your credentials and administrator access.'); }
+  finally {$('send').disabled=false;}
+});
+$('reset-password').addEventListener('click',async()=>{
+  const email=$('email').value.trim();if(!email)return error('Enter your email address first.');
+  try{await firebase.auth().sendPasswordResetEmail(email);error('If the account is eligible, a password reset email will be sent.');}
+  catch(err){error('Unable to request a password reset. Please try again.');}
 });
 function adminUi(){ $('login').classList.add('hidden');$('panel').classList.remove('hidden');$('sidebar').innerHTML=sections.map(s=>'<button data-section="'+s+'" class="'+(s===section?'active':'')+'">'+safe(titles[s])+'</button>').join('');
   $('sidebar').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{section=b.dataset.section;keyword='';sortKey='';pageNum=0;render();adminUi();}));}
@@ -134,13 +123,13 @@ async function load(){
   catch(e){toast(e.message);if(e.message==='Forbidden'){await signOut();}}
   finally{$('skeleton').classList.add('hidden');}
 }
-async function signOut(){await api('/api/auth/logout',{method:'POST',body:'{}'}).catch(()=>{});await firebase.auth().signOut().catch(()=>{});$('panel').classList.add('hidden');$('login').classList.remove('hidden');$('verify-form').classList.add('hidden');$('request-form').classList.remove('hidden');error('');}
+async function signOut(){await api('/api/auth/logout',{method:'POST',body:'{}'}).catch(()=>{});await firebase.auth().signOut().catch(()=>{});$('panel').classList.add('hidden');$('login').classList.remove('hidden');$('password').value='';error('');}
 $('logout').addEventListener('click',signOut);$('refresh').addEventListener('click',load);
 $('theme').addEventListener('click',()=>{document.body.classList.toggle('dark');localStorage.setItem('sb-admin-theme',document.body.classList.contains('dark')?'dark':'light');});
 if(localStorage.getItem('sb-admin-theme')==='dark')document.body.classList.add('dark');
 $('sidebar-toggle').addEventListener('click',()=>{const side=document.querySelector('aside');side.hidden=!side.hidden;});
 ['mousemove','keydown','pointerdown','touchstart'].forEach(name=>document.addEventListener(name,()=>{lastInput=Date.now();},{passive:true}));
-setInterval(()=>{if(!$('panel').classList.contains('hidden')&&Date.now()-lastInput>15*60000){signOut();toast('Signed out due to inactivity.');}tick();},1000);
+setInterval(()=>{if(!$('panel').classList.contains('hidden')&&Date.now()-lastInput>15*60000){signOut();toast('Signed out due to inactivity.');}},1000);
 function rowDate(v){return v?String(v).slice(0,10):'—';}
 function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});}
 function tableFields(s){return {orders:['orderNumber','customerName','phone','total','orderStatus','createdAt'],
