@@ -7,7 +7,7 @@ module.exports = async function handler(req, res) {
   if (Number(req.headers['content-length'] || 0) > 4096)
     return res.status(413).json({ error: 'Request too large.' });
   try {
-    switch (String(req.query?.action || '').toLowerCase()) {
+    switch (String(req.params?.action || req.query?.action || '').toLowerCase()) {
       case 'request-otp': return await auth.requestOtp(req, res);
       case 'verify-otp': return await auth.verifyOtp(req, res);
       case 'session': return await auth.createSession(req, res);
