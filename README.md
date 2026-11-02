@@ -9,7 +9,7 @@ A vanilla HTML, CSS and JavaScript storefront for fresh vegetables, ready basket
 - **Frontend:** Vanilla HTML5, CSS3, JavaScript; Firebase browser SDK for Firestore and phone/password legacy login.
 - **Backend (Vercel):** Node.js 24 serverless functions in \`api/\`.
 - **Database and identity:** Firebase Firestore and Firebase Authentication. Server functions use \`firebase-admin\`.
-- **Email OTP:** Resend HTTP API, with server-generated codes and Firestore-backed challenge hashes.
+- **Authentication:** Firebase email/password; Firebase sends password reset emails.
 - **Other services:** Optional Razorpay Cloud Functions (online checkout is currently disabled); WhatsApp link-based ordering.
 - **Build:** \`node build.js\` copies public assets into \`dist/\`, with server/admin legacy assets excluded. Vercel uses \`vercel.json\`; Firebase Hosting is a legacy alternative and does not automatically provide the new Vercel OTP APIs.
 - **CI:** \`.github/workflows/storefront-checks.yml\` runs lint, smoke scripts, build, and checks for public admin asset leakage.
@@ -31,17 +31,11 @@ npm start
 
 The storefront is at http://localhost:3000. The isolated operations portal is at http://localhost:3000/secure-admin-portal.
 
-The OTP, contact form, and operations portal **require** a configured Firebase Admin service account and email provider. The browser and server Firebase configurations must refer to the same Firebase project. Local service-account credentials stay in \`.env\` (which is ignored by Git); do not commit them.
+The contact form and operations portal **require** a configured Firebase Admin service account and email provider. The browser and server Firebase configurations must refer to the same Firebase project. Local service-account credentials stay in \`.env\` (which is ignored by Git); do not commit them.
 
 ## Admin authentication
 
-1. Set \`ADMIN_EMAILS\` to the comma-separated approved admin email addresses.
-2. Set \`FIREBASE_SERVICE_ACCOUNT_JSON\`, \`OTP_HASH_SECRET\`, \`RESEND_API_KEY\`, \`EMAIL_FROM\`, and public Firebase config variables in Vercel.
-3. Enable Firebase Email/Password and custom-token Authentication support as appropriate for your project, verify your sending domain with Resend, and deploy the Vercel functions.
-4. Open \`/secure-admin-portal\` directly. It is intentionally absent from the public site's navigation and sitemap.
-5. Enter an approved email, receive a six-digit email OTP, and verify it. Session cookies are \`Secure\` and \`HttpOnly\`. The operations API enforces admin allowlist, Firebase claims, and 15-minute inactivity window.
-
-There is **no sample admin password**. A standard customer's sign-in cannot grant access to the admin API. The separate login document is publicly reachable by design, but **dashboard data is not**.
+Admin and customer sign-in use Firebase email/password. Admin access also requires an allowlisted email and a server-set Firebase admin claim. See [PASSWORD-LOGIN-SETUP.md](PASSWORD-LOGIN-SETUP.md) for preview setup, account migration, and acceptance checks. `OTP_HASH_SECRET` is still required to hash admin session identifiers.
 
 ## Store contact and delivery policy
 
@@ -59,7 +53,7 @@ The local mock server also retains development-only product, order, bulk-request
 
 ## Deployment and security notes
 
-- Deploy the Vercel branch preview first, set required environment variables, test OTP through a real Resend verified sender, and then review/merge the pull request.
+- Deploy a preview first and follow the password-login acceptance steps before reviewing the pull request.
 - Deploy the updated \`firestore.rules\` to Firebase. Existing legacy administrator custom claims and profile roles may require an intentional migration; no automatic privilege escalation is allowed.
 - Do not put Firebase Admin service-account JSON, email API keys, OTP HMAC secrets, or payment secrets into browser code.
 - The Firebase **web** API key in \`config/firebase-public.js\` is public by design. Restrict it in Google Cloud/Firebase settings as appropriate.

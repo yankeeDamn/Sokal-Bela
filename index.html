@@ -884,48 +884,10 @@
 <div class="modal-bg" id="auth-modal" style="display:none">
   <div class="modal-box">
     <h3 class="modal-title" id="auth-modal-title" data-i18n="auth.loginTitle">Customer Login</h3>
-    <div class="auth-tabs">
-      <button type="button" class="auth-tab active" id="auth-tab-email" onclick="setAuthMethod('email')" data-i18n="auth.tabEmail">Email</button>
-      <button type="button" class="auth-tab" id="auth-tab-phone" onclick="setAuthMethod('phone')" data-i18n="auth.tabPhone">Phone / OTP</button>
-    </div>
     <form id="auth-form" onsubmit="submitAuthForm(event)">
-      <div id="auth-email-pane">
-        <div class="form-group"><label class="form-label" for="auth-email">Email address</label>
-          <input type="email" id="auth-email" class="form-control" autocomplete="email" maxlength="254" required></div>
-        <div id="auth-email-otp-wrap" style="display:none">
-          <label class="form-label">Enter six-digit email OTP</label>
-          <div class="otp-input-row" id="email-otp-inputs">
-            <input aria-label="OTP digit 1" inputmode="numeric" autocomplete="one-time-code" maxlength="1">
-            <input aria-label="OTP digit 2" inputmode="numeric" maxlength="1">
-            <input aria-label="OTP digit 3" inputmode="numeric" maxlength="1">
-            <input aria-label="OTP digit 4" inputmode="numeric" maxlength="1">
-            <input aria-label="OTP digit 5" inputmode="numeric" maxlength="1">
-            <input aria-label="OTP digit 6" inputmode="numeric" maxlength="1">
-          </div>
-          <p id="email-otp-timer" role="status" style="margin:8px 0;color:var(--text2)"></p>
-          <button id="email-otp-resend" type="button" class="btn btn-outline btn-sm" onclick="resendEmailOtp()" disabled>Resend OTP</button>
-        </div>
-        <div id="auth-password-wrap" style="display:none">
-          <div class="form-group"><label class="form-label" for="auth-pass">Password</label>
-            <input type="password" id="auth-pass" class="form-control" autocomplete="current-password" minlength="6"></div>
-          <div class="form-group" id="auth-confirm-wrap" style="display:none">
-            <label class="form-label" for="auth-pass-confirm">Confirm Password</label>
-            <input type="password" id="auth-pass-confirm" class="form-control" autocomplete="new-password" minlength="6"></div>
-        </div>
-        <button class="btn btn-outline btn-sm" id="auth-password-toggle" type="button" onclick="togglePasswordLogin()" style="margin:4px 0 14px">Use password instead</button>
-      </div>
-      
-      <div id="auth-phone-pane" style="display:none">
-        <div class="form-group">
-          <label class="form-label" data-i18n="auth.phone">Phone Number</label>
-          <input type="tel" id="auth-phone" class="form-control" placeholder="9876543210" maxlength="10" autocomplete="tel">
-        </div>
-        <div class="form-group" id="auth-otp-wrap" style="display:none">
-          <label class="form-label" data-i18n="auth.otp">OTP Code</label>
-          <input type="text" id="auth-otp" class="form-control" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
-        </div>
-        <div id="recaptcha-container"></div>
-      </div>
+      <div class="form-group"><label class="form-label" for="auth-email">Email address</label><input type="email" id="auth-email" class="form-control" autocomplete="email" maxlength="254" required></div>
+      <div class="form-group"><label class="form-label" for="auth-pass">Password</label><input type="password" id="auth-pass" class="form-control" autocomplete="current-password" minlength="6" required></div>
+      <div class="form-group" id="auth-confirm-wrap" style="display:none"><label class="form-label" for="auth-pass-confirm">Confirm password</label><input type="password" id="auth-pass-confirm" class="form-control" autocomplete="new-password" minlength="6"></div>
       <div id="auth-err" style="display:none;color:var(--red);font-size:13px;margin-top:-6px;margin-bottom:10px"></div>
       <div class="modal-acts">
         <button type="submit" class="btn btn-primary" id="auth-submit-btn" data-i18n="auth.login">Login</button>
@@ -1338,179 +1300,34 @@ function showPage(id) {
   }
 
 
-  let emailOtpEmail = "", emailOtpExpiry = 0, emailOtpResendAt = 0, usePassword = false;
-  function otpInputs() { return [...document.querySelectorAll("#email-otp-inputs input")]; }
-  let otpInputsReady = false;
-  function setupOtpInputs() {
-    if (otpInputsReady) return;
-    otpInputsReady = true;
-    const inputs = otpInputs();
-    inputs.forEach((input,i) => {
-      input.addEventListener("input", () => {
-        input.value = input.value.replace(/\D/g, "").slice(-1);
-        if (input.value && i < 5) inputs[i + 1].focus();
-      });
-      input.addEventListener("keydown", e => {
-        if (e.key === "Backspace" && !input.value && i > 0) inputs[i - 1].focus();
-      });
-      input.addEventListener("paste", e => {
-        e.preventDefault();
-        const digits = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-        [...digits].forEach((digit,j) => { inputs[j].value = digit; });
-        inputs[Math.min(digits.length, 5)].focus();
-      });
-    });
-    setInterval(() => {
-      const panel = document.getElementById("auth-email-otp-wrap");
-      if (!panel || panel.style.display === "none") return;
-      const remain = Math.max(0, Math.ceil((emailOtpExpiry - Date.now()) / 1000));
-      const cooldown = Math.max(0, Math.ceil((emailOtpResendAt - Date.now()) / 1000));
-      const timer = document.getElementById("email-otp-timer");
-      timer.textContent = remain ? "Expires in " + Math.floor(remain/60) + ":" +
-        String(remain % 60).padStart(2,"0") : "Code expired. Request another.";
-      const resend = document.getElementById("email-otp-resend");
-      resend.disabled = cooldown > 0;
-      resend.textContent = cooldown ? "Resend in " + cooldown + "s" : "Resend OTP";
-    }, 1000);
-  }
   function openAuthModal(mode = "login") {
     const modal = document.getElementById("auth-modal");
-    if (!modal) return;
-    setupOtpInputs();
-    modal.style.display = "flex";
-    modal.dataset.mode = mode;
-    usePassword = mode === "signup";
-    emailOtpEmail = ""; emailOtpExpiry = 0;
-    document.getElementById("auth-email").readOnly = false;
-    document.getElementById("auth-email-otp-wrap").style.display = "none";
+    modal.style.display = "flex"; modal.dataset.mode = mode;
     document.getElementById("auth-err").style.display = "none";
-    document.getElementById("auth-modal-title").textContent = mode === "signup" ? "Create account" : "Sign in with email OTP";
+    document.getElementById("auth-pass").value = "";
+    document.getElementById("auth-pass-confirm").value = "";
+    document.getElementById("auth-confirm-wrap").style.display = mode === "signup" ? "block" : "none";
+    document.getElementById("auth-pass-confirm").required = mode === "signup";
+    document.getElementById("auth-modal-title").textContent = mode === "signup" ? "Create account" : "Sign in";
+    document.getElementById("auth-submit-btn").textContent = mode === "signup" ? "Create account" : "Sign in";
     document.getElementById("auth-toggle-label").textContent = mode === "signup" ? "Already registered?" : "New customer?";
     document.getElementById("auth-toggle-link").textContent = mode === "signup" ? "Log in" : "Create account";
-    setAuthMethod("email", true);
-  }
-  function setAuthMethod(method, keepValues) {
-    authMethod = method === "phone" ? "phone" : "email";
-    document.getElementById("auth-tab-email")?.classList.toggle("active", authMethod === "email");
-    document.getElementById("auth-tab-phone")?.classList.toggle("active", authMethod === "phone");
-    document.getElementById("auth-email-pane").style.display = authMethod === "email" ? "block" : "none";
-    document.getElementById("auth-phone-pane").style.display = authMethod === "phone" ? "block" : "none";
-    document.getElementById("auth-email-links").style.display = authMethod === "email" ? "block" : "none";
-    document.getElementById("auth-email").required = authMethod === "email";
-    document.getElementById("auth-password-wrap").style.display = usePassword ? "block" : "none";
-    document.getElementById("auth-confirm-wrap").style.display = usePassword &&
-      document.getElementById("auth-modal").dataset.mode === "signup" ? "block" : "none";
-    document.getElementById("auth-pass").required = authMethod === "email" && usePassword;
-    document.getElementById("auth-password-toggle").textContent = usePassword ? "Use email OTP instead" : "Use password instead";
-    document.getElementById("auth-submit-btn").textContent = authMethod === "phone" ?
-      (phoneConfirmResult ? "Verify phone OTP" : "Send phone OTP") :
-      usePassword ? (document.getElementById("auth-modal").dataset.mode === "signup" ? "Create account" : "Sign in") :
-      (emailOtpEmail ? "Verify email OTP" : "Send email OTP");
-    if (!keepValues) { phoneConfirmResult = null; document.getElementById("auth-otp-wrap").style.display = "none"; }
-  }
-  function togglePasswordLogin() {
-    usePassword = !usePassword;
-    emailOtpEmail = "";
-    document.getElementById("auth-email-otp-wrap").style.display = "none";
-    setAuthMethod("email", true);
   }
   function closeAuthModal() { document.getElementById("auth-modal").style.display = "none"; }
-  function toggleAuthMode() {
-    const mode = document.getElementById("auth-modal").dataset.mode;
-    openAuthModal(mode === "signup" ? "login" : "signup");
-  }
-  function authFriendlyError(err) {
-    return String(err?.message || err || "Authentication failed").replace("Firebase: ", "")
-      .replace(/\(auth\/[^)]+\)\.?/g, "").trim();
-  }
-  async function ensureRecaptcha() {
-    if (!auth) throw new Error("Authentication is unavailable.");
-    if (recaptchaVerifier) return recaptchaVerifier;
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
-    await recaptchaVerifier.render();
-    return recaptchaVerifier;
-  }
-  async function otpFetch(action, payload) {
-    const response = await fetch("/api/auth/" + action, {
-      method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || "Authentication request failed.");
-    return result;
-  }
-  async function resendEmailOtp() {
-    if (Date.now() < emailOtpResendAt) return;
-    await sendEmailOtp().catch(err => {
-      const error = document.getElementById("auth-err");
-      error.textContent = authFriendlyError(err); error.style.display = "block";
-    });
-  }
-  async function sendEmailOtp() {
-    const email = document.getElementById("auth-email").value.trim().toLowerCase();
-    if (!/^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new Error("Enter a valid email address.");
-    await otpFetch("request-otp", { email, purpose:"customer" });
-    emailOtpEmail = email; emailOtpExpiry = Date.now() + 300000; emailOtpResendAt = Date.now() + 30000;
-    const emailInput = document.getElementById("auth-email");
-    emailInput.readOnly = true;
-    otpInputs().forEach(i => { i.value = ""; });
-    document.getElementById("auth-email-otp-wrap").style.display = "block";
-    document.getElementById("auth-submit-btn").textContent = "Verify email OTP";
-    otpInputs()[0].focus();
-    showToast("If eligible, a code has been emailed.", "success");
-  }
+  function toggleAuthMode() { openAuthModal(document.getElementById("auth-modal").dataset.mode === "signup" ? "login" : "signup"); }
+  function authFriendlyError(err) { return String(err?.message || err || "Authentication failed").replace("Firebase: ", "").replace(/\(auth\/[^)]+\)\.?/g, "").trim(); }
   async function submitAuthForm(e) {
-    e.preventDefault();
-    const errEl = document.getElementById("auth-err");
-    const btn = document.getElementById("auth-submit-btn");
-    errEl.style.display = "none"; btn.disabled = true;
+    e.preventDefault(); const errEl=document.getElementById("auth-err"), btn=document.getElementById("auth-submit-btn");
+    errEl.style.display="none"; btn.disabled=true;
     try {
-      const mode = document.getElementById("auth-modal").dataset.mode || "login";
-      if (authMethod === "email" && !usePassword) {
-        if (!auth) throw new Error("Firebase Authentication is unavailable.");
-        if (!emailOtpEmail) {
-          await sendEmailOtp();
-        } else {
-          if (Date.now() >= emailOtpExpiry) throw new Error("Code expired. Request another.");
-          const code = otpInputs().map(i => i.value).join("");
-          if (!/^\d{6}$/.test(code)) throw new Error("Enter all six digits.");
-          const result = await otpFetch("verify-otp", { email:emailOtpEmail, code, purpose:"customer" });
-          await auth.signInWithCustomToken(result.customToken);
-          await otpFetch("session", { idToken:await auth.currentUser.getIdToken(), purpose:"customer" });
-          showToast("Signed in successfully.", "success");
-          emailOtpEmail = "";
-          document.getElementById("auth-email").readOnly = false;
-          closeAuthModal();
-        }
-      } else if (authMethod === "phone") {
-        if (!auth) throw new Error("Phone authentication is unavailable.");
-        const phone = document.getElementById("auth-phone").value.replace(/\D/g,"");
-        if (!/^[6-9]\d{9}$/.test(phone)) throw new Error("Enter a valid Indian mobile number.");
-        if (!phoneConfirmResult) {
-          phoneConfirmResult = await auth.signInWithPhoneNumber("+91" + phone, await ensureRecaptcha());
-          document.getElementById("auth-otp-wrap").style.display = "block";
-          btn.textContent = "Verify phone OTP";
-        } else {
-          const code = document.getElementById("auth-otp").value.trim();
-          if (!/^\d{6}$/.test(code)) throw new Error("Enter a six-digit code.");
-          await phoneConfirmResult.confirm(code);
-          phoneConfirmResult = null;
-        }
-      } else {
-        if (!auth) throw new Error("Authentication is unavailable.");
-        const email = document.getElementById("auth-email").value.trim().toLowerCase();
-        const password = document.getElementById("auth-pass").value;
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || password.length < 6)
-          throw new Error("Enter a valid email and password of at least six characters.");
-        if (mode === "signup") {
-          if (password !== document.getElementById("auth-pass-confirm").value) throw new Error("Passwords do not match.");
-          await auth.createUserWithEmailAndPassword(email, password);
-        } else await auth.signInWithEmailAndPassword(email, password);
-        showToast("Signed in successfully.", "success");
-      }
-    } catch (err) {
-      errEl.textContent = authFriendlyError(err); errEl.style.display = "block";
-    } finally { btn.disabled = false; }
+      if (!auth) throw new Error("Authentication is unavailable.");
+      const email=document.getElementById("auth-email").value.trim(), password=document.getElementById("auth-pass").value;
+      if (document.getElementById("auth-modal").dataset.mode === "signup") {
+        if(password !== document.getElementById("auth-pass-confirm").value) throw new Error("Passwords do not match.");
+        await auth.createUserWithEmailAndPassword(email,password);
+      } else await auth.signInWithEmailAndPassword(email,password);
+      showToast("Signed in successfully.","success"); closeAuthModal();
+    } catch(err) {errEl.textContent=authFriendlyError(err);errEl.style.display="block";} finally {btn.disabled=false;}
   }
   async function sendCustomerPasswordReset() {
     if (!auth) { showToast("Authentication is unavailable right now.","error"); return; }
@@ -2512,8 +2329,8 @@ window.setCat=setCat; window.selectPay=selectPay; window.goCheckoutStep=goChecko
 window.openCartDrawer=openCartDrawer; window.closeCartDrawer=closeCartDrawer;
 window.navSearch=navSearch; window.headerUserAction=headerUserAction; window.vegImgError=vegImgError;
 window.openProductDetails=openProductDetails; window.closeProductDetails=closeProductDetails;
-window.setAuthMethod=setAuthMethod; window.addBulkRow=addBulkRow;
-window.resendEmailOtp=resendEmailOtp; window.togglePasswordLogin=togglePasswordLogin;
+window.addBulkRow=addBulkRow;
+
 window.openAuthModal=openAuthModal; window.closeAuthModal=closeAuthModal; window.toggleAuthMode=toggleAuthMode;
 window.submitAuthForm=submitAuthForm; window.sendCustomerPasswordReset=sendCustomerPasswordReset; window.logoutUser=logoutUser;
 window.loadMyOrders=loadMyOrders;
