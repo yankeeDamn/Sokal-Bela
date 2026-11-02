@@ -28,9 +28,21 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
 app.use(limiter);
 
-app.use(cors());
+// All new authentication APIs are same-origin; permissive CORS is not enabled.
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '.')));
+// Vercel-compatible handlers so the same OTP path can be exercised locally.
+app.all('/api/auth/:action', (req, res) => {
+  req.query.action = req.params.action;
+  return require('./api/auth/[action].js')(req, res);
+});
+app.all('/api/admin-data', (req, res) => require('./api/admin-data.js')(req, res));
+app.get('/secure-admin-portal', (req, res) => require('./api/secure-admin-portal.js')(req, res));
+app.use((req, res, next) => {
+  if (/^\/(?:admin(?:\.html|\.js)?|admin\/|api\/admin\/)/.test(req.path))
+    return res.status(404).send('Not found');
+  next();
+});
+app.use(express.static(path.join(__dirname, '.'), { dotfiles:'ignore' }));
 
 // Mock database in memory — match the storefront vegetable catalogue
 let products = [
@@ -49,60 +61,7 @@ let products = [
 let orders = [];
 let orderCounter = 100;
 
-// ===== AUTH ENDPOINTS =====
-app.post('/api/auth/signup', (req, res) => {
-  try {
-    const { email, password, displayName } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Missing email or password' });
-    }
-    const user = {
-      uid: 'user_' + Date.now(),
-      email,
-      displayName: displayName || 'User',
-      phone: '',
-      addresses: [],
-      createdAt: new Date().toISOString()
-    };
-    res.json({ success: true, user, message: 'Signup successful' });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-app.post('/api/auth/login', (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Missing email or password' });
-    }
-    // Mock login
-    if (email === 'admin@sokal.com' && password === 'admin123') {
-      return res.json({ 
-        success: true, 
-        user: { 
-          uid: 'admin', 
-          email: 'admin@sokal.com', 
-          displayName: 'Admin',
-          isAdmin: true 
-        },
-        message: 'Login successful'
-      });
-    }
-    res.json({ 
-      success: true, 
-      user: { 
-        uid: 'user_' + Date.now(), 
-        email, 
-        displayName: email.split('@')[0],
-        isAdmin: false 
-      },
-      message: 'Login successful' 
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
+// Legacy mock sign-in removed: use /api/auth/request-otp and /api/auth/verify-otp.
 
 // ===== PRODUCT ENDPOINTS =====
 app.get('/api/products', (req, res) => {
@@ -208,7 +167,7 @@ app.post('/api/orders', (req, res) => {
   }
 });
 
-app.get('/api/orders/:userId', (req, res) => {
+app.get('/api/orders/:userId', (req, res) => { return res.status(403).json({ error: 'Forbidden' });
   try {
     const userOrders = orders.filter(o => o.customerId === req.params.userId);
     res.json({ success: true, orders: userOrders });
@@ -217,34 +176,7 @@ app.get('/api/orders/:userId', (req, res) => {
   }
 });
 
-app.get('/api/admin/orders', (req, res) => {
-  try {
-    res.json({ success: true, orders, count: orders.length });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-app.patch('/api/admin/orders/:orderId', (req, res) => {
-  try {
-    const { status } = req.body;
-    const order = orders.find(o => o.id === req.params.orderId);
-    if (!order) {
-      return res.status(404).json({ success: false, error: 'Order not found' });
-    }
-    
-    const validStatuses = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ success: false, error: 'Invalid status' });
-    }
-
-    order.status = status;
-    order.updatedAt = new Date().toISOString();
-    res.json({ success: true, order, message: `Order status updated to ${status}` });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
+// Admin endpoints are provided only by /api/admin-data with a verified session.
 
 // ===== REVIEW ENDPOINTS =====
 app.post('/api/products/:productId/reviews', (req, res) => {
@@ -285,7 +217,7 @@ app.get('/api/products/:productId/reviews', (req, res) => {
 });
 
 // ===== NOTIFICATION ENDPOINTS =====
-app.post('/api/notify/email', (req, res) => {
+app.post('/api/notify/email', (req, res) => { return res.status(501).json({ error: 'Notifications not configured' });
   try {
     const { to, subject, message } = req.body;
     console.log(`📧 Email sent to ${to}: ${subject}`);
@@ -295,7 +227,7 @@ app.post('/api/notify/email', (req, res) => {
   }
 });
 
-app.post('/api/notify/sms', (req, res) => {
+app.post('/api/notify/sms', (req, res) => { return res.status(501).json({ error: 'Notifications not configured' });
   try {
     const { phone, message } = req.body;
     console.log(`📱 SMS sent to ${phone}: ${message}`);
@@ -456,7 +388,7 @@ app.post('/api/payment-status', (req, res) => {
 });
 
 // List stored payment records (local dev inspection only)
-app.get('/api/payments', (req, res) => {
+app.get('/api/payments', (req, res) => { return res.status(403).json({ error: 'Forbidden' });
   res.json({ success: true, payments, count: payments.length });
 });
 
@@ -487,14 +419,12 @@ app.get('/api/health', (req, res) => {
     status: 'Server is running',
     timestamp: new Date().toISOString(),
     endpoints: [
-      'POST /api/auth/signup',
-      'POST /api/auth/login',
+      'POST /api/auth/request-otp',
+      'POST /api/auth/verify-otp',
       'GET /api/products',
       'GET /api/products/:id',
       'POST /api/orders',
       'GET /api/orders/:userId',
-      'GET /api/admin/orders',
-      'PATCH /api/admin/orders/:orderId',
       'POST /api/products/:productId/reviews',
       'GET /api/products/:productId/reviews',
       'POST /api/notify/email',
@@ -513,14 +443,6 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin.html'));
-});
-
-app.get(/^\/admin\/.+/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin.html'));
-});
-
 // SPA fallback for extensionless frontend routes
 app.get(/^\/(?!api\/)(?!.*\.[a-zA-Z0-9]+$).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -536,10 +458,6 @@ app.listen(PORT, () => {
 ║ API Health: http://localhost:${PORT}/api/health         ║
 ║ Frontend: http://localhost:${PORT}                      ║
 ╠════════════════════════════════════════════════════════╣
-║ Sample Credentials:                                    ║
-║ - Email: admin@sokal.com                               ║
-║ - Password: admin123                                    ║
-║                                                        ║
 ║ Sample Coupons:                                        ║
 ║ - SAVE10 (10% off)                                      ║
 ║ - SAVE50 (₹50 off)                                      ║
