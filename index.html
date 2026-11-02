@@ -986,6 +986,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="config/contact.js"></script>
+<script src="config/firebase-public.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/veg-images.js"></script>
 <!-- ======================================================
@@ -996,15 +997,7 @@
 if (typeof t !== 'function') { window.t = function (key) { return key; }; }
 
 /* ========== CONFIG ========== */
-const FIREBASE_CFG = {
-  apiKey: "AIzaSyBKqJH8EWddXthZZao7lpFZhU2d5Z65Mbw",
-  authDomain: "sokal-bela-store.firebaseapp.com",
-  projectId: "sokal-bela-store",
-  storageBucket: "sokal-bela-store.firebasestorage.app",
-  messagingSenderId: "461746078421",
-  appId: "1:461746078421:web:76d7e15bd0c179a6ba985c",
-  measurementId: "G-QH41QC1D8X"
-};
+const FIREBASE_CFG = window.SOKAL_FIREBASE_CONFIG;
 const OWNER_WA     = SOKAL_CONTACT.whatsappDigits;
 const ROLES = { CUSTOMER: "Customer", SELLER: "Seller" };
 const ORDER_STATUSES = ["Pending","Confirmed","Packed","OutForDelivery","Delivered","Cancelled","ReturnRequested","Returned"];
