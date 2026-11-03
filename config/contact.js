@@ -3,10 +3,10 @@
   'use strict';
   const config = Object.freeze({
     businessName: 'Sokal Belar Bazar - 24/7',
-    phone: '7001867903',
-    e164: '+917001867903',
-    displayPhone: '+91 7001867903',
-    whatsappDigits: '917001867903',
+    phone: '7551858583',
+    e164: '+917551858583',
+    displayPhone: '+91 7551858583',
+    whatsappDigits: '917551858583',
     whatsappColor: '#25d366',
     address: 'Maa Tara Apartment, 1 TRDA Bypass Choaphuka, Choa Poka, Rampurhat, West Bengal 731224',
     minimumOrder: 200,

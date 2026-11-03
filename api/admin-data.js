@@ -42,6 +42,8 @@ module.exports = async function handler(req, res) {
   const db = gate.firestore(), action = String(req.query?.action || 'overview');
   try {
     if (req.method === 'GET') {
+      // Full catalogue export is available only after the existing server-side admin check.
+      if (action === 'partner-catalog') return res.status(200).json({ products: require('../src/data/partnerProducts.js') });
       if (action !== 'overview') return res.status(404).json({ error: 'Not found' });
       const [users, orders, bulk, products, payments, deliveries, logs, settings] = await Promise.all([
         table(db, 'users'), table(db, 'orders'), table(db, 'bulkOrders'),

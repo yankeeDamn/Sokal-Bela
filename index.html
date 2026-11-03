@@ -435,6 +435,7 @@
     .product-details-btn{border:0;background:transparent;color:var(--green-dark);font-weight:700;font-size:.84rem;text-align:left;padding:10px 0 0;text-decoration:underline}
     .product-details-btn:hover{color:var(--green)}
   </style>
+  <link rel="stylesheet" href="/public/partner-store.css">
 </head>
 <body>
 
@@ -455,7 +456,7 @@
         <option value="bn">বাংলা</option>
         <option value="hi">हिन्दी</option>
       </select>
-      <button class="icon-btn" onclick="openCartDrawer()" data-i18n-aria="nav.cart" aria-label="Cart">🛒<span class="cart-badge" id="cart-badge">0</span></button>
+      <button class="icon-btn" data-fresh-only onclick="openCartDrawer()" data-i18n-aria="nav.cart" aria-label="Cart">🛒<span class="cart-badge" id="cart-badge">0</span></button>
       <button class="icon-btn" id="nav-user-btn" onclick="headerUserAction()" data-i18n-aria="nav.login" aria-label="Login">👤</button>
       <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
@@ -465,7 +466,7 @@
       <li><a href="#" class="nav-link" data-page="bulk" data-i18n="nav.bulk">Bulk Orders</a></li>
       <li><a href="#" class="nav-link" data-page="catering" data-i18n="nav.catering">Catering</a></li>
       <li><a href="/about.html" class="nav-link">About</a></li><li><a href="/contact.html" class="nav-link">Contact</a></li>
-      <li><a href="#" class="nav-link" data-page="cart">🛒 <span data-i18n="nav.cart">Cart</span></a></li>
+      <li data-fresh-only><a href="#" class="nav-link" data-page="cart">🛒 <span data-i18n="nav.cart">Cart</span></a></li>
       <li><a href="#" class="nav-link" data-page="orders" id="nav-orders-link" style="display:none">📦 <span data-i18n="nav.orders">My Orders</span></a></li>
       <li id="nav-login-item"><a href="#" class="nav-link" onclick="openAuthModal('login');return false;" data-i18n="nav.login">Login</a></li>
       <li id="nav-signup-item"><a href="#" class="nav-link" onclick="openAuthModal('signup');return false;" data-i18n="nav.signup">Sign Up</a></li>
@@ -480,7 +481,7 @@
 <!-- ====== HOME PAGE ====== -->
 <section id="home-page" class="page active">
 
-  <div class="hero">
+  <div class="hero" id="fresh-hero">
     <div class="hero-sun" aria-hidden="true"></div>
     <div class="container hero-grid">
       <div class="hero-copy">
@@ -507,6 +508,18 @@
   </div>
 
 
+  <div class="ps-hero" id="partner-hero" hidden>
+    <div class="container ps-hero-inner"><div><small>সকাল বেলা · RAMPURHAT 731224</small>
+      <h1>Partner Store <span lang="bn">স্পেশাল স্টোর</span></h1>
+      <p>Everyday finds for your kitchen, home and wardrobe.</p></div><div class="ps-hero-mark" aria-hidden="true">🛍️</div></div>
+  </div>
+  <div id="store-mode-switcher" class="ps-switch" hidden>
+    <div class="ps-switch-inner" role="tablist" aria-label="Choose a store">
+      <button type="button" role="tab" id="fresh-tab" aria-controls="fresh-store-panel" aria-selected="true"><strong lang="bn">🥬 তাজা বাজার</strong><small>Fresh Vegetables (Same-Day)</small></button>
+      <button type="button" role="tab" id="partner-tab" aria-controls="partner-store-panel" aria-selected="false" tabindex="-1"><strong lang="bn">🛍️ স্পেশাল স্টোর</strong><small>Partner Store (Amazon • Flipkart • Meesho)</small></button>
+    </div>
+  </div>
+  <div id="fresh-store-panel">
   <section class="section" aria-labelledby="featured-heading">
     <div class="container">
       <h2 class="sec-title" id="featured-heading">🥬 Featured Produce</h2>
@@ -561,6 +574,8 @@
     </div>
   </section>
 
+  </div>
+  <section id="partner-store-panel" role="tabpanel" aria-labelledby="partner-tab" hidden></section>
 </section>
 
 <!-- ====== PRODUCTS PAGE ====== -->
@@ -602,7 +617,7 @@
             <div id="cart-items-list"></div>
             <div class="summary-box">
               <div class="sum-row"><span data-i18n="cart.subtotal">Subtotal</span><span id="c-subtotal">₹0</span></div>
-              <div class="sum-row"><span data-i18n="cart.delivery">Delivery</span><span id="c-delivery">Free</span></div>
+              <div class="sum-row"><span data-i18n="cart.delivery">Delivery</span><span id="c-delivery">Confirmed with your address</span></div>
               <div class="sum-row total"><span data-i18n="cart.total">Total</span><span id="c-total">₹0</span></div>
               <div id="min-warn" class="min-warn" style="display:none;margin-top:10px" data-i18n="cart.minWarn">⚠️ Minimum order is ₹200. Please add more items.</div>
             </div>
@@ -838,6 +853,7 @@
       </div>
       <div>
         <h4>Contact</h4>
+        <p>Sokal Belar Bazar - 24/7</p>
         <p>📞 <a href="#" data-contact-tel><span data-contact-phone>Call us</span></a></p>
         <p>📍 <span data-contact-address>Rampurhat, West Bengal 731224</span></p>
         <p>⏰ Open 24/7</p>
@@ -846,7 +862,7 @@
         <h4>Quick Links</h4>
         <a href="#" onclick="showPage('products');return false">🥦 Products</a>
         <a href="#" onclick="showPage('bulk');return false">📦 Bulk Orders</a>
-        <a href="#" onclick="showPage('cart');return false">🛒 My Cart</a>
+        <a href="#" data-fresh-only onclick="showPage('cart');return false">🛒 My Cart</a>
         <a href="#" data-contact-wa target="_blank" rel="noopener">💬 WhatsApp Us</a>
 <a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/faq.html">FAQ</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a><a href="/refund-delivery.html">Refund &amp; Delivery</a>
       </div>
@@ -932,13 +948,18 @@
 </div>
 
 <div class="drawer-bg" id="cart-drawer-bg" onclick="closeCartDrawer()"></div>
-<aside class="drawer" id="cart-drawer" aria-label="Cart">
+<aside class="drawer" id="cart-drawer" aria-label="Fresh vegetable cart">
   <div class="drawer-head">
-    <strong data-i18n="nav.cart">Cart</strong>
+    <strong data-i18n="cart.freshTitle">Fresh vegetable cart</strong>
     <button class="btn btn-outline btn-sm" onclick="closeCartDrawer()">✕</button>
   </div>
   <div class="drawer-body" id="cart-drawer-body"></div>
   <div class="drawer-foot">
+    <div class="fresh-progress">
+      <strong data-i18n="cart.freshRules">🚚 Free delivery on orders ₹300+ within 5 km | Min order ₹200</strong>
+      <progress id="fresh-progress" aria-label="Fresh vegetable order progress" max="300" value="0"></progress>
+      <p id="fresh-progress-message" aria-live="polite"></p>
+    </div>
     <button class="btn btn-primary btn-full" onclick="closeCartDrawer();showPage('cart');goCheckoutStep(1)" data-i18n="cart.checkout">Proceed to Checkout</button>
   </div>
 </aside>
@@ -948,6 +969,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="config/contact.js"></script>
+<script type="module" src="/js/partner/StoreModeSwitcher.mjs"></script>
 <script src="config/firebase-public.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/veg-images.js"></script>
@@ -1202,6 +1224,7 @@ window.addEventListener("load",()=>{
 function showPage(id) {
   const el = document.getElementById(id + "-page");
   if (!el) return;
+  document.dispatchEvent(new Event("sokal:page"));
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   el.classList.add("active");
   window.scrollTo({top:0,behavior:"smooth"});
@@ -1486,7 +1509,7 @@ function updateCartBar() {
   const count = cart.reduce((n, i) => n + (Number(i.qty) || 0), 0);
   const total = cart.reduce((n, i) => n + (Number(i.price) || 0) * (Number(i.qty) || 0), 0);
   const hideOn = ["cart", "confirmation"].some(id => document.getElementById(id + "-page")?.classList.contains("active"));
-  const show = count > 0 && !hideOn;
+  const show = count > 0 && !hideOn && !document.body.classList.contains("partner-mode");
   bar.classList.toggle("show", show);
   document.body.classList.toggle("has-cart-bar", show);
   document.getElementById("cb-count").textContent = window.I18N ? I18N.localizeDigits(count) : count;
@@ -1668,9 +1691,10 @@ function renderCart() {
   const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
   const money = (n) => window.I18N ? ("₹" + I18N.localizeDigits(n)) : ("₹"+n);
   document.getElementById("c-subtotal").textContent = money(sub);
-  document.getElementById("c-delivery").textContent = t("cart.free");
+  document.getElementById("c-delivery").textContent = sub >= SOKAL_CONTACT.freeDeliveryAt
+    ? t("cart.withinRadius", { km: SOKAL_CONTACT.freeDeliveryRadiusKm }) : t("cart.confirmCharge");
   document.getElementById("c-total").textContent    = money(sub);
-  document.getElementById("min-warn").style.display = sub<200?"block":"none";
+  document.getElementById("min-warn").style.display = sub<SOKAL_CONTACT.minimumOrder?"block":"none";
   renderCartDrawer();
 }
 
@@ -1685,7 +1709,7 @@ function goCheckoutStep(step) {
   if (step === 2 && !cart.length) { showToast(t("cart.empty"), "error"); return; }
   if (step === 2) {
     const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
-    if (sub < 200) { showToast(t("cart.minWarn"), "error"); return; }
+    if (sub < SOKAL_CONTACT.minimumOrder) { showToast(t("cart.minWarn"), "error"); return; }
   }
   if (step === 3) {
     const cust = {
@@ -1711,6 +1735,16 @@ function goCheckoutStep(step) {
 function renderCartDrawer() {
   const body = document.getElementById("cart-drawer-body");
   if (!body) return;
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const { minimumOrder, freeDeliveryAt, freeDeliveryRadiusKm: km } = SOKAL_CONTACT;
+  const meter = document.getElementById("fresh-progress");
+  meter.max = freeDeliveryAt;
+  meter.value = Math.min(subtotal, freeDeliveryAt);
+  const milestones = [];
+  if (subtotal < minimumOrder) milestones.push(t("cart.toMinimum", { amount: +(minimumOrder - subtotal).toFixed(2) }));
+  if (subtotal < freeDeliveryAt) milestones.push(t("cart.toFree", { amount: +(freeDeliveryAt - subtotal).toFixed(2), km }));
+  else milestones.push(t("cart.withinRadius", { km }));
+  document.getElementById("fresh-progress-message").textContent = milestones.join(" ");
   if (!cart.length) {
     body.innerHTML = `<p style="color:var(--text2);text-align:center;padding:24px">${esc(t("cart.empty"))}</p>`;
     return;
@@ -1786,7 +1820,7 @@ async function handleCheckout(e) {
   cust.deliverySlot = document.getElementById("cust-slot")?.value || "";
   const addressForOrder = cust.deliverySlot ? (cust.address + " | Delivery time: " + cust.deliverySlot) : cust.address;
   const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
-  if (sub<200) { showToast(t("cart.minWarn"),"error"); goCheckoutStep(1); return; }
+  if (sub<SOKAL_CONTACT.minimumOrder) { showToast(t("cart.minWarn"),"error"); goCheckoutStep(1); return; }
 
   const cartBackup = cart.map((item) => ({ ...item }));
   const orderCust = { ...cust, address: addressForOrder, lang: window.I18N?.lang || "en" };

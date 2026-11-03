@@ -6,7 +6,7 @@ const path = require('path');
 const SRC = __dirname;
 const OUT = path.join(SRC, 'dist');
 const SKIP = new Set([
-  'dist', 'api', 'backend', 'scripts', 'node_modules', '.git', '.github', '.vercel',
+  'dist', 'src', 'api', 'backend', 'scripts', 'node_modules', '.git', '.github', '.vercel',
   'local-server.js', 'build.js', 'vercel.json', 'package.json', 'package-lock.json',
   'admin.html', 'admin.js', 'app.js', 'style.css', 'db-operations.js', 'notifications.js', 'razorpay-integration.js', 'lib',
   '.vercelignore', '.gitignore', '.env', '.env.example', '.firebaserc', 'firebase.json',
@@ -22,6 +22,11 @@ for (const name of fs.readdirSync(SRC)) {
   fs.cpSync(path.join(SRC, name), path.join(OUT, name), { recursive: true });
   count++;
 }
+
+// Only the shopper projection is served. The editable source may contain private supplier codes.
+const { publicCatalog } = require('./js/partner/catalog.mjs');
+const catalog = publicCatalog(require('./src/data/partnerProducts.js'));
+fs.writeFileSync(path.join(OUT, 'public', 'partner-catalog.json'), JSON.stringify(catalog));
 
 if (!fs.existsSync(path.join(OUT, 'index.html'))) {
   console.error('BUILD FAILED: index.html not found in project root');

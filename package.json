@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node local-server.js",
-    "dev": "npx nodemon local-server.js",
+    "dev": "npx nodemon --ignore dist --ext js,mjs,json,html,css,svg local-server.js",
     "func:start": "cd backend/functions && npm run start",
-    "test": "node --check local-server.js && node --check build.js && node --check js/veg-images.js && node --check js/i18n.js && node scripts/check-images.js && node scripts/check-matching.js",
+    "test": "node --check local-server.js && node --check build.js && node --check js/veg-images.js && node --check js/i18n.js && node scripts/check-images.js && node scripts/check-matching.js && node --test scripts/partner-store.test.mjs",
     "build": "node build.js",
     "lint": "node scripts/check-inline.js && node --check api/auth/'[action].js' && node --check api/admin-data.js && node --check api/secure-admin-portal.js && node --check lib/server-auth.js && node --check config/contact.js"
   },

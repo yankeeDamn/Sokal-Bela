@@ -41,7 +41,9 @@ app.use((req, res, next) => {
     return res.status(404).send('Not found');
   next();
 });
-app.use(express.static(path.join(__dirname, '.'), { dotfiles:'ignore' }));
+// Serve exactly the Vercel build, which excludes the private partner authoring catalogue.
+require('./build.js');
+app.use(express.static(path.join(__dirname, 'dist'), { dotfiles:'ignore' }));
 
 // Mock database in memory — match the storefront vegetable catalogue
 let products = [
