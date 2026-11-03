@@ -39,7 +39,7 @@ Admin and customer sign-in use Firebase email/password. Admin access also requir
 
 ## Store contact and delivery policy
 
-The single source of truth for the storefront's contact number and standard delivery thresholds is \`config/contact.js\`. The current number is +91 7001867903, WhatsApp is https://wa.me/917001867903, minimum order ₹200, and free delivery on ₹300+ within 5 km. Store operations are available for inquiries 24/7; delivery timing is confirmed individually.
+The single source of truth for the storefront's contact number and standard delivery thresholds is \`config/contact.js\`. The current number is +91 7551858583, WhatsApp is https://wa.me/917551858583, minimum order ₹200, and free delivery on ₹300+ within 5 km. Store operations are available for inquiries 24/7; delivery timing is confirmed individually.
 
 ## Customer-facing pages
 
@@ -63,3 +63,20 @@ The local mock server also retains development-only product, order, bulk-request
 - Real email delivery, live order write/read, payments, and Lighthouse/mobile accessibility must be tested in a connected staging or production environment before release.
 
 See \`IMPLEMENTATION-REPORT.md\` for the audit, change summary and manual test checklist.
+
+## Fresh Bazar and Partner Store
+
+The home page opens in Fresh Vegetables. On a Vercel Preview deployment, open the following paths on the **same origin**.
+
+| Path | Expected behaviour |
+| --- | --- |
+| `/` in a new private window | Fresh store only while the public flag is false |
+| `/?preview=true` | Unlocks the Partner Store tab on this browser. Start in Fresh, add a vegetable, switch to Partner, then switch back to check the saved cart. |
+| `/?admin=sokal247` | Opens the local Quick Product Generator. Preview an item with a new category, then use **Copy Updated partnerProducts.js Code**. |
+| `/?preview=false` | Clears this browser’s preview unlock. Locally authored drafts are retained. |
+
+The sample catalogue has eight illustrated products. Sample prices, stock and delivery windows are illustrative. The Amazon and Flipkart sample links have no affiliate tracking. Before launch, check each listing, replace the samples with your products and approved affiliate links, and confirm who fulfills each Meesho item. Change `sample` to `false` on verified listings. Set `ENABLE_PARTNER_STORE_PUBLIC` in `config/commerce.mjs` to `true` in a separate release when ready.
+
+Replace **`src/data/partnerProducts.js`** with the generator’s complete export and review the change in GitHub. Each row has one unique ID. Categories come from the data. `tags` support both languages, `discountPercent` is derived, and `supplierCode` is private. The build writes only shopper fields to `dist/public/partner-catalog.json`. Once the deployed catalogue contains private references, an exact export also requires your existing operations-portal sign-in or selecting the matching private source file in the generator. Local previews and copy do not update Firebase, GitHub or a deployment.
+
+For acceptance, inspect a Meesho order draft in WhatsApp before sending it. Check the number, names, product ID, quantity and address. Check an Amazon or Flipkart link opens the matching retailer in a new tab. In the fresh drawer, try subtotals below ₹200, from ₹200 to ₹299.99, and at ₹300. Free delivery requires an address within 5 km. The store confirms distance and any other fee with the customer.

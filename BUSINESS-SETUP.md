@@ -9,7 +9,7 @@
 
 ## 2. Order flow (no online payment)
 1. Customer orders on the website, WhatsApp, Facebook message, or phone.
-2. The website opens a ready-made WhatsApp message to +91 7001867903.
+2. The website opens a ready-made WhatsApp message to +91 7551858583.
 3. You confirm price, delivery time and address by call/WhatsApp.
 4. Customer pays cash or UPI on delivery or at the shop.
 5. Mark the order Delivered in the Admin panel.
