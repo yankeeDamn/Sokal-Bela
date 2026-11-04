@@ -1,7 +1,9 @@
 // Copies the static site into ./dist so Vercel always has an explicit folder to serve.
-// No frontend file is modified; files are copied exactly as they are.
+// Contact-dependent share images and metadata are generated from the same config as the storefront.
 const fs = require('fs');
 const path = require('path');
+const contact = require('./config/contact.mjs').default;
+const renderShareCard = require('./scripts/render-share-card');
 
 const SRC = __dirname;
 const OUT = path.join(SRC, 'dist');
@@ -19,9 +21,17 @@ fs.mkdirSync(OUT, { recursive: true });
 let count = 0;
 for (const name of fs.readdirSync(SRC)) {
   if (SKIP.has(name) || name.endsWith('.zip') || name.startsWith('.env')) continue;
-  fs.cpSync(path.join(SRC, name), path.join(OUT, name), { recursive: true });
+  if (name.endsWith('.html')) {
+    const html = fs.readFileSync(path.join(SRC, name), 'utf8');
+    const image = '/public/images/og-cover.png';
+    fs.writeFileSync(path.join(OUT, name), html.replaceAll(image + '"', image + '?v=' + contact.phone + '"'));
+  } else {
+    fs.cpSync(path.join(SRC, name), path.join(OUT, name), { recursive: true });
+  }
   count++;
 }
+
+renderShareCard(path.join(OUT, 'public', 'images'));
 
 // Only the shopper projection is served. The editable source may contain private supplier codes.
 const { publicCatalog } = require('./js/partner/catalog.mjs');

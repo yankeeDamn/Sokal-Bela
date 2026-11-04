@@ -9,7 +9,7 @@
 
 ## 2. Order flow (no online payment)
 1. Customer orders on the website, WhatsApp, Facebook message, or phone.
-2. The website opens a ready-made WhatsApp message to +91 7551858583.
+2. The website opens a ready-made message to the store’s configured WhatsApp number.
 3. You confirm price, delivery time and address by call/WhatsApp.
 4. Customer pays cash or UPI on delivery or at the shop.
 5. Mark the order Delivered in the Admin panel.
@@ -48,10 +48,10 @@ Owner (pricing, quotes, suppliers) · Shop helper (packing, counter) · Delivery
 - Confirmation: "Your order is confirmed. Delivery by [time]. Pay cash/UPI on delivery."
 - Bulk/catering: "Thank you! Please share date, guest count and venue. We'll send a quote today."
 
-## 8. Where to edit things in index.html (search for the word shown)
+## 8. Where to edit store settings
 - Baskets, items and prices: `EDIT ME`
 - Delivery pincodes: `DELIVERY_PINCODES`
-- Owner WhatsApp number: `OWNER_WA`
+- Set the business call and WhatsApp numbers in `config/contact.mjs` using `SOKAL_BELA_PHONE` and `SOKAL_BELA_WHATSAPP`.
 - Facebook link: `facebook.com`
 - Admin panel: open your site link followed by `/secure-admin-portal` (example: `yoursite.vercel.app/#admin`). The secure operations portal is hosted separately from the customer-facing storefront.
 

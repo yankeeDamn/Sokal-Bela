@@ -1,9 +1,7 @@
+import { whatsappUrl } from '../../config/contact.mjs';
+
 const currency = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 });
 export const rupees = amount => '₹' + currency.format(amount);
-
-export function whatsappUrl(digits, message) {
-  return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
-}
 
 export function orderMessage(product, { name, phone, address, quantity }) {
   if (!product.inStock || product.fulfillmentMode !== 'whatsapp_cod') throw new Error('This item cannot be ordered here.');
@@ -21,7 +19,7 @@ export function orderMessage(product, { name, phone, address, quantity }) {
   ].join('\n');
 }
 
-export function PartnerOrderModal(digits) {
+export function PartnerOrderModal() {
   const dialog = document.createElement('dialog');
   dialog.className = 'ps-dialog';
   dialog.setAttribute('aria-labelledby', 'ps-order-title');
@@ -51,7 +49,7 @@ export function PartnerOrderModal(digits) {
     event.preventDefault();
     try {
       const message = orderMessage(current, Object.fromEntries(new FormData(form)));
-      const url = whatsappUrl(digits, message);
+      const url = whatsappUrl(message);
       dialog.close();
       window.location.assign(url);
     } catch (e) { error.textContent = e.message; }

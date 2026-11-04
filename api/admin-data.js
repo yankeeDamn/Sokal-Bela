@@ -1,6 +1,7 @@
 'use strict';
 const gate = require('../lib/server-auth');
-const contact = require('../config/contact');
+const contact = require('../config/contact.mjs').default;
+const storePhones = { phone: contact.phone, deliveryPhone: contact.phone, paymentPhone: contact.phone };
 const STATUSES = ['Pending', 'Confirmed', 'Out for Delivery', 'Delivered', 'Cancelled'];
 function clean(value) {
   if (value && typeof value.toDate === 'function') return value.toDate().toISOString();
@@ -95,7 +96,7 @@ module.exports = async function handler(req, res) {
         kpis, trends, days, status: Object.fromEntries(STATUSES.map(s =>
           [s,orders.filter(o => toStatus(o.orderStatus || o.status) === s).length])),
         tables: {users, orders, bulk, products, payments, deliveries},
-        logs, settings, truncated: [users,orders,bulk,products,payments,deliveries]
+        logs, settings: { ...settings, ...storePhones }, truncated: [users,orders,bulk,products,payments,deliveries]
           .some(list => list.length === 250)
       });
     }
@@ -157,9 +158,8 @@ module.exports = async function handler(req, res) {
     }
     if (req.method === 'PATCH' && action === 'settings') {
       const input = req.body || {};
-      const phone = contact.phone;
       const settings = {
-        phone, deliveryPhone: phone, paymentPhone: phone,
+        ...storePhones,
         address: String(input.address || '').trim().slice(0,300),
         minOrder: Math.max(contact.minimumOrder, numeric(input.minOrder)),
         freeDeliveryAt: Math.max(contact.freeDeliveryAt, numeric(input.freeDeliveryAt)),

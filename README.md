@@ -39,7 +39,7 @@ Admin and customer sign-in use Firebase email/password. Admin access also requir
 
 ## Store contact and delivery policy
 
-The single source of truth for the storefront's contact number and standard delivery thresholds is \`config/contact.js\`. The current number is +91 7551858583, WhatsApp is https://wa.me/917551858583, minimum order ₹200, and free delivery on ₹300+ within 5 km. Store operations are available for inquiries 24/7; delivery timing is confirmed individually.
+Both stores use `SOKAL_BELA_PHONE` for calls and `SOKAL_BELA_WHATSAPP` for WhatsApp. The build also uses this config for the phone number on the social share card. The fresh store accepts orders of ₹200 or more and offers free delivery on ₹300+ within 5 km. The store handles inquiries 24/7 and confirms delivery timing individually. [Contact and delivery config](config/contact.mjs)
 
 ## Customer-facing pages
 
