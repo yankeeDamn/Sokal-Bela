@@ -4,7 +4,7 @@ const currency = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 });
 export const rupees = amount => '₹' + currency.format(amount);
 
 export function orderMessage(product, { name, phone, address, quantity }) {
-  if (!product.inStock || product.fulfillmentMode !== 'whatsapp_cod') throw new Error('This item cannot be ordered here.');
+  if (product.nonElectric !== true || !product.inStock || product.fulfillmentMode !== 'whatsapp_cod') throw new Error('This item cannot be ordered here.');
   const qty = Number(quantity);
   if (!Number.isInteger(qty) || qty < 1 || qty > 99 || !/^[6-9]\d{9}$/.test(phone) ||
       !name.trim() || !address.trim()) throw new Error('Check your name, mobile number, landmark and quantity.');

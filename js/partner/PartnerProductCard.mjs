@@ -20,7 +20,7 @@ export function PartnerProductCard(product, openOrder) {
   deal.hidden = !product.discountPercent;
   deal.textContent = product.discountPercent + '% off';
   set('.ps-platform', product.platform);
-  set('.ps-sample', product.sample ? 'Sample listing' : product.category);
+  set('.ps-sample', [product.subcategory || product.category, product.sample && 'Sample listing'].filter(Boolean).join(' · '));
   set('h3', product.titleEn);
   set('.ps-bn', product.titleBn);
   set('.ps-price strong', rupees(product.sellingPrice));

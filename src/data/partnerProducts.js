@@ -1,11 +1,69 @@
-// Private authoring catalogue. Use HTTPS retailer links and put reselling references in supplierCode only.
-// Example prices and illustrations. Build derives discountPercent and strips private references.
+// Private authoring catalogue. Confirm each listing is non-electric before setting nonElectric to true.
+// Use supplierCode only for private references. Prices and illustrations below are samples.
 module.exports = [
+  {
+    "id": "SB-PARTNER-109",
+    "titleEn": "Neatuals wide-tooth neem wood comb",
+    "titleBn": "নিম কাঠের চওড়া দাঁতের চিরুনি",
+    "category": "Beauty & Health",
+    "subcategory": "",
+    "nonElectric": true,
+    "platform": "Flipkart",
+    "fulfillmentMode": "affiliate_redirect",
+    "sellingPrice": 267,
+    "mrp": 499,
+    "images": [
+      "/public/images/partner-goods.svg#comb"
+    ],
+    "externalUrl": "https://www.flipkart.com/neatuals-neem-wood-wide-tooth-comb/p/itmbdf6387c5e8a1",
+    "supplierCode": "",
+    "deliveryBadge": "🚚 3–5 Days Delivery in Rampurhat",
+    "codAvailable": false,
+    "inStock": true,
+    "featured": true,
+    "tags": [
+      "hair care",
+      "grooming",
+      "চুল",
+      "রূপচর্চা"
+    ],
+    "sample": true
+  },
+  {
+    "id": "SB-PARTNER-110",
+    "titleEn": "Cotton face towels, set of two",
+    "titleBn": "সুতির মুখ মোছার তোয়ালে, দুইটির সেট",
+    "category": "Beauty & Health",
+    "subcategory": "",
+    "nonElectric": true,
+    "platform": "Meesho",
+    "fulfillmentMode": "whatsapp_cod",
+    "sellingPrice": 149,
+    "mrp": 249,
+    "images": [
+      "/public/images/partner-goods.svg#towels"
+    ],
+    "externalUrl": "",
+    "supplierCode": "",
+    "deliveryBadge": "🚚 3–5 Days Delivery in Rampurhat",
+    "codAvailable": true,
+    "inStock": true,
+    "featured": false,
+    "tags": [
+      "washcloth",
+      "personal care",
+      "তোয়ালে",
+      "মুখ"
+    ],
+    "sample": true
+  },
   {
     "id": "SB-PARTNER-101",
     "titleEn": "Pigeon pull-cord vegetable chopper, 400 ml",
     "titleBn": "পিজন সবজি কাটার চপার, ৪০০ মিলি",
-    "category": "Kitchen & Home",
+    "category": "Home & Kitchen",
+    "subcategory": "",
+    "nonElectric": true,
     "platform": "Amazon",
     "fulfillmentMode": "affiliate_redirect",
     "sellingPrice": 249,
@@ -30,7 +88,9 @@ module.exports = [
     "id": "SB-PARTNER-102",
     "titleEn": "Milton airtight pantry jar, 3 L",
     "titleBn": "মিল্টন বায়ুরোধী মশলার জার, ৩ লিটার",
-    "category": "Kitchen & Home",
+    "category": "Home & Kitchen",
+    "subcategory": "",
+    "nonElectric": true,
     "platform": "Amazon",
     "fulfillmentMode": "affiliate_redirect",
     "sellingPrice": 199,
@@ -52,110 +112,12 @@ module.exports = [
     "sample": true
   },
   {
-    "id": "SB-PARTNER-103",
-    "titleEn": "EKS SF-400 digital kitchen scale",
-    "titleBn": "ইকেএস ডিজিটাল রান্নাঘরের ওজন মাপার যন্ত্র",
-    "category": "Daily Electronics",
-    "platform": "Flipkart",
-    "fulfillmentMode": "affiliate_redirect",
-    "sellingPrice": 315,
-    "mrp": 599,
-    "images": [
-      "/public/images/partner-goods.svg#scale"
-    ],
-    "externalUrl": "https://www.flipkart.com/eks-sf-400-digital-kitchen-weighing-scale/p/itm42a6d50a31b42",
-    "supplierCode": "",
-    "deliveryBadge": "🚚 3–5 Days Delivery in Rampurhat",
-    "codAvailable": false,
-    "inStock": true,
-    "featured": false,
-    "tags": [
-      "weighing",
-      "battery",
-      "ওজন"
-    ],
-    "sample": true
-  },
-  {
-    "id": "SB-PARTNER-104",
-    "titleEn": "Wipro Garnet 9 W rechargeable LED bulb",
-    "titleBn": "উইপ্রো ৯ ওয়াট রিচার্জেবল এলইডি বাল্ব",
-    "category": "Daily Electronics",
-    "platform": "Flipkart",
-    "fulfillmentMode": "affiliate_redirect",
-    "sellingPrice": 399,
-    "mrp": 649,
-    "images": [
-      "/public/images/partner-goods.svg#bulb"
-    ],
-    "externalUrl": "https://www.flipkart.com/wipro-garnet-9w-inverter-led-pack-1-4-hrs-bulb-emergency-light/p/itm64c21dd6cc0e8",
-    "supplierCode": "",
-    "deliveryBadge": "🚚 3–5 Days Delivery in Rampurhat",
-    "codAvailable": false,
-    "inStock": true,
-    "featured": false,
-    "tags": [
-      "emergency",
-      "light",
-      "আলো"
-    ],
-    "sample": true
-  },
-  {
-    "id": "SB-PARTNER-105",
-    "titleEn": "Everyday cotton saree with woven border",
-    "titleBn": "পাড় দেওয়া সুতির শাড়ি",
-    "category": "Fashion & Sarees",
-    "platform": "Meesho",
-    "fulfillmentMode": "whatsapp_cod",
-    "sellingPrice": 549,
-    "mrp": 899,
-    "images": [
-      "/public/images/partner-goods.svg#saree"
-    ],
-    "externalUrl": "",
-    "supplierCode": "",
-    "deliveryBadge": "🚚 3–5 Days Delivery in Rampurhat",
-    "codAvailable": true,
-    "inStock": true,
-    "featured": true,
-    "tags": [
-      "cotton",
-      "sari",
-      "তাঁত"
-    ],
-    "sample": true
-  },
-  {
-    "id": "SB-PARTNER-106",
-    "titleEn": "Indigo block-print daily kurti",
-    "titleBn": "নীল ছাপা সুতির কুর্তি",
-    "category": "Fashion & Sarees",
-    "platform": "Meesho",
-    "fulfillmentMode": "whatsapp_cod",
-    "sellingPrice": 349,
-    "mrp": 599,
-    "images": [
-      "/public/images/partner-goods.svg#kurti"
-    ],
-    "externalUrl": "",
-    "supplierCode": "",
-    "deliveryBadge": "🚚 3–5 Days Delivery in Rampurhat",
-    "codAvailable": true,
-    "inStock": true,
-    "featured": false,
-    "tags": [
-      "kurta",
-      "indigo",
-      "পোশাক"
-    ],
-    "sample": true
-  },
-  {
     "id": "SB-PARTNER-107",
     "titleEn": "Brass puja diya pair",
     "titleBn": "পিতলের পুজোর প্রদীপ জোড়া",
-    "category": "Home & Puja Essentials",
+    "category": "Home & Kitchen",
+    "subcategory": "",
+    "nonElectric": true,
     "platform": "Meesho",
     "fulfillmentMode": "whatsapp_cod",
     "sellingPrice": 179,
@@ -180,7 +142,9 @@ module.exports = [
     "id": "SB-PARTNER-108",
     "titleEn": "Two-tier countertop organizer rack",
     "titleBn": "দুই তাকের ঘর গোছানোর র‍্যাক",
-    "category": "Home & Puja Essentials",
+    "category": "Home & Kitchen",
+    "subcategory": "",
+    "nonElectric": true,
     "platform": "Meesho",
     "fulfillmentMode": "whatsapp_cod",
     "sellingPrice": 299,
@@ -198,6 +162,65 @@ module.exports = [
       "shelf",
       "organiser",
       "তাক"
+    ],
+    "sample": true
+  },
+  {
+    "id": "SB-PARTNER-111",
+    "titleEn": "BQH adjustable skipping rope",
+    "titleBn": "ব্যায়ামের জন্য দৈর্ঘ্য বদলানো যায় এমন স্কিপিং রোপ",
+    "category": "Other Everyday Items",
+    "subcategory": "Sports & Fitness",
+    "nonElectric": true,
+    "platform": "Flipkart",
+    "fulfillmentMode": "affiliate_redirect",
+    "sellingPrice": 106,
+    "mrp": 249,
+    "images": [
+      "/public/images/partner-goods.svg#rope"
+    ],
+    "externalUrl": "https://www.flipkart.com/bqh-skipping-rope-men-gym-women-kids-adjustable-jump-freestyle/p/itm9df14e1a468e8",
+    "supplierCode": "",
+    "deliveryBadge": "🚚 3–5 Days Delivery in Rampurhat",
+    "codAvailable": false,
+    "inStock": true,
+    "featured": true,
+    "tags": [
+      "jump rope",
+      "exercise",
+      "sports",
+      "খেলাধুলা",
+      "ব্যায়াম",
+      "দড়ি"
+    ],
+    "sample": true
+  },
+  {
+    "id": "SB-PARTNER-112",
+    "titleEn": "Kenware steel hand trowel, 30 cm",
+    "titleBn": "বাগানের মাটি খোঁড়ার হাত খুরপি, ৩০ সেমি",
+    "category": "Other Everyday Items",
+    "subcategory": "Gardening",
+    "nonElectric": true,
+    "platform": "Flipkart",
+    "fulfillmentMode": "affiliate_redirect",
+    "sellingPrice": 167,
+    "mrp": 299,
+    "images": [
+      "/public/images/partner-goods.svg#trowel"
+    ],
+    "externalUrl": "https://www.flipkart.com/kenware-hand-gardening-throwel-digging-transplant-trowel-30-cm-30-cm-garden/p/itm5d87921095839",
+    "supplierCode": "",
+    "deliveryBadge": "🚚 3–5 Days Delivery in Rampurhat",
+    "codAvailable": false,
+    "inStock": true,
+    "featured": false,
+    "tags": [
+      "planting",
+      "hand tools",
+      "garden",
+      "বাগান",
+      "খুরপি"
     ],
     "sample": true
   }

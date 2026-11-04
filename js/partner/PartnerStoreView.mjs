@@ -1,4 +1,4 @@
-import { categories, DRAFT_KEY, filterCatalog, PLATFORMS, publicProduct, readDrafts, withDrafts } from './catalog.mjs';
+import { categories, EVERYDAY, everydayGroups, filterCatalog, PLATFORMS, publicProduct, readDrafts, saveLocalDraft, withDrafts } from './catalog.mjs';
 import { PartnerProductCard } from './PartnerProductCard.mjs';
 import { PartnerOrderModal } from './PartnerOrderModal.mjs';
 import { QuickAdminGenerator } from './QuickAdminGenerator.mjs';
@@ -8,7 +8,8 @@ export async function PartnerStoreView(panel, admin, storage) {
   if (!response.ok) throw new Error('Catalogue unavailable');
   const snapshot = await response.json();
   snapshot.products = snapshot.products.map(publicProduct);
-  const filters = { category: '', platform: '', search: '', sort: 'featured' };
+  const defaults = { category: '', subcategory: '', platform: '', search: '', sort: 'featured' };
+  const filters = { ...defaults };
   const openOrder = PartnerOrderModal();
   panel.innerHTML = `<div class="container ps-content">
     <div class="ps-notice"><span aria-hidden="true">✦</span><div><strong>✨ Sokal Bela Partner Store</strong>
@@ -19,6 +20,7 @@ export async function PartnerStoreView(panel, admin, storage) {
       <div class="ps-input-row"><label>Search / খুঁজুন<input type="search" class="ps-search" placeholder="Search products, categories or tags"></label>
         <label>Sort by<select class="ps-sort"><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="discount">Biggest Discount (%)</option></select></label></div>
       <div class="ps-group" role="group" aria-label="Categories"><span>Category</span><div class="ps-pills ps-category"></div></div>
+      <div class="ps-group ps-everyday" role="group" aria-label="Other Everyday Items groups" hidden><span>Browse</span><div class="ps-pills ps-subcategory"></div></div>
       <div class="ps-group" role="group" aria-label="Platforms"><span>Platform</span><div class="ps-pills ps-platforms"></div></div>
     </div>
     <p class="ps-results" role="status"></p><div class="ps-grid"></div>
@@ -26,7 +28,7 @@ export async function PartnerStoreView(panel, admin, storage) {
   </div>`;
   const search = panel.querySelector('.ps-search'), sort = panel.querySelector('.ps-sort');
   const results = panel.querySelector('.ps-results'), grid = panel.querySelector('.ps-grid');
-  const empty = panel.querySelector('.ps-empty');
+  const empty = panel.querySelector('.ps-empty'), everyday = panel.querySelector('.ps-everyday');
   const getDrafts = () => readDrafts(storage);
   let products;
   function renderList() {
@@ -43,19 +45,30 @@ export async function PartnerStoreView(panel, admin, storage) {
       button.setAttribute('aria-pressed', String(filters[field] === value));
       button.onclick = () => {
         filters[field] = value;
+        if (field === 'category') {
+          filters.subcategory = '';
+          renderGroups();
+        }
         for (const el of wrapper.children) el.setAttribute('aria-pressed', String(el === button));
         renderList();
       };
       return button;
     }));
   }
+  function renderGroups() {
+    everyday.hidden = filters.category !== EVERYDAY;
+    if (!everyday.hidden) {
+      pills('.ps-subcategory', [['', 'All everyday items'], ...everydayGroups(products).map(value => [value, value])], 'subcategory');
+    }
+  }
   function refresh(reset = false) {
     products = withDrafts(snapshot.products, getDrafts().map(publicProduct));
     if (reset) {
-      Object.assign(filters, { category: '', platform: '', search: '', sort: 'featured' });
+      Object.assign(filters, defaults);
       search.value = ''; sort.value = 'featured';
     }
     pills('.ps-category', [['', 'All'], ...categories(products).map(value => [value, value])], 'category');
+    renderGroups();
     pills('.ps-platforms', [['', 'All Platforms'], ...Object.entries(PLATFORMS)], 'platform');
     renderList();
   }
@@ -66,9 +79,8 @@ export async function PartnerStoreView(panel, admin, storage) {
   if (admin) {
     const button = panel.querySelector('.ps-open-admin');
     button.hidden = false;
-    button.onclick = QuickAdminGenerator(snapshot, getDrafts, product => {
-      const drafts = withDrafts(getDrafts(), [product]);
-      try { storage.setItem(DRAFT_KEY, JSON.stringify(drafts)); }
+    button.onclick = QuickAdminGenerator(snapshot, storage, product => {
+      try { saveLocalDraft(storage, product); }
       catch { throw new Error('Browser storage is unavailable. Use Copy Updated partnerProducts.js Code to keep this product.'); }
       refresh(true);
       results.textContent += ' · Preview added on this device: ' + product.titleEn;
