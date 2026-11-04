@@ -1,7 +1,8 @@
 import { FALLBACK_IMAGE } from './catalog.mjs';
-import { rupees, whatsappUrl } from './PartnerOrderModal.mjs';
+import { rupees } from './PartnerOrderModal.mjs';
+import { whatsappUrl } from '../../config/contact.mjs';
 
-export function PartnerProductCard(product, openOrder, digits) {
+export function PartnerProductCard(product, openOrder) {
   const card = document.createElement('article');
   card.className = 'ps-card';
   card.dataset.productId = product.id;
@@ -42,7 +43,7 @@ export function PartnerProductCard(product, openOrder, digits) {
     const help = document.createElement('a');
     help.className = 'ps-btn ps-outline'; help.target = '_blank'; help.rel = 'noopener noreferrer';
     help.textContent = 'Need COD Help? Order via Sokal Bela WhatsApp';
-    help.href = whatsappUrl(digits, '🛍️ Partner Store · COD assistance\n' + product.titleEn + ' (' + product.titleBn + ')\n' +
+    help.href = whatsappUrl('🛍️ Partner Store · COD assistance\n' + product.titleEn + ' (' + product.titleBn + ')\n' +
       product.id + ' | ' + product.platform + '\n' + product.externalUrl +
       '\nCan you help me order this to Rampurhat (731224)? Please confirm COD, price, shipping and delivery.');
     actions.append(buy, help);

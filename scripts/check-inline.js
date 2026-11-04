@@ -12,8 +12,7 @@ const checks = [
   [!html.includes('data-page="admin"'), 'Public navigation cannot link to the admin portal'],
   [!html.includes('id="admin-page"'), 'Public HTML cannot bundle admin page'],
   [!html.includes('admin123'), 'No demo credentials in the storefront'],
-  [!html.includes('7001867903'), 'Old phone number absent from public HTML'],
-  [html.includes('config/contact.js'), 'Shared contact configuration imported'],
+  [html.includes('type="module" src="/config/contact.mjs"'), 'Shared contact configuration imported'],
   [html.includes('signInWithEmailAndPassword') && !html.includes('auth-tab-phone'), 'Password login present without phone OTP'],
   [html.includes('id="featured-grid"') && html.includes('id="baskets-grid"'), 'Featured produce and baskets present']
 ];
@@ -36,8 +35,11 @@ const scan = dir => {
     if (ent.isDirectory()) { if (!skipDirs.has(ent.name)) scan(require('node:path').join(dir,ent.name)); continue; }
     if (!/\.(?:m?js|html|css|json|md|xml|txt|yml|rules)$/.test(ent.name) || ['package-lock.json','check-inline.js'].includes(ent.name)) continue;
     const path = require('node:path').join(dir, ent.name);
-    if (/700[\s.-]*186[\s.-]*7903|917001867903/.test(fs.readFileSync(path,'utf8')))
-      throw new Error('Old contact number remains in '+path);
+    const source = fs.readFileSync(path, 'utf8');
+    if (ent.name.endsWith('.html') && source.includes('data-contact-') && !source.includes('type="module" src="/config/contact.mjs"'))
+      throw new Error('Contact controls need the shared contact module in ' + path);
+    if (/(?:wa\.me\/|(?:api|web)\.whatsapp\.com\/send\?phone=|tel:)\+?\d|\+91[ -]?[6-9](?:[ -]?\d){9}\b/i.test(source))
+      throw new Error('Use the shared contact config for business phone numbers in ' + path);
   }
 };
 scan('.');

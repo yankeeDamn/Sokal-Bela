@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
+import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import vm from 'node:vm';
 import { storeAccess } from '../config/commerce.mjs';
 import { affiliateUrl, categories, DRAFT_KEY, FALLBACK_IMAGE, filterCatalog, normalizeProduct, publicCatalog, readAuthorFile, readDrafts, sourceCode, withDrafts } from '../js/partner/catalog.mjs';
-import { orderMessage, whatsappUrl } from '../js/partner/PartnerOrderModal.mjs';
+import { orderMessage } from '../js/partner/PartnerOrderModal.mjs';
 import raw from '../src/data/partnerProducts.js';
-import contact from '../config/contact.js';
+import { SOKAL_BELA_PHONE, SOKAL_BELA_WHATSAPP, whatsappUrl } from '../config/contact.mjs';
 
 const rows = raw.map(normalizeProduct);
 const cod = rows.find(p => p.platform === 'Meesho');
@@ -66,8 +67,10 @@ test('validated links, stocks and prices guard each fulfilment path', () => {
 test('WhatsApp order draft is encoded, has no vegetable minimum, and requires a valid address and quantity', () => {
   const small = { ...cod, sellingPrice: 79 };
   const text = orderMessage(small, data);
-  const url = new URL(whatsappUrl(contact.whatsappDigits, text));
-  assert.equal(url.pathname, '/917551858583');
+  const url = new URL(whatsappUrl(text));
+  assert.equal(url.origin, 'https://wa.me');
+  assert.equal(url.pathname, '/' + SOKAL_BELA_WHATSAPP);
+  assert.equal(SOKAL_BELA_WHATSAPP, '91' + SOKAL_BELA_PHONE);
   assert.equal(url.searchParams.get('text'), text);
   for (const part of [small.titleEn, small.titleBn, small.id, 'Meesho', '₹79', '₹158', 'Cash on Delivery', 'Qty:* 2', data.address, data.name, data.phone, 'Rampurhat (731224)', '3–5 Days'])
     assert.ok(text.includes(part), part);
@@ -107,12 +110,18 @@ test('authoring export round-trips private refs without putting them in the publ
 test('the production builder excludes the private authoring file and emits a shopper-only snapshot', t => {
   const dir = mkdtempSync(join(tmpdir(), 'sokal-partner-build-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
-  for (const path of ['public', 'src/data', 'js/partner']) mkdirSync(join(dir, path), { recursive: true });
-  for (const path of ['build.js','js/partner/catalog.mjs'])
+  for (const path of ['public/images', 'src/data', 'js/partner', 'config', 'scripts']) mkdirSync(join(dir, path), { recursive: true });
+  for (const path of ['build.js', 'js/partner/catalog.mjs', 'scripts/render-share-card.js', 'config/contact.mjs',
+    ...['tomato','brinjal','carrot','cauliflower'].map(veg => 'public/images/' + veg + '.svg')])
     cpSync(new URL('../' + path, import.meta.url), join(dir, path));
-  writeFileSync(join(dir, 'index.html'), '<!doctype html>');
+  writeFileSync(join(dir, 'index.html'), '<meta property="og:image" content="/public/images/og-cover.png">');
   writeFileSync(join(dir, 'src/data/partnerProducts.js'), sourceCode([{ ...cod, supplierCode: 'test-private-code-012' }]));
-  execFileSync(process.execPath, ['build.js'], { cwd: dir });
+  execFileSync(process.execPath, ['build.js'], {
+    cwd: dir, env: { ...process.env, NODE_PATH: fileURLToPath(new URL('../node_modules', import.meta.url)) }
+  });
+  const cover = readFileSync(join(dir, 'dist/public/images/og-cover.png'));
+  assert.deepEqual([cover.readUInt32BE(16), cover.readUInt32BE(20)], [1200, 630]);
+  assert.ok(readFileSync(join(dir, 'dist/index.html'), 'utf8').includes('og-cover.png?v=' + SOKAL_BELA_PHONE));
   assert.equal(existsSync(join(dir, 'dist/src')), false);
   const artifact = readFileSync(join(dir, 'dist/public/partner-catalog.json'), 'utf8');
   assert.ok(!artifact.includes('test-private-code-012'));

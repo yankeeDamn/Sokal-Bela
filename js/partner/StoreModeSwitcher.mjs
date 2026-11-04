@@ -24,7 +24,7 @@ export function StoreModeSwitcher() {
       '<div class="ps-skeleton"></div>'.repeat(4) + '</div></div>';
     try {
       const { PartnerStoreView } = await import('./PartnerStoreView.mjs');
-      const openGenerator = await PartnerStoreView(partner, access.admin, storage, window.SOKAL_CONTACT.whatsappDigits);
+      const openGenerator = await PartnerStoreView(partner, access.admin, storage);
       if (pendingAdmin && !partner.hidden) { pendingAdmin = false; openGenerator?.(); }
     } catch {
       loaded = null;

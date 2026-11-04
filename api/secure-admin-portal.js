@@ -1,7 +1,7 @@
 'use strict';
 const crypto = require('node:crypto');
 const gate = require('../lib/server-auth');
-const contact = require('../config/contact');
+const contact = require('../config/contact.mjs').default;
 
 module.exports = async function handler(req, res) {
   gate.setHeaders(res);

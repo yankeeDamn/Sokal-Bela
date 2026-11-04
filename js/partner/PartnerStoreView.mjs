@@ -3,13 +3,13 @@ import { PartnerProductCard } from './PartnerProductCard.mjs';
 import { PartnerOrderModal } from './PartnerOrderModal.mjs';
 import { QuickAdminGenerator } from './QuickAdminGenerator.mjs';
 
-export async function PartnerStoreView(panel, admin, storage, digits) {
+export async function PartnerStoreView(panel, admin, storage) {
   const response = await fetch('/public/partner-catalog.json', { cache: 'no-cache' });
   if (!response.ok) throw new Error('Catalogue unavailable');
   const snapshot = await response.json();
   snapshot.products = snapshot.products.map(publicProduct);
   const filters = { category: '', platform: '', search: '', sort: 'featured' };
-  const openOrder = PartnerOrderModal(digits);
+  const openOrder = PartnerOrderModal();
   panel.innerHTML = `<div class="container ps-content">
     <div class="ps-notice"><span aria-hidden="true">✦</span><div><strong>✨ Sokal Bela Partner Store</strong>
       <p>Handpicked deals from Amazon, Flipkart &amp; Meesho. Estimated delivery in 3–5 days across Rampurhat (731224). No ₹200 minimum cart restriction!</p>
@@ -31,7 +31,7 @@ export async function PartnerStoreView(panel, admin, storage, digits) {
   let products;
   function renderList() {
     const items = filterCatalog(products, filters);
-    grid.replaceChildren(...items.map(item => PartnerProductCard(item, openOrder, digits)));
+    grid.replaceChildren(...items.map(item => PartnerProductCard(item, openOrder)));
     results.textContent = items.length + (items.length === 1 ? ' product' : ' products');
     empty.hidden = items.length > 0;
   }
