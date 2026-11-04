@@ -82,6 +82,7 @@
 .ps-detail,.ps-total {font-weight:650;color:var(--ps-forest)}
 .ps-total {background:var(--ps-mint);border-radius:8px;padding:9px 12px}
 .ps-form p {margin:0}
+.ps-form .ps-power-check {display:flex;align-items:center;gap:8px}
 .ps-checks {display:flex;gap:12px;flex-wrap:wrap}
 .ps-checks label {display:flex;align-items:center;gap:5px}
 .ps-error {color:#9e2522;font-weight:600}

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import vm from 'node:vm';
 import { storeAccess } from '../config/commerce.mjs';
-import { affiliateUrl, categories, DRAFT_KEY, FALLBACK_IMAGE, filterCatalog, normalizeProduct, publicCatalog, readAuthorFile, readDrafts, sourceCode, withDrafts } from '../js/partner/catalog.mjs';
+import { affiliateUrl, categories, DRAFT_KEY, EVERYDAY, everydayGroups, FALLBACK_IMAGE, filterCatalog, normalizeProduct, publicCatalog, readAuthorFile, readDrafts, saveLocalDraft, sourceCode, unreviewedDrafts, withDrafts } from '../js/partner/catalog.mjs';
 import { orderMessage } from '../js/partner/PartnerOrderModal.mjs';
 import raw from '../src/data/partnerProducts.js';
 import { SOKAL_BELA_PHONE, SOKAL_BELA_WHATSAPP, whatsappUrl } from '../config/contact.mjs';
@@ -36,20 +36,57 @@ test('preview is opt-in, persists per device, can be relocked, and works without
 });
 
 test('catalogue derives discounts, unique categories, sorts and bilingual search', () => {
-  assert.equal(rows.length, 8); assert.equal(categories(rows).length, 4);
+  assert.equal(rows.length, 8);
+  assert.deepEqual(categories(rows), ['Beauty & Health', 'Home & Kitchen', 'Other Everyday Items']);
+  assert.deepEqual(everydayGroups(rows), ['Sports & Fitness', 'Gardening']);
   assert.equal(new Set(rows.map(p => p.platform)).size, 3);
-  const newProduct = normalizeProduct({ ...cod, id: 'SB-NEW', category: 'Books', tags: ['শিক্ষা'], featured: true, images: [] });
+  assert.ok(rows.every(p => p.nonElectric === true));
+  const newProduct = normalizeProduct({ ...cod, id: 'SB-NEW', category: EVERYDAY, subcategory: 'Gardening', tags: ['মাটি'], featured: true, images: [] });
   assert.deepEqual(newProduct.images, [FALLBACK_IMAGE]);
   const catalogue = [...rows, newProduct];
-  assert.ok(categories(catalogue).includes('Books'));
-  for (const search of ['শিক্ষা', 'books']) assert.equal(filterCatalog(catalogue, { search })[0].id, 'SB-NEW');
+  assert.ok(filterCatalog(catalogue, { search: 'মাটি' }).some(p => p.id === 'SB-NEW'));
+  for (const group of everydayGroups(rows)) {
+    const found = filterCatalog(catalogue, { category: EVERYDAY, subcategory: group });
+    assert.ok(found.length && found.every(p => p.category === EVERYDAY && p.subcategory === group));
+    assert.equal(filterCatalog(catalogue, { search: group.toLowerCase() }).length, found.length);
+  }
   assert.ok(filterCatalog(rows, { search: retail.titleBn, platform: 'Amazon' }).some(p => p.id === retail.id));
-  assert.equal(filterCatalog(rows, { platform: 'Meesho', category: 'Daily Electronics' }).length, 0);
+  assert.equal(filterCatalog(rows, { category: EVERYDAY, subcategory: 'Gardening', platform: 'Amazon' }).length, 0);
   for (const [sort, field, direction] of [['low','sellingPrice',1], ['high','sellingPrice',-1], ['discount','discountPercent',-1], ['featured','featured',-1]]) {
     const items = filterCatalog(rows,{ sort });
     assert.ok(items.every((p,i) => !i || (p[field] - items[i-1][field]) * direction >= 0));
   }
   assert.equal(normalizeProduct({ ...cod, sellingPrice: 250, mrp: 500, discountPercent: 2 }).discountPercent, 50);
+});
+
+test('build, export and local previews enforce the non-electric assortment', () => {
+  for (const bad of [
+    { category: 'Daily Electronics' }, { category: 'Fashion & Sarees' }, { nonElectric: false },
+    { nonElectric: undefined }, { category: EVERYDAY, subcategory: '' }, { category: EVERYDAY, subcategory: 'Electronics' },
+    { titleEn: 'Electric kitchen kettle' }, { titleBn: 'ব্যাটারিচালিত পাম্প' },
+    { titleEn: 'USB-powered desk fan' }, { tags: ['rechargeable'] }
+  ]) {
+    const row = { ...cod, ...bad };
+    assert.throws(() => publicCatalog([row]));
+    assert.throws(() => sourceCode([row]));
+    assert.throws(() => saveLocalDraft(memoryStorage(), row));
+  }
+  assert.doesNotThrow(() => normalizeProduct({ ...cod, titleEn: 'Non-electric battery-free manual chopper' }));
+  assert.throws(() => orderMessage({ ...cod, nonElectric: false }, data));
+});
+
+test('older device drafts stay off the storefront and keep private details until individually reviewed', () => {
+  const storage = memoryStorage();
+  const older = { ...retail, id: 'saved-manual', category: 'Kitchen & Home', nonElectric: undefined, supplierCode: 'mine' };
+  const oldScale = { ...retail, id: 'saved-scale', titleEn: 'Digital kitchen scale', category: 'Daily Electronics', nonElectric: undefined };
+  storage.setItem(DRAFT_KEY, JSON.stringify([older, oldScale]));
+  assert.deepEqual(readDrafts(storage), []);
+  saveLocalDraft(storage, { ...cod, id: 'new-manual' });
+  assert.deepEqual(unreviewedDrafts(storage).map(p => p.id), ['saved-manual','saved-scale']);
+  saveLocalDraft(storage, { ...older, category: 'Home & Kitchen', nonElectric: true });
+  assert.equal(readDrafts(storage).find(p => p.id === older.id).supplierCode, 'mine');
+  assert.deepEqual(unreviewedDrafts(storage).map(p => p.id), ['saved-scale']);
+  assert.ok(!sourceCode(readDrafts(storage)).includes('saved-scale'));
 });
 
 test('validated links, stocks and prices guard each fulfilment path', () => {
