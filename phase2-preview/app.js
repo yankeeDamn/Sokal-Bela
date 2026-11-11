@@ -7,7 +7,7 @@ const BASKETS=[
  {name:'Salad Pack · সালাদ',items:[['Cucumber',1],['Carrot',1],['Tomato',1]]}
 ];
 const BASE='/api/v2',KEY='sokal-bela-pg-cart-v1', $=id=>document.getElementById(id);
-let products=[],cart=[],category='All',shop={shopPhone:'',minOrder:300,freeDeliveryMin:500,radiusKm:5,deliveryFee:0,deliveryPincodes:['731224']};
+let products=[],cart=[],category='All',settingsReady=false,shop={shopPhone:'',minOrder:0,freeDeliveryMin:1,radiusKm:0,deliveryFee:0,deliveryPincodes:[]};
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const wa=text=>'https://wa.me/'+'91'+String(shop.shopPhone).replace(/\D/g,'')+'?text='+encodeURIComponent(text);
@@ -100,13 +100,14 @@ function renderCart(){
  $('cart-lines').innerHTML=rows.length?rows.map(x=>'<div class="cart-line"><div><strong>'+escapeHtml(x.product.name_en)+' · '+escapeHtml(x.product.name_bn)+'</strong><small>'+money(x.product.price)+' / '+escapeHtml(x.product.unit)+'</small><button type="button" class="text-button" data-remove="'+x.id+'">Remove</button></div><input type="number" min="0" max="50" value="'+x.qty+'" aria-label="Quantity" data-line="'+x.id+'"><strong>'+money(x.product.price*x.qty)+'</strong></div>').join(''):'<p>Your cart is empty.</p>';
  $('subtotal').textContent=money(subtotal);$('delivery-fee').textContent=money(rows.length?fee:0);$('grand-total').textContent=money(rows.length?subtotal+fee:0);
  $('free-progress').max=shop.freeDeliveryMin;$('free-progress').value=Math.min(subtotal,shop.freeDeliveryMin);
- $('progress-msg').textContent=subtotal<shop.minOrder?'Add '+money(shop.minOrder-subtotal)+' for the minimum order.':
+ $('progress-msg').textContent=!settingsReady?'Store settings are loading…':subtotal<shop.minOrder?'Add '+money(shop.minOrder-subtotal)+' for the minimum order.':
  subtotal<shop.freeDeliveryMin?'Minimum reached! Add '+money(shop.freeDeliveryMin-subtotal)+' for free delivery within '+shop.radiusKm+' km.':'Free delivery threshold reached (within '+shop.radiusKm+' km).';
- $('checkout-go').disabled=!rows.length||subtotal<shop.minOrder;
- $('checkout-policy').textContent='Minimum '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km. Cash or UPI on delivery.';
+ $('checkout-go').disabled=!settingsReady||!rows.length||subtotal<shop.minOrder;
+ $('checkout-policy').textContent=settingsReady?'Minimum '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km. Cash or UPI on delivery.':'Loading store settings…';
 }
 async function checkout(event){
  event.preventDefault();
+ if(!settingsReady)return flash('Shop settings unavailable. Checkout is disabled.',true);
  const btn=$('place-order'),values=Object.fromEntries(new FormData(event.currentTarget));
  values.items=cart.map(x=>({productId:x.id,qty:x.qty}));
  btn.disabled=true;btn.textContent='Saving order…';
@@ -127,7 +128,8 @@ async function lookup(event){
  catch(e){$('lookup-result').textContent=e.message;}
 }
 async function enquiry(event){
- event.preventDefault();const form=event.currentTarget,values=Object.fromEntries(new FormData(form));
+ event.preventDefault();
+ if(!settingsReady)return flash('Shop settings unavailable. Please retry later.',true);const form=event.currentTarget,values=Object.fromEntries(new FormData(form));
  values.items=[];const button=form.querySelector('button[type=submit]');button.disabled=true;
  try{
   const r=await api('/requests',{method:'POST',body:JSON.stringify(values)});
@@ -154,8 +156,14 @@ async function start(){
  $('lookup-form').addEventListener('submit',lookup);
  $('request-form').addEventListener('submit',enquiry);
  try{
-  const d=await api('/settings');shop={...shop,...d.settings};
-  $('banner').textContent='🚚 Min '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km · 7 AM–9 PM';
+  const d=await api('/settings');shop={...shop,...d.settings};settingsReady=true;
+  const formatTime=value=>{
+   const [h,m]=String(value||'').split(':').map(Number);
+   if(!Number.isInteger(h)||h<0||h>23)return '?';
+   return ((h%12)||12)+(m?':'+String(m).padStart(2,'0'):'')+(h>=12?' PM':' AM');
+  };
+  const hours=shop.shopHours?formatTime(shop.shopHours.open)+'–'+formatTime(shop.shopHours.close):'';
+  $('banner').textContent='🚚 Min '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km'+(hours?' · '+hours:'');
   $('floating-whatsapp').href=wa('Hello Sokal Bela, I would like to order vegetables.');renderCart();
  }catch(e){flash('Settings: '+e.message,true);$('banner').textContent='Store temporarily unavailable';}
  try{await refresh();}catch(e){$('product-grid').textContent='Could not load vegetables: '+e.message;flash(e.message,true);}
