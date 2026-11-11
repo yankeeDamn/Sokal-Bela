@@ -20,9 +20,9 @@ module.exports=async(req,res)=>{
    basket.set(id,(basket.get(id)||0)+item.qty);
    if(basket.get(id)>50)throw c.bad('Maximum 50 units per product.');
   }
+  await c.enforceLimit(req,'orders',5,15);
   client=await c.db().connect();
   await client.query('BEGIN');
-  await c.limit(client,req,'orders',5,15);
   const s=await c.settings(client);
   if(s.deliveryPincodes.length&&!s.deliveryPincodes.includes(pincode))throw c.bad('Delivery is not available for this pincode. Please call or WhatsApp us.','OUTSIDE_DELIVERY_AREA',422);
   const ids=[...basket.keys()].sort((a,b)=>BigInt(a)<BigInt(b)?-1:BigInt(a)>BigInt(b)?1:0);
