@@ -1,0 +1,83 @@
+name: Phase 2 PostgreSQL API and mobile preview
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  api-and-preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: sokal_phase2_test
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sokal_phase2_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgres://postgres@127.0.0.1:5432/sokal_phase2_test
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+      PGDATABASE: sokal_phase2_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install PostgreSQL client and app dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+          npm install --no-package-lock
+      - name: JavaScript syntax checks
+        run: |
+          node --check lib/neon-core.js
+          for f in api/v2/*.js; do node --check "$f"; done
+          node --check phase2-preview/app.js
+          node --check tests/neon-phase2.test.cjs
+      - name: Apply schema, starter records and Phase 2 rate limit
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -f db/schema.sql
+          psql -X -v ON_ERROR_STOP=1 -f db/seed.sql
+          psql -X -v ON_ERROR_STOP=1 -f db/phase2.sql
+      - name: Real PostgreSQL API and transaction tests
+        run: node --test --test-concurrency=1 tests/neon-phase2.test.cjs
+      - name: Existing storefront build and 390px Chrome smoke screenshot
+        run: |
+          npm run build
+          test -f dist/phase2-preview/index.html
+          test -f dist/phase2-preview/app.js
+          test -f dist/phase2-preview/style.css
+          python3 -m http.server 8787 --directory dist >/tmp/phase2-static.log 2>&1 &
+          sleep 2
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size=390,844 --force-device-scale-factor=1 --virtual-time-budget=3500 --screenshot=phase2-390px.png http://127.0.0.1:8787/phase2-preview/
+          test -s phase2-390px.png
+          python3 - <<'PY'
+          import struct
+          d=open('phase2-390px.png','rb').read(24)
+          assert d[:8]==b'\x89PNG\r\n\x1a\n'
+          w,h=struct.unpack('>II',d[16:24])
+          assert 360<=w<=420 and h>=600,(w,h)
+          print(f'Screenshot viewport: {w}x{h}')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase2-phone-screenshot-and-files
+          path: |
+            phase2-390px.png
+            phase2-preview/index.html
+            phase2-preview/style.css
+            phase2-preview/app.js
+            api/v2/
+            lib/neon-core.js
+            db/phase2.sql
+          if-no-files-found: ignore
