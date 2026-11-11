@@ -1054,6 +1054,25 @@
 ====================================================== -->
 <script>
 'use strict';
+/* ===== EDIT ME: SOKAL BELA PHASE 1 SETTINGS =====
+   Shop phone/WhatsApp: edit config/contact.mjs (single source of truth).
+   Min ₹200; free delivery ₹300+ within 5 km: edit config/contact.mjs.
+   Baskets/prices: edit BASKETS below. Delivery PIN codes: DELIVERY_PINCODES.
+   Affiliate links and prices: add/edit kitchenItems in secure admin portal.
+   No API credentials, passwords, or affiliate private tokens belong here.
+   ================================================ */
+const MIN_ORDER_AMOUNT = 200;
+const FREE_DELIVERY_MIN = 300;
+const DAIRY_WHATSAPP_NOTE = "Hello Sokal Bela! Is milk, paneer or ghee available today?";
+/* ===== EDIT ME: shop settings ===== */
+const SHOW_PRODUCT_PHOTOS = false;
+const DELIVERY_PINCODES = ["731224"];   // pincodes you deliver to; add more like "731224","731101"
+const BASKETS = [                        // change items/prices any time; leave price "" to show "confirm on WhatsApp"
+  {name:"Family Basket", note:"4–5 members, about 1 week", price:"", items:["Potato 2 kg","Onion 2 kg","Tomato 1 kg","Brinjal 1 kg","Green chilli 250 g","Seasonal vegetable 1 kg"]},
+  {name:"Small Family / Bachelor Basket", note:"1–2 members", price:"", items:["Potato 1 kg","Onion 1 kg","Tomato 500 g","Seasonal vegetable 1 kg"]},
+  {name:"Salad Pack", note:"Fresh & light", price:"", items:["Cucumber 500 g","Carrot 500 g","Tomato 500 g","Beetroot 250 g","Lemon 4 pcs"]}
+];
+
 if (typeof t !== 'function') { window.t = function (key) { return key; }; }
 
 /* ========== CONFIG ========== */
@@ -1263,24 +1282,6 @@ async function handleCatering(e){
   document.getElementById("cat-form").reset();
 }
 
-/* ===== EDIT ME: SOKAL BELA PHASE 1 SETTINGS =====
-   Shop phone/WhatsApp: edit config/contact.mjs (single source of truth).
-   Min ₹200; free delivery ₹300+ within 5 km: edit config/contact.mjs.
-   Baskets/prices: edit BASKETS below. Delivery PIN codes: DELIVERY_PINCODES.
-   Affiliate links and prices: add/edit kitchenItems in secure admin portal.
-   No API credentials, passwords, or affiliate private tokens belong here.
-   ================================================ */
-const MIN_ORDER_AMOUNT = 200;
-const FREE_DELIVERY_MIN = 300;
-const DAIRY_WHATSAPP_NOTE = "Hello Sokal Bela! Is milk, paneer or ghee available today?";
-/* ===== EDIT ME: shop settings ===== */
-const SHOW_PRODUCT_PHOTOS = false;
-const DELIVERY_PINCODES = ["731224"];   // pincodes you deliver to; add more like "731224","731101"
-const BASKETS = [                        // change items/prices any time; leave price "" to show "confirm on WhatsApp"
-  {name:"Family Basket", note:"4–5 members, about 1 week", price:"", items:["Potato 2 kg","Onion 2 kg","Tomato 1 kg","Brinjal 1 kg","Green chilli 250 g","Seasonal vegetable 1 kg"]},
-  {name:"Small Family / Bachelor Basket", note:"1–2 members", price:"", items:["Potato 1 kg","Onion 1 kg","Tomato 500 g","Seasonal vegetable 1 kg"]},
-  {name:"Salad Pack", note:"Fresh & light", price:"", items:["Cucumber 500 g","Carrot 500 g","Tomato 500 g","Beetroot 250 g","Lemon 4 pcs"]}
-];
 function renderBaskets(){
   const el=document.getElementById("baskets-grid"); if(!el) return;
   el.innerHTML=BASKETS.map((b,i)=>`<div class="basket"><h3>🧺 ${b.name}</h3><div style="font-size:13px;color:var(--text2)">${b.note}</div>
