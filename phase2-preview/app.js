@@ -10,7 +10,7 @@ const BASE='/api/v2',KEY='sokal-bela-pg-cart-v1', $=id=>document.getElementById(
 let products=[],cart=[],category='All',shop={shopPhone:'',minOrder:300,freeDeliveryMin:500,radiusKm:5,deliveryFee:0,deliveryPincodes:['731224']};
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-const wa=text=>'https://wa.me/91'+String(shop.shopPhone).replace(/\D/g,'')+'?text='+encodeURIComponent(text);
+const wa=text=>'https://wa.me/'+'91'+String(shop.shopPhone).replace(/\D/g,'')+'?text='+encodeURIComponent(text);
 function flash(message,isError=false){const el=$('flash');el.textContent=message;el.className=isError?'error':'';el.hidden=false;clearTimeout(flash.timeout);flash.timeout=setTimeout(()=>el.hidden=true,6000);}
 async function api(path,options={}){
  let response;try{response=await fetch(BASE+path,{...options,credentials:'omit',headers:options.body?{'Content-Type':'application/json'}:{}});}
