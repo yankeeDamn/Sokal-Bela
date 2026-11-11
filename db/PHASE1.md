@@ -11,7 +11,7 @@
 ## Decisions from latest instructions
 - Keep: bulk orders, catering, ready baskets, custom bucket builder. Your deletion paragraph conflicts with the feature list; **these features must survive**. They need a tiny PostgreSQL `bulk_requests` table.
 - New pricing: minimum order **₹300** and free delivery at **₹500+ within 5 km**. A test order below ₹200 must fail as a subset; also test ₹299 rejected and ₹300 accepted.
-- Latest supplied owner WhatsApp: **+91 7551858583**. Older project discussions used other numbers; confirm the number before cutover. Nothing in the live store is modified in Phase 1.
+- Owner WhatsApp: use the shared value in `config/contact.mjs`. Older project discussions used other numbers, so confirm the number before cutover. Nothing in the live store is modified in Phase 1.
 - Shop hours: **07:00–21:00 Asia/Kolkata**. Early subscription windows beginning at 06:00 are a separate morning-delivery service and should be explicitly confirmed.
 - No customer login, no Firebase, no online payment, no other sellers. Admin login uses one server-verified password hash, secure session cookie and rate limiter.
 - No external affiliate scraping; only owner-authored product details and links.
