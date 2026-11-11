@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1e5a28"><meta name="robots" content="noindex,nofollow">
+<title>Sokal Bela · PostgreSQL Preview · Rampurhat</title>
+<link rel="stylesheet" href="./style.css"></head>
+<body>
+<header class="top"><div class="top-inner">
+  <button class="brand" type="button" data-go="vegetables">🥬 <span>Sokal Bela<small>সকাল বেলা · Rampurhat</small></span></button>
+  <span class="top-note">Farm fresh · প্রতিদিন তাজা</span>
+  <button id="open-cart" class="cart-chip" type="button" data-go="cart">🛒 Cart <span id="badge">0</span></button>
+</div></header>
+<div class="delivery-banner" id="banner">Loading delivery information…</div>
+<nav class="tabs" aria-label="Shopping sections">
+<button type="button" class="tab active" data-go="vegetables">🥬 Vegetables<span lang="bn">শাকসবজি</span></button>
+<button type="button" class="tab" data-go="dairy">🥛 Dairy<span lang="bn">দুধ ও ঘি</span></button>
+<button type="button" class="tab" data-go="kitchen">🍳 Kitchen<span lang="bn">রান্নাঘর</span></button>
+</nav>
+<main id="main">
+<section id="vegetables" class="screen active">
+ <div class="hero"><p class="eyebrow">LOCAL FRESHNESS · RAMPURHAT, BIRBHUM</p><h1>Fresh vegetables, right at your door.<span lang="bn">সকালের তাজা বাজার</span></h1><p>Choose your vegetables. We confirm the order by WhatsApp or phone. Pay cash or UPI on delivery.</p>
+ <div class="hero-actions"><button data-go="products" type="button" class="button amber">Shop today's produce</button><button data-go="bulk" class="button outline" type="button">Bulk orders</button></div></div>
+ <div id="products" class="panel"><div class="section-head"><div><h2>Vegetables · শাকসবজি</h2><p>Available stock and prices from our shop database</p></div><span id="item-count" class="pill">0 items</span></div>
+  <label class="field">Search · খুঁজুন <input id="search" type="search" placeholder="Potato, আলু, category…" autocomplete="off"></label>
+  <div id="categories" class="chips" aria-label="Product categories"></div>
+  <div id="product-grid" class="grid products" aria-live="polite"><p>Loading products…</p></div>
+ </div>
+ <div class="panel split"><div><h2>🧺 Ready Baskets · তৈরি ঝুড়ি</h2><p>Choose a prepared list. Available items go into your normal cart at today's database prices.</p><div id="baskets"></div></div><div><h2>✨ Build Your Bucket · নিজের ঝুড়ি</h2><form id="bucket-form"><label class="field">Product<select id="bucket-product" required></select></label><label class="field">Quantity<input id="bucket-qty" type="number" min="1" max="50" value="1" required></label><button class="button primary" type="submit">Add to cart · যোগ করুন</button></form></div></div>
+ <div class="panel"><h2>🎉 Bulk Orders & Catering</h2><p>For events, restaurants, celebrations and gatherings. We confirm requests by WhatsApp or phone; no advance online payment.</p><div class="hero-actions"><button class="button outline" type="button" data-go="bulk">Bulk vegetable order</button><button class="button outline" type="button" data-go="catering">Catering enquiry</button></div></div>
+</section>
+<section id="dairy" class="screen panel"><h1>🥛 Dairy · দুধ, পনির ও ঘি</h1><p>The Neon database already has starter milk, paneer and ghee entries. The dairy purchase and Morning Pass subscription screens will be added in Phase 3.</p><p>No subscriptions are accepted in this preview yet.</p><button data-go="vegetables" class="button primary">Browse vegetables</button></section>
+<section id="kitchen" class="screen panel"><h1>🍳 Kitchen · রান্নাঘর</h1><p>Kitchen accessory cards and approved Amazon/Flipkart affiliate links are planned for Phase 4. Nothing is available for purchase here yet.</p><button data-go="vegetables" class="button primary">Browse vegetables</button></section>
+<section id="cart" class="screen panel"><div class="section-head"><h1>🛒 Your Cart · আপনার ঝুড়ি</h1><button type="button" class="text-button" data-go="vegetables">Continue shopping</button></div>
+ <div id="cart-lines"></div>
+ <div class="progress"><label for="free-progress">Delivery progress · ডেলিভারি</label><progress id="free-progress" max="500" value="0"></progress><p id="progress-msg"></p></div>
+ <div class="totals"><div><span>Subtotal</span><strong id="subtotal">₹0</strong></div><div><span>Delivery charge</span><strong id="delivery-fee">₹0</strong></div><div class="grand"><span>Total</span><strong id="grand-total">₹0</strong></div></div>
+ <p class="notice">No online payment. Pay cash or UPI on delivery or at the shop. Below the free-delivery threshold, any applicable fee is shown at checkout.</p>
+ <button type="button" id="checkout-go" class="button primary full" data-go="checkout">Proceed to Checkout</button>
+</section>
+<section id="checkout" class="screen panel"><button class="text-button" type="button" data-go="cart">← Back to cart</button><h1>🚚 Delivery Details · ডেলিভারি</h1><p id="checkout-policy"></p>
+ <form id="checkout-form" class="form-grid"><label class="field">Full name · নাম<input name="customerName" maxlength="120" required autocomplete="name"></label>
+ <label class="field">Phone · ফোন<input name="phone" type="tel" inputmode="numeric" maxlength="12" pattern="[6-9][0-9]{9}" placeholder="10-digit mobile" required autocomplete="tel-national"></label>
+ <label class="field wide">Address · ঠিকানা<textarea name="address" maxlength="500" rows="3" required></textarea></label>
+ <label class="field">Pincode · পিনকোড<input name="pincode" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required placeholder="731224"></label>
+ <label class="field">Delivery time · সময়<input name="deliverySlot" placeholder="Today 5–7 PM" maxlength="100" required></label>
+ <label class="field wide">Notes (optional)<textarea name="notes" maxlength="500" rows="2"></textarea></label>
+ <label class="trap" aria-hidden="true">Leave blank<input name="website" tabindex="-1" autocomplete="off"></label>
+ <div class="wide notice">We confirm availability and delivery by WhatsApp or phone. <strong>No online payment.</strong> Pay cash or UPI on delivery.</div>
+ <button type="submit" id="place-order" class="button primary wide">Confirm Order · অর্ডার করুন</button></form>
+</section>
+<section id="success" class="screen panel success"><div class="huge">✅</div><h1>Order request saved!</h1><p>Your order number:</p><div id="order-number" class="order-code"></div>
+ <p id="success-total"></p><p>Send the prepared message to Sokal Bela so we can confirm your delivery.</p>
+ <a id="send-whatsapp" class="button whats" href="#" target="_blank" rel="noopener noreferrer">Open WhatsApp confirmation</a>
+ <button type="button" data-go="lookup" class="button outline">Track order</button></section>
+<section id="lookup" class="screen panel"><h1>📦 Check Your Order</h1><form id="lookup-form" class="form-grid">
+ <label class="field">Order number<input name="order_no" required placeholder="SB-YYYYMMDD-XXXXXXXX"></label>
+ <label class="field">Phone<input name="phone" inputmode="numeric" required maxlength="10"></label>
+ <button class="button primary wide">Find order</button></form><div id="lookup-result" role="status"></div></section>
+<section id="request" class="screen panel"><button class="text-button" type="button" data-go="vegetables">← Back</button><h1 id="request-title">Bulk Orders</h1><p>We will contact you to confirm availability and pricing. No online payment.</p>
+ <form id="request-form" class="form-grid"><input type="hidden" name="type" id="request-type" value="bulk">
+ <label class="field">Contact name<input name="contactName" required maxlength="120"></label><label class="field">Phone<input name="phone" inputmode="numeric" maxlength="10" required></label>
+ <label class="field wide">Venue/address<textarea name="address" maxlength="500"></textarea></label>
+ <label class="field">Event date<input name="eventDate" type="date"></label>
+ <label class="field">Guests (optional)<input name="guestCount" type="number" min="1" max="100000"></label>
+ <label class="field wide">Products / requirements<textarea name="notes" maxlength="1000" rows="4" placeholder="Example: Potato 20 kg, onion 10 kg; delivery morning"></textarea></label>
+ <label class="trap" aria-hidden="true">Leave blank<input name="website" tabindex="-1" autocomplete="off"></label>
+ <button class="button primary wide">Send enquiry · পাঠান</button></form>
+ <div id="request-result" role="status"></div></section>
+</main>
+<div id="flash" role="status" aria-live="polite" hidden></div>
+<a class="floating-whatsapp" id="floating-whatsapp" href="https://wa.me/917551858583" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Sokal Bela">💬</a>
+<footer><div class="footer-inner"><div><strong>🥬 Sokal Bela · সকাল বেলা</strong><p>Rampurhat, Birbhum, West Bengal</p></div><div><button type="button" class="text-button" data-go="lookup">My order</button><p>Cash / UPI on delivery · No online checkout</p></div></div></footer>
+<script src="./app.js" defer></script>
+</body></html>
