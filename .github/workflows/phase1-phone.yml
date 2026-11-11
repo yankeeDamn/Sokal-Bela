@@ -1,0 +1,48 @@
+name: Phase 1 phone viewport screenshot
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  phone-viewport:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install existing dependencies
+        run: npm install --no-package-lock
+      - name: Validate storefront JavaScript and create existing static output
+        run: |
+          npm run lint
+          npm run build
+      - name: Render actual storefront in headless Chrome at phone width
+        run: |
+          python3 -m http.server 8787 --directory dist > /tmp/phase1-server.log 2>&1 &
+          sleep 2
+          CHROME="$(command -v google-chrome || command -v chromium || true)"
+          test -n "$CHROME"
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=390,844 --virtual-time-budget=7000 --screenshot=phase1-mobile.png http://127.0.0.1:8787/
+          test -s phase1-mobile.png
+          python3 - <<'PY'
+          import struct
+          with open('phase1-mobile.png','rb') as f: header=f.read(24)
+          assert header[:8]==b'\x89PNG\r\n\x1a\n', 'Screenshot invalid'
+          width,height=struct.unpack('>II',header[16:24])
+          assert 360 <= width <= 420, (width,height)
+          assert height >= 600, (width,height)
+          print(f'Phone-sized Chrome screenshot: {width}x{height}')
+          PY
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=390,844 --virtual-time-budget=7000 --dump-dom http://127.0.0.1:8787/ > phase1-rendered-dom.html
+          grep -q 'id="kitchen-page"' phase1-rendered-dom.html
+          grep -q 'id="dairy-grid"' phase1-rendered-dom.html
+          grep -q 'id="bucket-form"' phase1-rendered-dom.html
+          grep -q 'phase1-tabbar' phase1-rendered-dom.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase1-phone-screenshot
+          path: phase1-mobile.png
+          if-no-files-found: ignore
