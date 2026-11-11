@@ -1,0 +1,54 @@
+name: Phase 1 PostgreSQL schema verification
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: sokal_bela_test
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sokal_bela_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGDATABASE: sokal_bela_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+      - name: Apply schema and seed twice (idempotency)
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -f db/schema.sql
+          psql -X -v ON_ERROR_STOP=1 -f db/seed.sql
+          psql -X -v ON_ERROR_STOP=1 -f db/seed.sql
+      - name: Check counts, settings and indexes
+        run: |
+          test "$(psql -XAtc "SELECT COUNT(*) FROM products WHERE kind='vegetable'")" = "20"
+          test "$(psql -XAtc "SELECT COUNT(*) FROM products WHERE kind='dairy'")" = "6"
+          test "$(psql -XAtc "SELECT COUNT(*) FROM products WHERE active OR price<>0 OR stock<>0")" = "0"
+          test "$(psql -XAtc "SELECT value #>> '{}' FROM settings WHERE key='min_order'")" = "300"
+          test "$(psql -XAtc "SELECT value #>> '{}' FROM settings WHERE key='free_delivery_min'")" = "500"
+          test "$(psql -XAtc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('products','orders','order_items','subscriptions','subscription_items','subscription_deliveries','kitchen_items','settings','bulk_requests')")" = "9"
+          test "$(psql -XAtc "SELECT COUNT(*) FROM pg_indexes WHERE schemaname='public' AND indexname='idx_kitchen_search'")" = "1"
+      - name: Verify database rejects invalid product prices
+        run: |
+          if psql -X -v ON_ERROR_STOP=1 -c "INSERT INTO products (name_en,name_bn,kind,category,unit,price,stock) VALUES ('bad-price','bad','vegetable','test','kg',-1,0)"; then
+            echo 'Invalid negative price was accepted' >&2
+            exit 1
+          fi
