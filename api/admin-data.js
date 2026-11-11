@@ -193,7 +193,7 @@ module.exports = async function handler(req, res) {
           (imageUrl && !/^https:\/\//.test(imageUrl) && !/^\/public\/images\/[a-z0-9-]+\.svg$/.test(imageUrl)))
         return res.status(400).json({ error: 'Check bilingual names, price, stock, unit and image URL.' });
       const saved = {
-        name, bengaliName, nameEn:name, nameBn:bengaliName, price, stock, unit, imageUrl,
+        name, bengaliName, nameEn:name, nameBn:bengaliName, price, stock, unit, imageUrl, emoji:String(data.emoji || '').slice(0,8),
         description: String(data.description || '').trim().slice(0,500),
         category: String(data.category || 'Others').slice(0,80),
         active: data.active !== false, updatedAt: new Date(),
