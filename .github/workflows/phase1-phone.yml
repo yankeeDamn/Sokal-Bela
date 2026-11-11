@@ -46,3 +46,13 @@ jobs:
           name: phase1-phone-screenshot
           path: phase1-mobile.png
           if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase1-full-updated-files
+          path: |
+            index.html
+            firestore.rules
+            api/admin-data.js
+            api/secure-admin-portal.js
+          if-no-files-found: error
