@@ -82,3 +82,14 @@ test('bulk and catering requests are stored without payments',async()=>{
   assert.equal(check.rows[0].request_type,type);
  }
 });
+
+test('IP throttling counts failed attempts and blocks the sixth order',async()=>{
+ const id=await productRow('Rate Limit Test',299,30);
+ const request=mock('POST',{...customer,items:[item(id)]});
+ const codes=[];
+ for(let n=0;n<6;n++){
+  await order(request.req,request.res);
+  codes.push(request.result.status);
+ }
+ assert.deepEqual(codes,[422,422,422,422,422,429]);
+});
