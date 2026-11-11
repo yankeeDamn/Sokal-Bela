@@ -81,7 +81,7 @@ dialog{background:var(--card);color:var(--ink);border:1px solid var(--line);bord
 <div class="field"><label for="p-unit">Unit</label><select id="p-unit"><option>kg</option><option>g</option><option>litre</option><option>ml</option><option>pack</option><option>piece</option><option>bunch</option></select></div>
 <div class="field"><label for="p-category">Category</label><input id="p-category" value="Others"></div></div>
 <div class="field"><label for="p-description">Freshness description</label><textarea id="p-description"></textarea></div>
-<div class="field"><label for="p-image">Optional image URL</label><input id="p-image"></div>
+<div class="field"><label for="p-image">Optional image URL</label><input id="p-image"></div><div class="field"><label for="p-emoji">Card emoji (e.g. 🥛 🧀 🍳)</label><input id="p-emoji" maxlength="8"></div>
 <div class="form-grid"><div class="field"><label>Brand <input id="p-brand"></label></div><div class="field"><label>Pack size <input id="p-pack"></label></div>
 <div class="field"><label>Shelf life days <input id="p-shelf" type="number" min="0"></label></div><div class="field"><label>Daily stock target <input id="p-target" type="number" min="0"></label></div></div>
 <div class="field"><label>FSSAI note <input id="p-fssai"></label></div><p><label><input type="checkbox" id="p-perishable"> Perishable · daily stock reset</label></p>
@@ -252,7 +252,7 @@ async function changeOrder(row,status,note){
 }
 function editProduct(product){
   productId=product?.id||'';$('product-heading').textContent=productId?'Edit product':'Add product';
-  for(const [id,key] of [['p-name','name'],['p-bn','bengaliName'],['p-price','price'],['p-stock','stock'],['p-unit','unit'],['p-category','category'],['p-description','description'],['p-image','imageUrl']]){
+  for(const [id,key] of [['p-name','name'],['p-bn','bengaliName'],['p-price','price'],['p-stock','stock'],['p-unit','unit'],['p-category','category'],['p-description','description'],['p-image','imageUrl'],['p-emoji','emoji']]){
     $(id).value=product?.[key]??(key==='unit'?'kg':key==='category'?'Others':'');
   }
   for(const [id,key] of [['p-brand','brand'],['p-pack','packSize'],['p-shelf','shelfLifeDays'],['p-target','dailyStockTarget'],['p-fssai','fssaiNote']])$(id).value=product?.[key]??'';
@@ -263,7 +263,7 @@ $('product-cancel').addEventListener('click',()=>$('product-dialog').close());
 $('product-form').addEventListener('submit',async e=>{
   e.preventDefault();const obj={id:productId,name:$('p-name').value,bengaliName:$('p-bn').value,
     price:Number($('p-price').value),stock:Number($('p-stock').value),unit:$('p-unit').value,category:$('p-category').value,
-    description:$('p-description').value,imageUrl:$('p-image').value,active:$('p-active').checked,
+    description:$('p-description').value,imageUrl:$('p-image').value,emoji:$('p-emoji').value,active:$('p-active').checked,
     brand:$('p-brand').value,packSize:$('p-pack').value,perishable:$('p-perishable').checked,
     shelfLifeDays:$('p-shelf').value,dailyStockTarget:$('p-target').value,fssaiNote:$('p-fssai').value};
   try{await api('/api/admin-data?action=product',{method:productId?'PATCH':'POST',body:JSON.stringify(obj)});
