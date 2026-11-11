@@ -16,8 +16,8 @@ module.exports=async(req,res)=>{
   const items=Array.isArray(b.items)?b.items:[];
   if(items.length>30||JSON.stringify(items).length>5000)throw c.bad('Too many requested items.');
   const safeItems=items.map(x=>({name:c.clean(x?.name,100),qty:c.clean(String(x?.qty||''),30)})).filter(x=>x.name);
+  await c.enforceLimit(req,'requests',4,30);
   client=await c.db().connect();await client.query('BEGIN');
-  await c.limit(client,req,'requests',4,30);
   const row=await client.query("INSERT INTO bulk_requests(request_type,contact_name,phone,address,event_date,guest_count,items,notes) VALUES($1,$2,$3,$4,$5,$6,$7::jsonb,$8) RETURNING id::text",[type,name,phone,address,eventDate||null,guests,JSON.stringify(safeItems),notes]);
   await client.query('COMMIT');
   return c.respond(res,201,{ok:true,requestId:row.rows[0].id,message:'Request received. Please confirm details on WhatsApp.'});
