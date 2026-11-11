@@ -3,6 +3,14 @@ const gate = require('../lib/server-auth');
 const contact = require('../config/contact.mjs').default;
 const storePhones = { phone: contact.phone, deliveryPhone: contact.phone, paymentPhone: contact.phone };
 const STATUSES = ['Pending', 'Confirmed', 'Out for Delivery', 'Delivered', 'Cancelled'];
+const PHASE1_UNITS = ['kg','g','piece','bunch','litre','ml','pack'];
+function partnerUrl(value, store) {
+  try {
+    const u = new URL(String(value || ''));
+    const host = store === 'amazon' ? 'amazon.in' : store === 'flipkart' ? 'flipkart.com' : '';
+    return host && u.protocol === 'https:' && (u.hostname === host || u.hostname.endsWith('.' + host)) ? u.href : null;
+  } catch { return null; }
+}
 function clean(value) {
   if (value && typeof value.toDate === 'function') return value.toDate().toISOString();
   if (Array.isArray(value)) return value.map(clean);
@@ -46,9 +54,9 @@ module.exports = async function handler(req, res) {
       // Full catalogue export is available only after the existing server-side admin check.
       if (action === 'partner-catalog') return res.status(200).json({ products: require('../src/data/partnerProducts.js') });
       if (action !== 'overview') return res.status(404).json({ error: 'Not found' });
-      const [users, orders, bulk, products, payments, deliveries, logs, settings] = await Promise.all([
+      const [users, orders, bulk, products, kitchenItems, payments, deliveries, logs, settings] = await Promise.all([
         table(db, 'users'), table(db, 'orders'), table(db, 'bulkOrders'),
-        table(db, 'products'), table(db, 'payments'), table(db, 'deliveries'),
+        table(db, 'products'), table(db, 'kitchenItems'), table(db, 'payments'), table(db, 'deliveries'),
         db.collection('adminAuditLog').orderBy('at', 'desc').limit(25).get()
           .then(s => s.docs.map(d => ({ id:d.id, ...clean(d.data()) }))),
         db.collection('storeConfig').doc('main').get().then(d => d.exists ? clean(d.data()) : {})
@@ -95,8 +103,8 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({
         kpis, trends, days, status: Object.fromEntries(STATUSES.map(s =>
           [s,orders.filter(o => toStatus(o.orderStatus || o.status) === s).length])),
-        tables: {users, orders, bulk, products, payments, deliveries},
-        logs, settings: { ...settings, ...storePhones }, truncated: [users,orders,bulk,products,payments,deliveries]
+        tables: {users, orders, bulk, products, kitchenItems, payments, deliveries},
+        logs, settings: { ...settings, ...storePhones }, truncated: [users,orders,bulk,products,kitchenItems,payments,deliveries]
           .some(list => list.length === 250)
       });
     }
@@ -116,6 +124,55 @@ module.exports = async function handler(req, res) {
       await audit(db, admin, 'order.update', id);
       return res.status(200).json({ ok: true });
     }
+    
+    if (req.method === 'POST' && action === 'reset-perishable') {
+      const snaps = await db.collection('products').where('perishable','==',true).limit(250).get();
+      const batch = db.batch(); let count = 0;
+      for (const doc of snaps.docs) {
+        const p = doc.data(); const target = Number(p.dailyStockTarget);
+        if (!Number.isInteger(target) || target < 0 || target > 100000) continue;
+        batch.update(doc.ref, { stock: target, status: p.active === false ? 'inactive' : target ? 'active' : 'out_of_stock', updatedAt: new Date() });
+        count++;
+      }
+      if (count) await batch.commit();
+      await audit(db, admin, 'product.reset-daily-stock', String(count));
+      return res.status(200).json({ok:true,count, capped:snaps.size === 250});
+    }
+    if (action === 'kitchen-item' && ['POST','PATCH','DELETE'].includes(req.method)) {
+      const input = req.body || {}, id = String(input.id || '');
+      if (req.method === 'DELETE') {
+        if (!/^[a-zA-Z0-9_-]{1,100}$/.test(id)) return res.status(400).json({error:'Invalid item id'});
+        await db.collection('kitchenItems').doc(id).delete();
+        await audit(db,admin,'kitchen.delete',id);
+        return res.status(200).json({ok:true});
+      }
+      const store = String(input.store || '').toLowerCase();
+      const affiliateUrl = partnerUrl(input.affiliateUrl,store);
+      const title = String(input.title || '').trim().slice(0,100);
+      const description = String(input.description || '').trim().slice(0,400);
+      const imageUrl = String(input.imageUrl || '').trim();
+      const price = input.price === '' || input.price == null ? null : Number(input.price);
+      const sortOrder = Number(input.sortOrder ?? 0);
+      if (!title || !affiliateUrl || !['amazon','flipkart'].includes(store) || imageUrl.length > 1024 ||
+          (imageUrl && !/^https:\/\//.test(imageUrl)) ||
+          (price !== null && (!Number.isFinite(price) || price < 0)) ||
+          !Number.isInteger(sortOrder) || Math.abs(sortOrder) > 100000)
+        return res.status(400).json({error:'Enter title, valid Amazon/Flipkart HTTPS affiliate link, and optional approx. price.'});
+      const saved = {title,description,store,affiliateUrl,imageUrl,
+        emoji:String(input.emoji || '🍳').slice(0,8),price,
+        category:String(input.category || 'Kitchen').slice(0,80),
+        sortOrder,active:input.active !== false,updatedAt:new Date()};
+      let ref;
+      if (req.method === 'PATCH') {
+        if (!/^[a-zA-Z0-9_-]{1,100}$/.test(id))return res.status(400).json({error:'Invalid item id'});
+        ref=db.collection('kitchenItems').doc(id);if(!(await ref.get()).exists)return res.status(404).json({error:'Item missing'});
+        await ref.update(saved);
+      } else {
+        ref=db.collection('kitchenItems').doc();await ref.set({...saved,createdAt:new Date()});
+      }
+      await audit(db,admin,req.method === 'POST'?'kitchen.create':'kitchen.update',ref.id);
+      return res.status(200).json({ok:true,id:ref.id});
+    }
     if (action === 'product' && ['POST','PATCH','DELETE'].includes(req.method)) {
       const data = req.body || {};
       const id = String(data.id || '');
@@ -132,14 +189,20 @@ module.exports = async function handler(req, res) {
       const unit = String(data.unit || 'kg');
       const imageUrl = String(data.imageUrl || '').trim();
       if (!name || !bengaliName || price <= 0 || stock < 0 || stock > 100000 ||
-          !['kg','500g','piece','bunch'].includes(unit) || imageUrl.length > 1024 ||
+          !PHASE1_UNITS.includes(unit) || imageUrl.length > 1024 ||
           (imageUrl && !/^https:\/\//.test(imageUrl) && !/^\/public\/images\/[a-z0-9-]+\.svg$/.test(imageUrl)))
         return res.status(400).json({ error: 'Check bilingual names, price, stock, unit and image URL.' });
       const saved = {
-        name, bengaliName, price, stock, unit, imageUrl,
+        name, bengaliName, nameEn:name, nameBn:bengaliName, price, stock, unit, imageUrl,
         description: String(data.description || '').trim().slice(0,500),
         category: String(data.category || 'Others').slice(0,80),
         active: data.active !== false, updatedAt: new Date(),
+        perishable: data.perishable === true,
+        brand: String(data.brand || '').slice(0,100),
+        packSize: String(data.packSize || '').slice(0,50),
+        fssaiNote: String(data.fssaiNote || '').slice(0,200),
+        shelfLifeDays: data.shelfLifeDays === '' || data.shelfLifeDays == null ? null : Math.max(0,Math.min(365,Number(data.shelfLifeDays)||0)),
+        dailyStockTarget: Math.max(0,Math.min(100000,Math.floor(Number(data.dailyStockTarget)||0))),
         status: data.active === false ? 'inactive' : stock > 0 ? 'active' : 'out_of_stock'
       };
       let ref;
