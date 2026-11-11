@@ -46,7 +46,7 @@ The existing live Firebase storefront still uses root `index.html`. The Phase 2 
 12. Keep PR #32 as **draft**, do NOT merge, and report test results or screenshots. Phase 3 starts only after your explicit approval.
 
 ## Price thresholds and contact
-All three values come from Neon `settings` (not browser constants): min order **₹300**, free delivery from **₹500**, within **5 km**, phone **+91 7551858583** (latest provided number). Shop hours **07:00–21:00 Asia/Kolkata**. If settings are unavailable checkout fails rather than switching to Firebase. Delivery below ₹500 currently defaults to ₹0 until the owner chooses a fee; change `delivery_fee` in Neon settings only when confirmed.
+All three values come from Neon `settings` (not browser constants): min order **₹300**, free delivery from **₹500**, within **5 km**, phone read from **Neon settings.shop_phone** (confirm the owner number before launch). Shop hours **07:00–21:00 Asia/Kolkata**. If settings are unavailable checkout fails rather than switching to Firebase. Delivery below ₹500 currently defaults to ₹0 until the owner chooses a fee; change `delivery_fee` in Neon settings only when confirmed.
 
 ## Security / known limitations
 - The browser supplies only product IDs and quantities. The server loads approved products, checks stock and pincode, computes prices/totals, writes order+items and decrements stock in ONE transaction with row locks.
