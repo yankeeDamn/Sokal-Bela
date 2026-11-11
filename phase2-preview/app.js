@@ -69,7 +69,7 @@ function renderProducts(){
  $('item-count').textContent=list.length+' items';
  $('product-grid').innerHTML=list.length?list.map(p=>{
   const img=typeof p.image_url==='string'&&/^https:\/\//i.test(p.image_url);
-  const picture=img?'<img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.name_en)+'" loading="lazy" onerror="this.remove();this.parentElement.querySelector(\'.emoji\').hidden=false;">':'';
+  const picture=img?'<img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.name_en)+'" loading="lazy" onerror="this.nextElementSibling.hidden=false;this.remove();">':'';
   const emoji='<span class="emoji"'+(img?' hidden':'')+'>'+escapeHtml(p.emoji||'🥬')+'</span>';
   return '<article class="product"><div class="visual">'+picture+emoji+
    (p.stock<1?'<span class="stock-badge">Sold out</span>':p.stock<=5?'<span class="stock-badge">Only '+p.stock+' left</span>':'')+'</div>'+
