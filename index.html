@@ -438,6 +438,26 @@
     .prod-description{font-size:.82rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px}
     .product-details-btn{border:0;background:transparent;color:var(--green-dark);font-weight:700;font-size:.84rem;text-align:left;padding:10px 0 0;text-decoration:underline}
     .product-details-btn:hover{color:var(--green)}
+  /* ===== Phase 1 mobile-first three-tab navigation ===== */
+    .phase1-tabbar{position:sticky;top:0;z-index:15;background:#e8f5ea;border-bottom:1px solid #c5dfc9;display:flex;gap:5px;justify-content:center;padding:8px 10px}
+    .phase1-main-tab{background:transparent;border:1px solid transparent;border-radius:10px;color:#1e5a28;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;min-height:44px}
+    .phase1-main-tab.active{background:#2d7a3a;color:#fff}
+    .phase1-hide-tabs .phase1-tabbar{display:none}
+    .phase1-group{margin-top:30px;border-top:1px solid #d5e7d7;padding-top:20px}
+    .bucket-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;max-width:730px}
+    .bucket-form label{font-weight:700}
+    .bucket-form select,.bucket-form input{min-width:95px;max-width:100%;border:1px solid #b7d5bd;padding:11px;border-radius:9px;font:inherit}
+    .bucket-form select{flex:1 1 230px}
+    .delivery-meter{margin-top:18px;max-width:630px;background:#e8f5ea;border-radius:12px;padding:14px}
+    .delivery-meter progress{display:block;width:100%;height:17px;accent-color:#2d7a3a;margin:8px 0}
+    .affiliate-disclosure{font-weight:600;background:#e8f5ea;padding:12px;border-radius:10px}
+    @media(max-width:680px){
+      .phase1-tabbar{position:fixed;top:auto;bottom:0;left:0;right:0;z-index:45;padding:5px 4px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -3px 15px #0002}
+      .phase1-main-tab{flex:1;min-width:0;font-size:11px;padding:8px 3px;line-height:1.3;white-space:normal}
+      body:not(.phase1-hide-tabs){padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+      body:not(.phase1-hide-tabs) [data-contact-wa].floating-wa,body:not(.phase1-hide-tabs) .back-to-top{bottom:90px}
+      .bucket-form label{width:100%}
+    }
   </style>
   <link rel="stylesheet" href="/public/partner-store.css">
 </head>
@@ -466,7 +486,9 @@
     </div>
     <ul class="nav-menu" id="nav-menu">
       <li><a href="#" class="nav-link" data-page="home" data-i18n="nav.home">Home</a></li>
-      <li><a href="#" class="nav-link" data-page="products" data-i18n="nav.products">Products</a></li>
+      <li><a href="#" class="nav-link" data-page="products" data-i18n="nav.products">Grocery &amp; Produce · বাজার</a></li>
+      <li><a href="#" class="nav-link" data-page="subscriptions">Morning Pass · সাবস্ক্রিপশন</a></li>
+      <li><a href="#" class="nav-link" data-page="kitchen">Kitchenware &amp; Gadgets · রান্নাঘর</a></li>
       <li><a href="#" class="nav-link" data-page="bulk" data-i18n="nav.bulk">Bulk Orders</a></li>
       <li><a href="#" class="nav-link" data-page="catering" data-i18n="nav.catering">Catering</a></li>
       <li><a href="/about.html" class="nav-link">About</a></li>
@@ -482,6 +504,11 @@
   </div>
 </nav>
 
+<div class="phase1-tabbar" role="navigation" aria-label="Main shopping tabs">
+  <button type="button" class="phase1-main-tab" data-page="products" onclick="showPage('products')">🥬 Grocery &amp; Produce<br><span lang="bn">বাজার</span></button>
+  <button type="button" class="phase1-main-tab" data-page="subscriptions" onclick="showPage('subscriptions')">🌅 Morning Pass<br><span lang="bn">সাবস্ক্রিপশন</span></button>
+  <button type="button" class="phase1-main-tab" data-page="kitchen" onclick="showPage('kitchen')">🍳 Kitchenware<br><span lang="bn">রান্নাঘর</span></button>
+</div>
 <main>
 
 <!-- ====== HOME PAGE ====== -->
@@ -597,9 +624,47 @@
         <div class="cat-tabs" id="cat-tabs"></div>
       </div>
       <div class="products-grid" id="products-grid"></div>
+      <section aria-labelledby="dairy-title" class="phase1-group">
+        <h3 id="dairy-title">🥛 Dairy and Daily Essentials · দুধ, পনির ও ঘি</h3>
+        <p class="sec-sub">Milk packs (500 ml, 1 L), paneer (200 g, 500 g, 1 kg) and ghee (200 ml, 500 ml, 1 L) appear here when the admin stocks them.</p>
+        <div class="products-grid" id="dairy-grid"></div>
+      </section>
+      <section aria-labelledby="bucket-title" class="phase1-group">
+        <h3 id="bucket-title">🧺 Build Your Basket · নিজের ঝুড়ি</h3>
+        <p class="sec-sub">Add a product and quantity to your existing cart; prices and stock stay the same as normal checkout.</p>
+        <form id="bucket-form" class="bucket-form" onsubmit="addBucketItem(event)">
+          <label for="bucket-product">Product · পণ্য</label><select id="bucket-product" required></select>
+          <label for="bucket-qty">Quantity · পরিমাণ</label><input id="bucket-qty" type="number" min="1" max="99" step="1" value="1" required>
+          <button class="btn btn-primary" type="submit">Add to Basket · ঝুড়িতে যোগ</button>
+        </form>
+        <div class="delivery-meter" aria-live="polite">
+          <label for="phase1-delivery-progress">Delivery progress · ডেলিভারি</label>
+          <progress id="phase1-delivery-progress" max="300" value="0"></progress>
+          <p id="phase1-delivery-message">Minimum ₹200; free delivery ₹300+ within 5 km.</p>
+        </div>
+      </section>
     </div>
   </div>
 </section>
+
+<!-- ====== PHASE 1: MORNING PASS PLACEHOLDER (subscriptions launch in Phase 2) ====== -->
+<section id="subscriptions-page" class="page"><div class="section"><div class="container">
+  <h2 class="sec-title">🌅 Morning Pass · সকালের সাবস্ক্রিপশন</h2>
+  <p class="sec-sub">Daily milk, essentials and weekly vegetables are planned for Phase 2. No subscriptions or charges are taken yet.</p>
+  <a class="btn btn-primary" href="#" data-contact-wa data-wa-text="Hello Sokal Bela, please let me know when Morning Pass subscriptions open." target="_blank" rel="noopener noreferrer">Ask about Morning Pass on WhatsApp</a>
+</div></div></section>
+
+<!-- ====== PHASE 1: KITCHENWARE / AFFILIATE PICKS ====== -->
+<section id="kitchen-page" class="page"><div class="section"><div class="container">
+  <h2 class="sec-title">🍳 Kitchenware &amp; Gadgets · রান্নাঘরের সামগ্রী</h2>
+  <p class="sec-sub">Two different ways to shop. Items from our shop use your Sokal Bela cart; partner picks open Amazon or Flipkart.</p>
+  <h3>🛒 From Our Shop · আমাদের দোকান</h3>
+  <p>Our stocked kitchen items use normal WhatsApp checkout and cash/UPI on delivery.</p>
+  <div class="products-grid" id="shop-kitchen-grid" aria-live="polite"></div>
+  <h3 style="margin-top:28px">🔗 Partner Picks · পার্টনার পণ্য</h3>
+  <p class="affiliate-disclosure">Curated picks. Purchased via trusted partner stores. We may earn a small commission at no extra cost to you.</p>
+  <div class="products-grid" id="affiliate-kitchen-grid" aria-live="polite"></div>
+</div></div></section>
 
 <!-- ====== CART PAGE ====== -->
 <section id="cart-page" class="page">
@@ -1193,8 +1258,18 @@ async function handleCatering(e){
   document.getElementById("cat-form").reset();
 }
 
+/* ===== EDIT ME: SOKAL BELA PHASE 1 SETTINGS =====
+   Shop phone/WhatsApp: edit config/contact.mjs (single source of truth).
+   Min ₹200; free delivery ₹300+ within 5 km: edit config/contact.mjs.
+   Baskets/prices: edit BASKETS below. Delivery PIN codes: DELIVERY_PINCODES.
+   Affiliate links and prices: add/edit kitchenItems in secure admin portal.
+   No API credentials, passwords, or affiliate private tokens belong here.
+   ================================================ */
+const MIN_ORDER_AMOUNT = 200;
+const FREE_DELIVERY_MIN = 300;
+const DAIRY_WHATSAPP_NOTE = "Hello Sokal Bela! Is milk, paneer or ghee available today?";
 /* ===== EDIT ME: shop settings ===== */
-const SHOW_PRODUCT_PHOTOS = true;
+const SHOW_PRODUCT_PHOTOS = false;
 const DELIVERY_PINCODES = ["731224"];   // pincodes you deliver to; add more like "731224","731101"
 const BASKETS = [                        // change items/prices any time; leave price "" to show "confirm on WhatsApp"
   {name:"Family Basket", note:"4–5 members, about 1 week", price:"", items:["Potato 2 kg","Onion 2 kg","Tomato 1 kg","Brinjal 1 kg","Green chilli 250 g","Seasonal vegetable 1 kg"]},
@@ -1239,10 +1314,13 @@ function showPage(id) {
     a.classList.toggle("active", a.dataset.page === id)
   );
   if (id === "cart") renderCart();
-  if (id === "products") { renderProducts(); renderCatTabs(); }
+  if (id === "products") { renderProducts(); renderCatTabs(); renderDairy(); renderBucketChoices(); }
+  if (id === "kitchen") renderKitchen();
+  document.body.classList.toggle("phase1-hide-tabs", ["cart","confirmation","admin"].includes(id));
   if (id === "bulk") initBulkRows();
   if (id === "orders") loadMyOrders();
   updateCartBar();
+  updatePhase1Navigation();
 }
 
 
@@ -1423,7 +1501,7 @@ async function loadProducts() {
   } catch (e) { console.warn(e); products = SEEDS.map(normalizeProduct); }
   cart = sanitizeCart(cart);
   saveCartStorage();
-  renderFeatured(); renderProducts(); renderCatTabs();
+  renderFeatured(); renderProducts(); renderCatTabs(); renderDairy(); renderBucketChoices(); renderKitchen();
 }
 
 /* Categories are sometimes stored as slugs ("fruity-vegetables"); show them as "Fruity Vegetables". */
@@ -1470,6 +1548,11 @@ function normalizeProduct(raw = {}) {
     active,
     status,
     sellerId: raw.sellerId || "",
+    brand: String(raw.brand || ""),
+    packSize: String(raw.packSize || ""),
+    perishable: raw.perishable === true,
+    shelfLifeDays: raw.shelfLifeDays == null ? null : Number(raw.shelfLifeDays),
+    fssaiNote: String(raw.fssaiNote || ""),
     createdAt: raw.createdAt || null,
     updatedAt: raw.updatedAt || null
   };
@@ -1519,6 +1602,14 @@ function updateCartBar() {
   document.body.classList.toggle("has-cart-bar", show);
   document.getElementById("cb-count").textContent = window.I18N ? I18N.localizeDigits(count) : count;
   document.getElementById("cb-total").textContent = "₹" + (window.I18N ? I18N.localizeDigits(total) : total);
+  const meter = document.getElementById("phase1-delivery-progress");
+  const msg = document.getElementById("phase1-delivery-message");
+  if (meter) { meter.max = FREE_DELIVERY_MIN; meter.value = Math.min(total,FREE_DELIVERY_MIN); }
+  if (msg) msg.textContent = total < MIN_ORDER_AMOUNT
+    ? "Add ₹"+(MIN_ORDER_AMOUNT-total).toFixed(0)+" more to reach the ₹200 minimum."
+    : total < FREE_DELIVERY_MIN
+    ? "Minimum reached. Add ₹"+(FREE_DELIVERY_MIN-total).toFixed(0)+" for free delivery within 5 km."
+    : "Free delivery threshold reached (within 5 km).";
 }
 
 function renderFeatured() {
@@ -1577,6 +1668,7 @@ function prodCard(p, ctx = "p") {
       <div class="prod-name">${esc(displayName(p))}</div>
       <div class="prod-price">${esc(priceLabel)}</div>
       <div class="prod-description">${esc(p.description || "Fresh, seasonal produce sourced from regional growers.")}</div>
+      ${p.packSize ? `<div class="prod-description">${esc(p.brand ? p.brand+" · " : "")}${esc(p.packSize)}</div>` : ""}
       <button type="button" class="product-details-btn" onclick="openProductDetails(\'${esc(p.id)}\')">View details &amp; delivery info</button>
     </div>
     <div class="prod-foot">
@@ -1616,13 +1708,80 @@ function filterProducts() { renderProducts(); }
 
 function renderCatTabs() {
   const el = document.getElementById("cat-tabs"); if (!el) return;
-  const cats = ["All",...new Set(products.map(p=>p.category).filter(Boolean))];
+  const cats = ["All", "Fruits", "Dairy",...new Set(products.map(p=>p.category).filter(Boolean))];
   el.innerHTML = cats.map(c =>`<button class="cat-btn${c===curCat?" active":""}" data-cat="${esc(c)}">${esc(c==="All"?t("cat.all"):c)}</button>`).join("");
   el.querySelectorAll(".cat-btn").forEach(btn => {
     btn.addEventListener("click", () => setCat(btn.dataset.cat || "All"));
   });
 }
 function setCat(c) { curCat = c; renderCatTabs(); renderProducts(); }
+
+
+/* ===== PHASE 1: grocery, bucket and kitchen (vanilla JS; no new framework) ===== */
+const PHASE1_ALLOWED_STORES = Object.freeze({amazon:"amazon.in",flipkart:"flipkart.com"});
+let phase1KitchenItems = [];
+function phase1AffiliateUrl(row) {
+  try {
+    const url = new URL(String(row.affiliateUrl || ""));
+    const domain = PHASE1_ALLOWED_STORES[row.store];
+    if (url.protocol !== "https:" || !domain || (url.hostname !== domain && !url.hostname.endsWith("."+domain))) return "";
+    return url.href;
+  } catch { return ""; }
+}
+function updatePhase1Navigation() {
+  const page = document.querySelector(".page.active")?.id?.replace("-page","");
+  document.querySelectorAll(".phase1-main-tab").forEach(btn=>{
+    const active=btn.dataset.page===page;
+    btn.classList.toggle("active",active);
+    btn.setAttribute("aria-current",active?"page":"false");
+  });
+}
+function renderDairy() {
+  const el=document.getElementById("dairy-grid"); if(!el) return;
+  const dairy=products.filter(p=>p.active!==false && p.category.toLowerCase()==="dairy");
+  el.innerHTML=dairy.length ? dairy.map(p=>prodCard(p,"d")).join("") :
+    '<div class="contact-card"><div class="cc-ico">🥛</div><h4>Milk, paneer & ghee · দুধ, পনির ও ঘি</h4><p>Stock is being arranged. Ask us for today’s availability.</p><a class="btn btn-wa" href="'+esc(SOKAL_CONTACT.whatsappUrl(DAIRY_WHATSAPP_NOTE))+'" target="_blank" rel="noopener noreferrer">Ask on WhatsApp</a></div>';
+}
+function renderBucketChoices(){
+  const sel=document.getElementById("bucket-product");if(!sel)return;
+  const selected=sel.value;
+  sel.innerHTML=products.filter(p=>p.active!==false && p.stock>0 && p.category!=="Kitchenware")
+    .map(p=>'<option value="'+esc(p.id)+'">'+esc(displayName(p))+' · ₹'+Number(p.price)+'/'+esc(p.unit)+'</option>').join("");
+  if([...sel.options].some(o=>o.value===selected))sel.value=selected;
+}
+function addBucketItem(event){
+  event.preventDefault();
+  const id=document.getElementById("bucket-product")?.value, p=products.find(x=>x.id===id);
+  const qty=Math.max(1,Math.min(99,Number(document.getElementById("bucket-qty")?.value)||1));
+  if(!p || p.stock<=0)return showToast("This item is unavailable.","error");
+  const existing=cart.find(i=>i.id===p.id);
+  const next=Math.min(p.stock,(existing?.qty||0)+qty);
+  if(existing)existing.qty=next;
+  else cart.push({id:p.id,productId:p.productId||p.id,name:p.name,bengaliName:p.bengaliName||"",price:p.price,unit:p.unit,qty:next});
+  saveCartStorage();renderCartCount();renderCartDrawer();
+  showToast("Added to cart · ঝুড়িতে যোগ হয়েছে");
+}
+async function loadKitchenItems(){
+  if(!(fbOk&&db)){phase1KitchenItems=[];renderKitchen();return;}
+  try{
+    const snap=await db.collection("kitchenItems").where("active","==",true).get();
+    phase1KitchenItems=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>Number(a.sortOrder||0)-Number(b.sortOrder||0));
+  }catch(err){console.warn("Kitchen catalogue unavailable",err.code||err.message);phase1KitchenItems=[];}
+  renderKitchen();
+}
+function renderKitchen(){
+  const own=document.getElementById("shop-kitchen-grid"),partner=document.getElementById("affiliate-kitchen-grid");
+  if(!own||!partner)return;
+  const stocked=products.filter(p=>p.category==="Kitchenware"&&p.active!==false);
+  own.innerHTML=stocked.length?stocked.map(p=>prodCard(p,"k")).join(""):'<p class="sec-sub">No in-store kitchen items listed yet. Ask us on WhatsApp.</p>';
+  const approved=phase1KitchenItems.filter(row=>row.active===true&&phase1AffiliateUrl(row));
+  partner.innerHTML=approved.length?approved.map(row=>{
+    const url=phase1AffiliateUrl(row),store=row.store==="amazon"?"Amazon":"Flipkart";
+    const caption=row.price==null||row.price===""?"Price: check partner store":"Approx. ₹"+Number(row.price).toLocaleString("en-IN")+" · check store for current price";
+    return '<article class="prod-card"><div class="prod-img"><div class="prod-emoji">'+esc(row.emoji||"🍳")+'</div></div><div class="prod-info"><h4>'+esc(row.title||"Kitchen pick")+'</h4><p>'+esc(row.description||"")+'</p><p>'+esc(caption)+'</p></div><div class="prod-foot"><a class="btn btn-primary" href="'+esc(url)+'" target="_blank" rel="nofollow sponsored noopener noreferrer">'+(row.store==="amazon"?"Check Price / Buy on Amazon":"View on Flipkart")+'</a></div></article>';
+  }).join(""):'<p class="sec-sub">Partner picks are being curated. Please check again later.</p>';
+}
+window.addEventListener("DOMContentLoaded",()=>{loadKitchenItems();updatePhase1Navigation();renderBucketChoices();});
 
 /* ========== CART ========== */
 function loadCartStorage(uid = currentUser?.uid || null) {
