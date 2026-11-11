@@ -129,7 +129,8 @@ module.exports = async function handler(req, res) {
       const snaps = await db.collection('products').where('perishable','==',true).limit(250).get();
       const batch = db.batch(); let count = 0;
       for (const doc of snaps.docs) {
-        const p = doc.data(); const target = Number(p.dailyStockTarget);
+        const p = doc.data(); if (p.dailyStockTarget == null) continue;
+        const target = Number(p.dailyStockTarget);
         if (!Number.isInteger(target) || target < 0 || target > 100000) continue;
         batch.update(doc.ref, { stock: target, status: p.active === false ? 'inactive' : target ? 'active' : 'out_of_stock', updatedAt: new Date() });
         count++;
@@ -202,7 +203,7 @@ module.exports = async function handler(req, res) {
         packSize: String(data.packSize || '').slice(0,50),
         fssaiNote: String(data.fssaiNote || '').slice(0,200),
         shelfLifeDays: data.shelfLifeDays === '' || data.shelfLifeDays == null ? null : Math.max(0,Math.min(365,Number(data.shelfLifeDays)||0)),
-        dailyStockTarget: Math.max(0,Math.min(100000,Math.floor(Number(data.dailyStockTarget)||0))),
+        dailyStockTarget: data.dailyStockTarget === '' || data.dailyStockTarget == null ? null : Math.max(0,Math.min(100000,Math.floor(Number(data.dailyStockTarget)||0))),
         status: data.active === false ? 'inactive' : stock > 0 ? 'active' : 'out_of_stock'
       };
       let ref;
