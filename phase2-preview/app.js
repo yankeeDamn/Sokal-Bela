@@ -7,7 +7,7 @@ const BASKETS=[
  {name:'Salad Pack · সালাদ',items:[['Cucumber',1],['Carrot',1],['Tomato',1]]}
 ];
 const BASE='/api/v2',KEY='sokal-bela-pg-cart-v1', $=id=>document.getElementById(id);
-let products=[],cart=[],category='All',shop={shopPhone:'7551858583',minOrder:300,freeDeliveryMin:500,radiusKm:5,deliveryFee:0,deliveryPincodes:['731224']};
+let products=[],cart=[],category='All',shop={shopPhone:'',minOrder:300,freeDeliveryMin:500,radiusKm:5,deliveryFee:0,deliveryPincodes:['731224']};
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const wa=text=>'https://wa.me/91'+String(shop.shopPhone).replace(/\D/g,'')+'?text='+encodeURIComponent(text);
