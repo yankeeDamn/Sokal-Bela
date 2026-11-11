@@ -211,6 +211,25 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Phase 1: curated partner links. Public queries MUST filter active == true.
+    // Creation, edits, visibility, price approximations and ordering are admin-only.
+    match /kitchenItems/{itemId} {
+      allow get, list: if isAdmin() || resource.data.active == true;
+      allow create: if isAdmin() &&
+        request.resource.data.title is string &&
+        request.resource.data.store in ["amazon", "flipkart"] &&
+        request.resource.data.affiliateUrl is string &&
+        request.resource.data.active is bool &&
+        request.resource.data.sortOrder is int;
+      allow update: if isAdmin() &&
+        request.resource.data.title is string &&
+        request.resource.data.store in ["amazon", "flipkart"] &&
+        request.resource.data.affiliateUrl is string &&
+        request.resource.data.active is bool &&
+        request.resource.data.sortOrder is int;
+      allow delete: if isAdmin();
+    }
+
     match /orders/{orderId} {
       allow create: if request.resource.data.customerId == actorId() &&
         validOrderCreateSchema(request.resource.data, orderId);

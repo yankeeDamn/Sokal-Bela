@@ -78,22 +78,38 @@ dialog{background:var(--card);color:var(--ink);border:1px solid var(--line);bord
 <div class="field"><label for="p-bn">বাংলা নাম</label><input id="p-bn" required></div>
 <div class="field"><label for="p-price">Price (₹)</label><input id="p-price" type="number" min="0.01" step=".01" required></div>
 <div class="field"><label for="p-stock">Stock</label><input id="p-stock" type="number" min="0" step="1" required></div>
-<div class="field"><label for="p-unit">Unit</label><select id="p-unit"><option>kg</option><option>500g</option><option>piece</option><option>bunch</option></select></div>
+<div class="field"><label for="p-unit">Unit</label><select id="p-unit"><option>kg</option><option>g</option><option>litre</option><option>ml</option><option>pack</option><option>piece</option><option>bunch</option></select></div>
 <div class="field"><label for="p-category">Category</label><input id="p-category" value="Others"></div></div>
 <div class="field"><label for="p-description">Freshness description</label><textarea id="p-description"></textarea></div>
-<div class="field"><label for="p-image">HTTPS image URL (or /public/images/name.svg)</label><input id="p-image"></div>
+<div class="field"><label for="p-image">Optional image URL</label><input id="p-image"></div><div class="field"><label for="p-emoji">Card emoji (e.g. 🥛 🧀 🍳)</label><input id="p-emoji" maxlength="8"></div>
+<div class="form-grid"><div class="field"><label>Brand <input id="p-brand"></label></div><div class="field"><label>Pack size <input id="p-pack"></label></div>
+<div class="field"><label>Shelf life days <input id="p-shelf" type="number" min="0"></label></div><div class="field"><label>Daily stock target <input id="p-target" type="number" min="0"></label></div></div>
+<div class="field"><label>FSSAI note <input id="p-fssai"></label></div><p><label><input type="checkbox" id="p-perishable"> Perishable · daily stock reset</label></p>
 <p><label><input type="checkbox" id="p-active" checked> Available to customers</label></p>
 <div class="actions"><button class="primary" type="submit">Save</button><button class="secondary" type="button" id="product-cancel">Cancel</button></div>
+</form></dialog>
+<dialog id="kitchen-dialog"><form id="kitchen-form"><h2>Partner Picks · Kitchen Items</h2>
+<div class="form-grid"><div class="field"><label>Title<input id="k-title" required></label></div>
+<div class="field"><label>Store<select id="k-store"><option value="amazon">Amazon</option><option value="flipkart">Flipkart</option></select></label></div>
+<div class="field"><label>Affiliate HTTPS URL<input id="k-url" required type="url"></label></div>
+<div class="field"><label>Approximate price (optional)<input id="k-price" type="number" min="0" step=".01"></label></div>
+<div class="field"><label>Emoji<input id="k-emoji" value="🍳"></label></div>
+<div class="field"><label>Sort order<input id="k-order" type="number" value="0"></label></div></div>
+<div class="field"><label>Your own description<textarea id="k-description"></textarea></label></div>
+<div class="field"><label>Image URL (optional)<input id="k-image"></label></div>
+<div class="field"><label>Category<input id="k-category" value="Kitchen"></label></div>
+<p><label><input type="checkbox" id="k-active" checked> Active</label></p>
+<div class="actions"><button class="primary" type="submit">Save</button><button type="button" class="secondary" id="kitchen-cancel">Cancel</button></div>
 </form></dialog><div id="toast" role="status" class="hidden"></div>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script nonce="__NONCE__">
 'use strict';
 const config = __FIREBASE_CFG__;
-const sections = ['overview','orders','bulk','users','products','payments','deliveries','settings','activity'];
-const titles = {overview:'Overview',orders:'Daily Orders',bulk:'Bulk Event Inquiries',users:'Users',products:'Products',payments:'Payments',deliveries:'Deliveries',settings:'Store Settings',activity:'Recent Activity'};
+const sections = ['overview','orders','bulk','users','products','kitchenItems','payments','deliveries','settings','activity'];
+const titles = {overview:'Overview',orders:'Daily Orders',bulk:'Bulk Event Inquiries',users:'Users',products:'Products',kitchenItems:'Kitchen Items',payments:'Payments',deliveries:'Deliveries',settings:'Store Settings',activity:'Recent Activity'};
 const $ = id => document.getElementById(id), safe = x => String(x == null ? '' : x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let data = null, section = 'overview', keyword = '', sortKey = '', descending = false, pageNum = 0, productId = '', expiry = 0, resendAt = 0, timer = null, lastInput = Date.now();
+let data = null, section = 'overview', keyword = '', sortKey = '', descending = false, pageNum = 0, productId = '', kitchenId = '', expiry = 0, resendAt = 0, timer = null, lastInput = Date.now();
 
 const api = (url, options) => fetch(url, {credentials:'same-origin',...options,headers:{'Content-Type':'application/json',...(options?.headers||{})}})
   .then(async response => { const result = await response.json().catch(()=>({})); if(!response.ok) throw new Error(result.error||'Request failed'); return result; });
@@ -135,7 +151,8 @@ function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFract
 function tableFields(s){return {orders:['orderNumber','customerName','phone','total','orderStatus','createdAt'],
 bulk:['contactName','phone','eventType','eventDate','guestCount','status'],
 users:['displayName','email','role','lastLoginAt'],
-products:['name','bengaliName','price','stock','unit','status'],
+products:['name','bengaliName','category','price','stock','unit','perishable','status'],
+kitchenItems:['title','store','active','sortOrder','affiliateUrl'],
 payments:['orderId','amount','paymentStatus','paymentMethod','createdAt'],
 deliveries:['orderId','address','status','deliveryNotes','updatedAt']}[s]||[];}
 function csvText(rows, fields){return [fields.join(','),...rows.map(r=>fields.map(f=>'"'+String(r[f]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');}
@@ -181,15 +198,16 @@ function overview(){
 function renderTable(){
   const fields=tableFields(section),rows=filtered(),start=pageNum*15,visible=rows.slice(start,start+15);
   const toolbar='<div class="toolbar"><input id="search" type="search" aria-label="Search records" placeholder="Search records..." value="'+safe(keyword)+'"><div class="actions">'+
-    (section==='products'?'<button class="primary" id="add-product">Add product</button>':'')+
+    (section==='products'?'<button class="primary" id="add-product">Add product</button> <button class="secondary" id="reset-daily">Reset today’s stock</button>':section==='kitchenItems'?'<button class="primary" id="add-kitchen">Add partner pick</button>':'')+
     '<button class="secondary" id="csv">Export CSV</button></div></div>';
   const header='<tr>'+fields.map(f=>'<th><button data-sort="'+f+'">'+safe(f.replace(/[A-Z]/g,x=>' '+x))+'</button></th>').join('')+
-    (section==='orders'||section==='products'?'<th>Actions</th>':'')+'</tr>';
+    (section==='orders'||section==='products'||section==='kitchenItems'?'<th>Actions</th>':'')+'</tr>';
   const body=visible.map(r=>'<tr>'+fields.map(f=>'<td>'+safe(r[f] && typeof r[f]==='object'?JSON.stringify(r[f]):r[f])+'</td>').join('')+
     (section==='orders'?'<td><select aria-label="Order status" data-order="'+safe(r.id)+'">'+
     ['Pending','Confirmed','Out for Delivery','Delivered','Cancelled'].map(s=>'<option'+(String(r.orderStatus||r.status||'').replace(/\s/g,'').toLowerCase()===s.replace(/\s/g,'').toLowerCase()?' selected':'')+'>'+s+'</option>').join('')+
     '</select><button class="secondary" data-note="'+safe(r.id)+'">Delivery note</button></td>':
-    section==='products'?'<td><button class="secondary" data-edit="'+safe(r.id)+'">Edit</button> <button class="secondary danger" data-delete="'+safe(r.id)+'">Delete</button></td>':'')+'</tr>').join('');
+    section==='products'?'<td><button class="secondary" data-edit="'+safe(r.id)+'">Edit</button> <button class="secondary danger" data-delete="'+safe(r.id)+'">Delete</button></td>':
+    section==='kitchenItems'?'<td><button class="secondary" data-kedit="'+safe(r.id)+'">Edit</button> <button class="secondary danger" data-kdelete="'+safe(r.id)+'">Delete</button></td>':'')+'</tr>').join('');
   $('content').innerHTML=toolbar+'<div class="table-scroll"><table><thead>'+header+'</thead><tbody>'+ (body||'<tr><td colspan="10">No records found.</td></tr>')+
     '</tbody></table></div><div class="pager"><button class="secondary" id="prev" '+(!pageNum?'disabled':'')+'>Previous</button><span>Page '+(pageNum+1)+' of '+Math.max(1,Math.ceil(rows.length/15))+'</span><button class="secondary" id="next" '+(start+15>=rows.length?'disabled':'')+'>Next</button></div>';
   $('search').addEventListener('input',e=>{keyword=e.target.value;pageNum=0;renderTable();$('search').focus();$('search').setSelectionRange(keyword.length,keyword.length);});
@@ -205,10 +223,24 @@ function renderTable(){
   }));
   if(section==='products'){
     $('add-product').addEventListener('click',()=>editProduct());
+    $('reset-daily').addEventListener('click',async()=>{
+      if(!confirm('Reset perishable stock to its configured daily target?'))return;
+      try{const x=await api('/api/admin-data?action=reset-perishable',{method:'POST',body:'{}'});toast('Reset '+x.count+' dairy/perishable items');load();}
+      catch(e){toast(e.message);}
+    });
     document.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>editProduct(data.tables.products.find(p=>p.id===b.dataset.edit))));
     document.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',async()=>{
       if(!confirm('Delete this product? This cannot be undone.'))return;
       try{await api('/api/admin-data?action=product',{method:'DELETE',body:JSON.stringify({id:b.dataset.delete})});toast('Product deleted');load();}catch(e){toast(e.message);}
+    }));
+  }
+  if(section==='kitchenItems'){
+    $('add-kitchen').addEventListener('click',()=>editKitchen());
+    document.querySelectorAll('[data-kedit]').forEach(b=>b.addEventListener('click',()=>editKitchen(data.tables.kitchenItems.find(p=>p.id===b.dataset.kedit))));
+    document.querySelectorAll('[data-kdelete]').forEach(b=>b.addEventListener('click',async()=>{
+      if(!confirm('Delete this affiliate pick?'))return;
+      try{await api('/api/admin-data?action=kitchen-item',{method:'DELETE',body:JSON.stringify({id:b.dataset.kdelete})});toast('Removed');load();}
+      catch(e){toast(e.message);}
     }));
   }
 }
@@ -220,18 +252,39 @@ async function changeOrder(row,status,note){
 }
 function editProduct(product){
   productId=product?.id||'';$('product-heading').textContent=productId?'Edit product':'Add product';
-  for(const [id,key] of [['p-name','name'],['p-bn','bengaliName'],['p-price','price'],['p-stock','stock'],['p-unit','unit'],['p-category','category'],['p-description','description'],['p-image','imageUrl']]){
+  for(const [id,key] of [['p-name','name'],['p-bn','bengaliName'],['p-price','price'],['p-stock','stock'],['p-unit','unit'],['p-category','category'],['p-description','description'],['p-image','imageUrl'],['p-emoji','emoji']]){
     $(id).value=product?.[key]??(key==='unit'?'kg':key==='category'?'Others':'');
   }
+  for(const [id,key] of [['p-brand','brand'],['p-pack','packSize'],['p-shelf','shelfLifeDays'],['p-target','dailyStockTarget'],['p-fssai','fssaiNote']])$(id).value=product?.[key]??'';
+  $('p-perishable').checked=product?.perishable===true;
   $('p-active').checked=product?.active!==false;$('product-dialog').showModal();
 }
 $('product-cancel').addEventListener('click',()=>$('product-dialog').close());
 $('product-form').addEventListener('submit',async e=>{
   e.preventDefault();const obj={id:productId,name:$('p-name').value,bengaliName:$('p-bn').value,
     price:Number($('p-price').value),stock:Number($('p-stock').value),unit:$('p-unit').value,category:$('p-category').value,
-    description:$('p-description').value,imageUrl:$('p-image').value,active:$('p-active').checked};
+    description:$('p-description').value,imageUrl:$('p-image').value,emoji:$('p-emoji').value,active:$('p-active').checked,
+    brand:$('p-brand').value,packSize:$('p-pack').value,perishable:$('p-perishable').checked,
+    shelfLifeDays:$('p-shelf').value,dailyStockTarget:$('p-target').value,fssaiNote:$('p-fssai').value};
   try{await api('/api/admin-data?action=product',{method:productId?'PATCH':'POST',body:JSON.stringify(obj)});
     $('product-dialog').close();toast('Product saved');load();}catch(err){toast(err.message);}
+});
+function editKitchen(item){
+  kitchenId=item?.id||'';
+  for(const [id,key] of [['k-title','title'],['k-store','store'],['k-url','affiliateUrl'],['k-price','price'],['k-emoji','emoji'],['k-order','sortOrder'],['k-description','description'],['k-image','imageUrl'],['k-category','category']]){
+    $(id).value=item?.[key]??(key==='store'?'amazon':key==='emoji'?'🍳':key==='sortOrder'?0:key==='category'?'Kitchen':'');
+  }
+  $('k-active').checked=item?.active!==false;
+  $('kitchen-dialog').showModal();
+}
+$('kitchen-cancel').addEventListener('click',()=>$('kitchen-dialog').close());
+$('kitchen-form').addEventListener('submit',async e=>{
+  e.preventDefault();const obj={id:kitchenId,title:$('k-title').value,store:$('k-store').value,
+    affiliateUrl:$('k-url').value,price:$('k-price').value,emoji:$('k-emoji').value,
+    sortOrder:Number($('k-order').value),description:$('k-description').value,
+    imageUrl:$('k-image').value,category:$('k-category').value,active:$('k-active').checked};
+  try{await api('/api/admin-data?action=kitchen-item',{method:kitchenId?'PATCH':'POST',body:JSON.stringify(obj)});
+    $('kitchen-dialog').close();toast('Partner pick saved');load();}catch(e){toast(e.message);}
 });
 function settings(){
   const s=data.settings||{};
