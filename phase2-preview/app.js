@@ -136,6 +136,18 @@ async function refreshDairy(){
  const d=await api('/products?kind=dairy');dairyProducts=d.products||[];
  renderDairy();renderCart();
 }
+async function refreshKitchen(){
+ const d=await api('/kitchen'),items=d.items||[];
+ $('kitchen-grid').innerHTML=items.length?items.map(item=>{
+  const img=typeof item.image_url==='string'&&/^https:\/\//i.test(item.image_url);
+  const visual=img?'<img src="'+escapeHtml(item.image_url)+'" loading="lazy" alt="'+escapeHtml(item.title)+'" onerror="this.nextElementSibling.hidden=false;this.remove();"><span class="emoji" hidden>'+escapeHtml(item.emoji||'🍳')+'</span>':
+   '<span class="emoji">'+escapeHtml(item.emoji||'🍳')+'</span>';
+  return '<article class="product"><div class="visual">'+visual+'</div>'+
+   '<div class="info"><h3>'+escapeHtml(item.title)+'</h3><p>'+escapeHtml(item.description||'')+'</p>'+
+   (item.approx_price!==null&&item.approx_price!==undefined?'<p>Approx. '+money(item.approx_price)+' · confirm price on partner site</p>':'')+'</div>'+
+   '<div class="actions"><a class="button primary" href="'+escapeHtml(item.affiliate_url)+'" target="_blank" rel="noopener noreferrer sponsored">View on '+escapeHtml(item.store==='amazon'?'Amazon':'Flipkart')+'</a></div></article>';
+ }).join(''):'<p>No kitchen partner products are published yet.</p>';
+}
 function renderBaskets(){
  $('baskets').innerHTML=BASKETS.map((b,i)=>'<div class="basket"><div><strong>'+escapeHtml(b.name)+'</strong><small>'+b.items.map(x=>escapeHtml(x.join(' ×'))).join(', ')+'</small></div><button type="button" class="button outline" data-basket="'+i+'">Add</button></div>').join('');
 }
@@ -287,5 +299,6 @@ async function start(){
  }catch(e){flash('Settings: '+e.message,true);$('banner').textContent='Store temporarily unavailable';}
  try{await refresh();}catch(e){$('product-grid').textContent='Could not load vegetables: '+e.message;flash(e.message,true);}
  try{await refreshDairy();}catch(e){$('dairy-grid').textContent='Could not load dairy: '+e.message;}
+ try{await refreshKitchen();}catch(e){$('kitchen-grid').textContent='Could not load kitchen items: '+e.message;}
 }
 document.addEventListener('DOMContentLoaded',start);
