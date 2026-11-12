@@ -7,7 +7,7 @@ const BASKETS=[
  {name:'Salad Pack · সালাদ',items:[['Cucumber',1],['Carrot',1],['Tomato',1]]}
 ];
 const BASE='/api/v2',KEY='sokal-bela-pg-cart-v1', $=id=>document.getElementById(id);
-let products=[],cart=[],category='All',settingsReady=false,shop={shopPhone:'',minOrder:0,freeDeliveryMin:1,radiusKm:0,deliveryFee:0,deliveryPincodes:[]};
+let products=[],dairyProducts=[],cart=[],category='All',settingsReady=false,shop={shopPhone:'',minOrder:0,freeDeliveryMin:1,radiusKm:0,deliveryFee:0,deliveryPincodes:[]};
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const wa=text=>'https://wa.me/'+'91'+String(shop.shopPhone).replace(/\D/g,'')+'?text='+encodeURIComponent(text);
@@ -45,7 +45,7 @@ function sanitizeCart(items){
 }
 function readCart(){try{return sanitizeCart(JSON.parse(localStorage.getItem(KEY)||'[]'));}catch{return [];}}
 function persist(){cart=sanitizeCart(cart);localStorage.setItem(KEY,JSON.stringify(cart));renderCart();}
-const byId=id=>products.find(p=>String(p.id)===String(id));
+const byId=id=>[...products,...dairyProducts].find(p=>String(p.id)===String(id));
 const cartLines=()=>cart.map(c=>({...c,product:byId(c.id)})).filter(c=>c.product);
 function addToCart(id,qty){
  const p=byId(id),n=Number(qty);
@@ -103,6 +103,38 @@ function renderProducts(){
    '<button class="button primary" data-add="'+p.id+'" '+(p.stock<1?'disabled':'')+'>Add · যোগ</button></div></article>';
  }).join(''):'<p>No items are active yet. The owner must enter real prices and stock in Neon before enabling products.</p>';
  $('bucket-product').innerHTML=products.filter(p=>p.stock>0).map(p=>'<option value="'+p.id+'">'+escapeHtml(p.name_en)+' · '+money(p.price)+'</option>').join('');
+}
+function renderDairy(){
+ const available=dairyProducts.filter(p=>p.stock>0);
+ $('dairy-grid').innerHTML=available.length?available.map(p=>
+  '<article class="product"><div class="visual"><span class="emoji">'+escapeHtml(p.emoji||'🥛')+'</span></div>'+
+  '<div class="info"><h3>'+escapeHtml(p.name_en)+' <span lang="bn">'+escapeHtml(p.name_bn)+'</span></h3>'+
+  '<p>'+escapeHtml(p.pack_size||p.category)+'</p><div class="price">'+money(p.price)+' / '+escapeHtml(p.unit)+'</div></div>'+
+  '<div class="actions"><input type="number" min="1" max="50" value="1" data-qty="'+p.id+'" aria-label="Quantity for '+escapeHtml(p.name_en)+'">'+
+  '<button class="button primary" data-add="'+p.id+'">Add · যোগ</button></div></article>'
+ ).join(''):'<p>No dairy products are active yet. Morning Pass requests open once the shop enables dairy stock and prices.</p>';
+ $('sub-product').innerHTML=available.map(p=>'<option value="'+p.id+'">'+escapeHtml(p.name_en)+' · '+escapeHtml(p.pack_size||p.unit)+' · '+money(p.price)+'</option>').join('');
+ $('subscription-submit').disabled=!settingsReady||!available.length;
+}
+async function subscribe(event){
+ event.preventDefault();
+ if(!settingsReady||!dairyProducts.length)return flash('Dairy subscriptions are not available yet.',true);
+ const form=event.currentTarget,values=Object.fromEntries(new FormData(form));
+ const qty=Number(values.qty);
+ if(!Number.isInteger(qty)||qty<1||qty>50)return flash('Choose a valid quantity.',true);
+ values.items=[{productId:values.productId,qty}];
+ delete values.productId;delete values.qty;
+ const btn=$('subscription-submit');btn.disabled=true;
+ try{
+  const data=await api('/subscriptions',{method:'POST',body:JSON.stringify(values)});
+  $('subscription-result').textContent='Request saved: '+data.subscriptionCode+'. Status: pending. We will confirm your schedule and pricing by phone or WhatsApp.';
+  form.reset();
+ }catch(e){flash(e.message,true);}
+ finally{btn.disabled=!settingsReady||!dairyProducts.length;}
+}
+async function refreshDairy(){
+ const d=await api('/products?kind=dairy');dairyProducts=d.products||[];
+ renderDairy();renderCart();
 }
 function renderBaskets(){
  $('baskets').innerHTML=BASKETS.map((b,i)=>'<div class="basket"><div><strong>'+escapeHtml(b.name)+'</strong><small>'+b.items.map(x=>escapeHtml(x.join(' ×'))).join(', ')+'</small></div><button type="button" class="button outline" data-basket="'+i+'">Add</button></div>').join('');
@@ -239,6 +271,7 @@ async function start(){
  $('search').addEventListener('input',renderProducts);
  $('bucket-form').addEventListener('submit',event=>{event.preventDefault();addToCart($('bucket-product').value,Number($('bucket-qty').value));});
  $('checkout-form').addEventListener('submit',checkout);
+ $('subscription-form').addEventListener('submit',subscribe);
  $('lookup-form').addEventListener('submit',lookup);
  $('request-form').addEventListener('submit',enquiry);
  try{
@@ -250,8 +283,9 @@ async function start(){
   };
   const hours=shop.shopHours?formatTime(shop.shopHours.open)+'–'+formatTime(shop.shopHours.close):'';
   $('banner').textContent='🚚 Min '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km'+(hours?' · '+hours:'');
-  $('floating-whatsapp').href=wa('Hello Sokal Bela, I would like to order vegetables.');renderCart();
+  $('floating-whatsapp').href=wa('Hello Sokal Bela, I would like to order vegetables.');renderCart();renderDairy();
  }catch(e){flash('Settings: '+e.message,true);$('banner').textContent='Store temporarily unavailable';}
  try{await refresh();}catch(e){$('product-grid').textContent='Could not load vegetables: '+e.message;flash(e.message,true);}
+ try{await refreshDairy();}catch(e){$('dairy-grid').textContent='Could not load dairy: '+e.message;}
 }
 document.addEventListener('DOMContentLoaded',start);
