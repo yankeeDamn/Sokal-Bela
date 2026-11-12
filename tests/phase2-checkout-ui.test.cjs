@@ -49,12 +49,12 @@ test('checkout shows committed order after async event.currentTarget becomes nul
 
 test('bulk and catering submit control exists and enquiry returns a confirmation',async()=>{
  const html=fs.readFileSync('phase2-preview/index.html','utf8');
- const requestForm=html.match(/<form id="request-form"[\\s\\S]*?<\\/form>/)?.[0];
+ const requestForm=html.slice(html.indexOf('<form id="request-form"'),html.indexOf('</form>',html.indexOf('<form id="request-form"'))+7);
  assert.ok(requestForm,'request form exists');
  assert.match(requestForm,/<button[^>]*type="submit"[^>]*>Send enquiry/);
  const source=fs.readFileSync('phase2-preview/app.js','utf8');
  const start=source.indexOf('async function enquiry(event){');
- const end=source.indexOf('\\nasync function refresh(){',start);
+ const end=source.indexOf('async function refresh(){',start);
  assert.ok(start>=0&&end>start);
  for(const type of ['bulk','catering']){
   const button={disabled:false};
