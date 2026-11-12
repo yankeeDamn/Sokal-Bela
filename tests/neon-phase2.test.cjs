@@ -2,11 +2,11 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const {Pool}=require('pg');
-const order=require('../api/v2/orders');
-const products=require('../api/v2/products');
-const settings=require('../api/v2/settings');
-const lookup=require('../api/v2/order-lookup');
-const enquiry=require('../api/v2/requests');
+const order=require('../lib/v2-handlers/orders');
+const products=require('../lib/v2-handlers/products');
+const settings=require('../lib/v2-handlers/settings');
+const lookup=require('../lib/v2-handlers/order-lookup');
+const enquiry=require('../lib/v2-handlers/requests');
 const conn=new Pool({connectionString:process.env.DATABASE_URL,ssl:false});
 let nextIp=20;
 function mock(method,body={},query={}){
