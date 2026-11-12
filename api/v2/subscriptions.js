@@ -20,7 +20,8 @@ module.exports=async(req,res)=>{
     !Number.isFinite(Date.parse(b.startDate))||
     new Date(b.startDate).toISOString().slice(0,10)!==b.startDate)
    throw c.bad('Choose a valid start date.');
-  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).map(p=>[p.type,p.value]));
+  const today=parts.year+'-'+parts.month+'-'+parts.day;
   if(b.startDate<today)throw c.bad('Start date cannot be in the past.');
   if(!Array.isArray(b.items)||b.items.length<1||b.items.length>20)
    throw c.bad('Choose 1 to 20 dairy products.');
