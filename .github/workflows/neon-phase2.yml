@@ -42,6 +42,9 @@ jobs:
           for f in api/v2/*.js; do node --check "$f"; done
           node --check phase2-preview/app.js
           node --check tests/neon-phase2.test.cjs
+          node --check tests/phase2-checkout-ui.test.cjs
+      - name: Checkout browser-state regression test
+        run: node --test tests/phase2-checkout-ui.test.cjs
       - name: Apply schema, starter records and Phase 2 rate limit
         run: |
           psql -X -v ON_ERROR_STOP=1 -f db/schema.sql
