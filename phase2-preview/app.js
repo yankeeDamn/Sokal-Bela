@@ -144,6 +144,9 @@ function renderCart(){
 }
 async function checkout(event){
  event.preventDefault();
+ // Keep the form reference BEFORE awaiting the network response:
+ // event.currentTarget may be null when async event dispatch has finished.
+ const form=event.currentTarget;
  if(!settingsReady)return flash('Shop settings unavailable. Checkout is disabled.',true);
  const lines=cartLines();
  if(lines.length<1 || lines.length>40 || cart.length!==lines.length || lines.some(x=>x.product.stock<x.qty)){
@@ -157,17 +160,39 @@ async function checkout(event){
   go('cart');
   return;
  }
- const btn=$('place-order'),values=Object.fromEntries(new FormData(event.currentTarget));
+ const btn=$('place-order'),values=Object.fromEntries(new FormData(form));
  values.items=lines.map(x=>({productId:x.id,qty:x.qty}));
  btn.disabled=true;btn.textContent='Saving order…';
+ let savedOrder=null;
  try{
-  const data=await api('/orders',{method:'POST',body:JSON.stringify(values)});
-  $('order-number').textContent=data.orderNo;$('success-total').textContent='Total: '+money(data.total);
-  const rows=lines.map(x=>x.product.name_en+' × '+x.qty).join('\n');
-  $('send-whatsapp').href=wa('Sokal Bela order '+data.orderNo+'\n'+rows+'\nTotal: ₹'+data.total+'\nName: '+values.customerName+'\nPhone: '+values.phone+'\nAddress: '+values.address+'\nPincode: '+values.pincode+'\nDelivery time: '+values.deliverySlot+'\nNotes: '+(values.notes||'-')+'\nConfirm by WhatsApp, pay cash or UPI on delivery.');
-  cart=[];persist();event.currentTarget.reset();go('success');$('send-whatsapp').focus();
- }catch(e){flash(e.message,true);await refresh().catch(()=>{});}
- finally{btn.disabled=false;btn.textContent='Confirm Order · অর্ডার করুন';}
+  savedOrder=await api('/orders',{method:'POST',body:JSON.stringify(values)});
+ }catch(e){
+  flash(e.message,true);
+  await refresh().catch(()=>{});
+  return;
+ }finally{
+  btn.disabled=false;
+  btn.textContent='Confirm Order · অর্ডার করুন';
+ }
+ // From here the order is already committed. An unrelated UI or browser
+ // storage failure must NEVER tell the shopper their order failed.
+ const data=savedOrder;
+ $('order-number').textContent=data.orderNo;
+ $('success-total').textContent='Total: '+money(data.total);
+ const rows=lines.map(x=>x.product.name_en+' × '+x.qty).join('\n');
+ $('send-whatsapp').href=wa('Sokal Bela order '+data.orderNo+'\n'+rows+'\nTotal: ₹'+data.total+'\nName: '+values.customerName+'\nPhone: '+values.phone+'\nAddress: '+values.address+'\nPincode: '+values.pincode+'\nDelivery time: '+values.deliverySlot+'\nNotes: '+(values.notes||'-')+'\nConfirm by WhatsApp, pay cash or UPI on delivery.');
+ // Show the saved order number first; then best-effort cleanup.
+ go('success');
+ try{
+  localStorage.setItem('sokal-bela-pg-last-receipt-v1',
+   JSON.stringify({orderNo:data.orderNo,total:data.total,createdAt:new Date().toISOString()}));
+ }catch(e){console.warn('Receipt backup not saved');}
+ try{
+  cart=[];
+  persist();
+  form.reset();
+ }catch(e){console.warn('Order confirmed; cart cleanup failed');}
+ $('send-whatsapp').focus();
 }
 async function lookup(event){
  event.preventDefault();const f=new FormData(event.currentTarget);
