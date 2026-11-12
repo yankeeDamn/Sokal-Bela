@@ -74,9 +74,10 @@ function go(id){
  document.querySelectorAll('.tab').forEach(node=>{const active=node.dataset.go===id;node.classList.toggle('active',active);node.setAttribute('aria-current',active?'page':'false');});
  if(id==='checkout'){
   const lines=cartLines();
+  const unavailable=cart.some(x=>!byId(x.id)||byId(x.id).stock<x.qty);
   const count=lines.length;
   const total=lines.reduce((sum,line)=>sum+Math.round(Number(line.product.price)*100)*line.qty,0)/100;
-  if(!settingsReady || !count || count>40 || total<shop.minOrder){
+  if(!settingsReady || unavailable || !count || count>40 || total<shop.minOrder){
    flash(!count?'Your cart is empty. Add a vegetable first.':'Review your cart before checkout.',true);
    id='cart';
    document.querySelectorAll('.screen').forEach(node=>node.classList.toggle('active',node.id===id));
@@ -118,23 +119,35 @@ function addBasket(index){
  if(n){persist();flash(n+' available products added. Review cart.');}else flash('None of these basket products are currently available.',true);
 }
 function renderCart(){
- $('badge').textContent=cart.reduce((s,x)=>s+x.qty,0);
- const rows=cartLines(),subtotalCents=rows.reduce((s,x)=>s+Math.round(Number(x.product.price)*100)*x.qty,0);
+ $('badge').textContent=cart.reduce((sum,x)=>sum+x.qty,0);
+ // Never silently hide a saved cart line. Show unavailable stock explicitly,
+ // including while the catalogue loads or after another order sells it out.
+ const missing=cart.filter(x=>!byId(x.id));
+ const soldOut=cart.filter(x=>byId(x.id)&&byId(x.id).stock<x.qty);
+ const rows=cartLines().filter(x=>x.product.stock>=x.qty);
+ const subtotalCents=rows.reduce((sum,x)=>sum+Math.round(Number(x.product.price)*100)*x.qty,0);
  const subtotal=subtotalCents/100,fee=subtotal>=shop.freeDeliveryMin?0:shop.deliveryFee;
  $('cart-lines').innerHTML=rows.length?rows.map(x=>'<div class="cart-line"><div><strong>'+escapeHtml(x.product.name_en)+' · '+escapeHtml(x.product.name_bn)+'</strong><small>'+money(x.product.price)+' / '+escapeHtml(x.product.unit)+'</small><button type="button" class="text-button" data-remove="'+x.id+'">Remove</button></div><input type="number" min="0" max="50" value="'+x.qty+'" aria-label="Quantity" data-line="'+x.id+'"><strong>'+money(x.product.price*x.qty)+'</strong></div>').join(''):'<p>Your cart is empty.</p>';
+ const unavailable=[...missing,...soldOut].map(x=>{
+  const p=byId(x.id);
+  const label=p?escapeHtml(p.name_en)+' · '+escapeHtml(p.name_bn):'Product #'+escapeHtml(x.id);
+  const message=p?'Only '+p.stock+' remaining; requested '+x.qty+'.':'Unavailable or catalogue still loading.';
+  return '<div class="cart-line"><div><strong>'+label+'</strong><small style="color:#a32922">'+escapeHtml(message)+'</small><button type="button" class="text-button" data-remove="'+escapeHtml(x.id)+'">Remove unavailable item</button></div></div>';
+ }).join('');
+ if(unavailable)$('cart-lines').insertAdjacentHTML('beforeend','<div role="alert" class="notice">Some items are unavailable. Please remove them or adjust their quantities before checkout.</div>'+unavailable);
  $('subtotal').textContent=money(subtotal);$('delivery-fee').textContent=money(rows.length?fee:0);$('grand-total').textContent=money(rows.length?subtotal+fee:0);
  $('free-progress').max=shop.freeDeliveryMin;$('free-progress').value=Math.min(subtotal,shop.freeDeliveryMin);
  $('progress-msg').textContent=!settingsReady?'Store settings are loading…':subtotal<shop.minOrder?'Add '+money(shop.minOrder-subtotal)+' for the minimum order.':
  subtotal<shop.freeDeliveryMin?'Minimum reached! Add '+money(shop.freeDeliveryMin-subtotal)+' for free delivery within '+shop.radiusKm+' km.':'Free delivery threshold reached (within '+shop.radiusKm+' km).';
- $('checkout-go').disabled=!settingsReady||!rows.length||subtotal<shop.minOrder;
+ $('checkout-go').disabled=!settingsReady||!rows.length||!!missing.length||!!soldOut.length||subtotal<shop.minOrder;
  $('checkout-policy').textContent=settingsReady?'Minimum '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km. Cash or UPI on delivery.':'Loading store settings…';
 }
 async function checkout(event){
  event.preventDefault();
  if(!settingsReady)return flash('Shop settings unavailable. Checkout is disabled.',true);
  const lines=cartLines();
- if(lines.length<1 || lines.length>40){
-  flash('Your cart is empty or has too many products. Return to Cart and add a vegetable.',true);
+ if(lines.length<1 || lines.length>40 || cart.length!==lines.length || lines.some(x=>x.product.stock<x.qty)){
+  flash('Your cart includes unavailable or insufficient-stock items. Review your cart before checkout.',true);
   go('cart');
   return;
  }
