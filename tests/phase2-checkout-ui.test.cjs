@@ -24,7 +24,7 @@ test('checkout shows committed order after async event.currentTarget becomes nul
   cart:[{id:'1',qty:1}],
   cartLines:()=>[{id:'1',qty:1,product:{name_en:'Potato',price:'350',stock:5}}],
   $:id=>elements[id],
-  FormData:class {constructor(value){assert.equal(value,form);}entries(){return [['customerName','Test'],['phone','9876543210'],['address','Test'],['pincode','731224'],['deliverySlot','Tomorrow']];}},
+  FormData:class {constructor(value){assert.equal(value,form);}[Symbol.iterator](){return [['customerName','Test'],['phone','9876543210'],['address','Test'],['pincode','731224'],['deliverySlot','Tomorrow']][Symbol.iterator]();}},
   api:async()=>{event.currentTarget=null;return {orderNo:'SB-20261112-ABCDEFGH',total:'350.00'};},
   money:n=>'₹'+n,
   wa:msg=>'https://example.test/?text='+encodeURIComponent(msg),
