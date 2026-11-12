@@ -204,7 +204,9 @@ async function lookup(event){
 async function enquiry(event){
  event.preventDefault();
  if(!settingsReady)return flash('Shop settings unavailable. Please retry later.',true);const form=event.currentTarget,values=Object.fromEntries(new FormData(form));
- values.items=[];const button=form.querySelector('button[type=submit]');button.disabled=true;
+ values.items=[];const button=form.querySelector('button[type=submit]');
+ if(!button){flash('Enquiry form is missing its submit button. Please reload the Preview.',true);return;}
+ button.disabled=true;
  try{
   const r=await api('/requests',{method:'POST',body:JSON.stringify(values)});
   const message='Sokal Bela '+values.type+' request #'+r.requestId+'\nName: '+values.contactName+'\nPhone: '+values.phone+'\nAddress/venue: '+values.address+'\nEvent: '+(values.eventDate||'To confirm')+'\nGuests: '+(values.guestCount||'-')+'\nRequirements: '+values.notes;
