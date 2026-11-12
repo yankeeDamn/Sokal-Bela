@@ -72,6 +72,16 @@ function go(id){
  const screen=$(id);if(!screen||!screen.classList.contains('screen'))return;
  document.querySelectorAll('.screen').forEach(node=>node.classList.toggle('active',node.id===id));
  document.querySelectorAll('.tab').forEach(node=>{const active=node.dataset.go===id;node.classList.toggle('active',active);node.setAttribute('aria-current',active?'page':'false');});
+ if(id==='checkout'){
+  const lines=cartLines();
+  const count=lines.length;
+  const total=lines.reduce((sum,line)=>sum+Math.round(Number(line.product.price)*100)*line.qty,0)/100;
+  if(!settingsReady || !count || count>40 || total<shop.minOrder){
+   flash(!count?'Your cart is empty. Add a vegetable first.':'Review your cart before checkout.',true);
+   id='cart';
+   document.querySelectorAll('.screen').forEach(node=>node.classList.toggle('active',node.id===id));
+  }
+ }
  if(id==='cart'||id==='checkout')renderCart();
  window.scrollTo({top:0,behavior:'auto'});
 }
@@ -122,13 +132,25 @@ function renderCart(){
 async function checkout(event){
  event.preventDefault();
  if(!settingsReady)return flash('Shop settings unavailable. Checkout is disabled.',true);
+ const lines=cartLines();
+ if(lines.length<1 || lines.length>40){
+  flash('Your cart is empty or has too many products. Return to Cart and add a vegetable.',true);
+  go('cart');
+  return;
+ }
+ const subtotal=lines.reduce((sum,line)=>sum+Math.round(Number(line.product.price)*100)*line.qty,0)/100;
+ if(subtotal<shop.minOrder){
+  flash('Minimum order is '+money(shop.minOrder)+'. Please add more items.',true);
+  go('cart');
+  return;
+ }
  const btn=$('place-order'),values=Object.fromEntries(new FormData(event.currentTarget));
- values.items=cart.map(x=>({productId:x.id,qty:x.qty}));
+ values.items=lines.map(x=>({productId:x.id,qty:x.qty}));
  btn.disabled=true;btn.textContent='Saving order…';
  try{
   const data=await api('/orders',{method:'POST',body:JSON.stringify(values)});
   $('order-number').textContent=data.orderNo;$('success-total').textContent='Total: '+money(data.total);
-  const rows=cartLines().map(x=>x.product.name_en+' × '+x.qty).join('\n');
+  const rows=lines.map(x=>x.product.name_en+' × '+x.qty).join('\n');
   $('send-whatsapp').href=wa('Sokal Bela order '+data.orderNo+'\n'+rows+'\nTotal: ₹'+data.total+'\nName: '+values.customerName+'\nPhone: '+values.phone+'\nAddress: '+values.address+'\nPincode: '+values.pincode+'\nDelivery time: '+values.deliverySlot+'\nNotes: '+(values.notes||'-')+'\nConfirm by WhatsApp, pay cash or UPI on delivery.');
   cart=[];persist();event.currentTarget.reset();go('success');$('send-whatsapp').focus();
  }catch(e){flash(e.message,true);await refresh().catch(()=>{});}
