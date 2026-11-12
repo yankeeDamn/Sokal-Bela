@@ -141,6 +141,16 @@ function renderCart(){
  subtotal<shop.freeDeliveryMin?'Minimum reached! Add '+money(shop.freeDeliveryMin-subtotal)+' for free delivery within '+shop.radiusKm+' km.':'Free delivery threshold reached (within '+shop.radiusKm+' km).';
  $('checkout-go').disabled=!settingsReady||!rows.length||!!missing.length||!!soldOut.length||subtotal<shop.minOrder;
  $('checkout-policy').textContent=settingsReady?'Minimum '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km. Cash or UPI on delivery.':'Loading store settings…';
+ // Checkout shows the same estimated charges as the cart. The server
+ // recalculates from database prices/settings when the order is submitted.
+ $('checkout-subtotal').textContent=money(subtotal);
+ $('checkout-delivery-fee').textContent=money(rows.length?fee:0);
+ $('checkout-grand-total').textContent=money(rows.length?subtotal+fee:0);
+ $('checkout-delivery-note').textContent=!settingsReady?'Delivery details are loading…':
+  subtotal>=shop.freeDeliveryMin?'Free delivery for eligible addresses within '+shop.radiusKm+' km.':
+  shop.deliveryFee>0?'Delivery fee is '+money(shop.deliveryFee)+' below '+money(shop.freeDeliveryMin)+'. Delivery availability is confirmed by phone or WhatsApp.':
+  'No delivery fee is currently configured. Delivery availability is confirmed by phone or WhatsApp.';
+
 }
 async function checkout(event){
  event.preventDefault();
