@@ -46,3 +46,35 @@ test('checkout shows committed order after async event.currentTarget becomes nul
  assert.equal(context.cart.length,0);
  assert.equal(JSON.parse(storage.get('sokal-bela-pg-last-receipt-v1')).orderNo,'SB-20261112-ABCDEFGH');
 });
+
+test('bulk and catering submit control exists and enquiry returns a confirmation',async()=>{
+ const html=fs.readFileSync('phase2-preview/index.html','utf8');
+ const requestForm=html.match(/<form id="request-form"[\\s\\S]*?<\\/form>/)?.[0];
+ assert.ok(requestForm,'request form exists');
+ assert.match(requestForm,/<button[^>]*type="submit"[^>]*>Send enquiry/);
+ const source=fs.readFileSync('phase2-preview/app.js','utf8');
+ const start=source.indexOf('async function enquiry(event){');
+ const end=source.indexOf('\\nasync function refresh(){',start);
+ assert.ok(start>=0&&end>start);
+ for(const type of ['bulk','catering']){
+  const button={disabled:false};
+  const form={querySelector:selector=>selector==='button[type=submit]'?button:null,reset(){this.didReset=true;}};
+  const elements={'request-result':{innerHTML:''}};
+  const context={
+   settingsReady:true,
+   FormData:class{constructor(x){assert.equal(x,form);}[Symbol.iterator](){return [['type',type],['contactName','Test Shop'],['phone','9876543210'],['address','Rampurhat'],['eventDate',''],['guestCount',''],['notes','Test request'],['website','']][Symbol.iterator]();}},
+   $:id=>elements[id],
+   api:async(path,options)=>{assert.equal(path,'/requests');assert.equal(options.method,'POST');assert.equal(JSON.parse(options.body).type,type);return {requestId:'42'};},
+   wa:message=>'https://example.test/?text='+encodeURIComponent(message),
+   escapeHtml:s=>s,
+   flash:message=>{throw Error('Unexpected error: '+message)}
+  };
+  vm.createContext(context);
+  vm.runInContext(source.slice(start,end),context);
+  await vm.runInContext('enquiry',context)({currentTarget:form,preventDefault(){}});
+  assert.equal(button.disabled,false);
+  assert.equal(form.didReset,true);
+  assert.match(elements['request-result'].innerHTML,/Request saved/);
+  assert.match(elements['request-result'].innerHTML,/Send on WhatsApp/);
+ }
+});
