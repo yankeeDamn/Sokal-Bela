@@ -13,10 +13,24 @@ const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:
 const wa=text=>'https://wa.me/'+'91'+String(shop.shopPhone).replace(/\D/g,'')+'?text='+encodeURIComponent(text);
 function flash(message,isError=false){const el=$('flash');el.textContent=message;el.className=isError?'error':'';el.hidden=false;clearTimeout(flash.timeout);flash.timeout=setTimeout(()=>el.hidden=true,6000);}
 async function api(path,options={}){
- let response;try{response=await fetch(BASE+path,{...options,credentials:'omit',headers:options.body?{'Content-Type':'application/json'}:{}});}
- catch{throw Error('Network unavailable. Check your connection.');}
+ // Vercel's protected Preview deployment uses a same-origin authentication
+ // cookie. Omitting credentials prevents the storefront from calling its own API.
+ let response;
+ try{
+  response=await fetch(BASE+path,{...options,credentials:'same-origin',redirect:'follow',
+   headers:options.body?{'Content-Type':'application/json'}:{}});
+ }catch{throw Error('Could not connect to the store API. Check your connection.');}
+ const type=response.headers.get('content-type')||'';
+ const redirectedToLogin=response.redirected &&
+   /(?:vercel\.com|vercel\.app)/i.test(new URL(response.url).hostname) &&
+   !new URL(response.url).pathname.startsWith('/api/v2/');
+ if(!type.includes('application/json')){
+  if(redirectedToLogin||response.status===401||response.status===403)
+   throw Error('Preview authentication required. Sign in to Vercel using this same Preview address, then reload.');
+  throw Error('The store API returned a web page instead of JSON (HTTP '+response.status+'). Check Vercel Deployment Protection or Function Logs.');
+ }
  const data=await response.json().catch(()=>({}));
- if(!response.ok)throw Error(data.error||'Store service unavailable. Please retry.');
+ if(!response.ok)throw Error(data.error||'Store API error (HTTP '+response.status+').');
  return data;
 }
 function sanitizeCart(items){
