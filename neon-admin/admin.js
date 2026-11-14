@@ -175,7 +175,7 @@ function renderOrders(data){
   ['Delivery',o=>line(o.delivery_slot,o.pincode)],
   ['Total',o=>line(money(o.total),'Delivery '+money(o.delivery_fee))],
   ['Email alert',o=>{const wrap=node('div');wrap.append(badge(o.alert_status));
-   if(o.alert_status!=='sent'&&o.alert_status!=='sending')wrap.append(button('Retry','small light',async()=>{try{await save({action:'retry-alert',id:o.id},'order alert');}catch(e){notice(e.message,true);}}));
+   if(['failed','pending'].includes(o.alert_status))wrap.append(button('Retry','small light',async()=>{try{await save({action:'retry-alert',id:o.id},'order alert');}catch(e){notice(e.message,true);}}));
    return wrap;}],
   ['Status',o=>{const sel=editSelect(o.status,ORDER);const wrap=node('div');wrap.append(sel,button('Save','small primary',()=>save({action:'order-status',id:o.id,status:sel.value},'order status').catch(e=>notice(e.message,true))));return wrap;}],
   ['Details',o=>button('View','small outline',()=>orderDetail(o))]
