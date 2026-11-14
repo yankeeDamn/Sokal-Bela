@@ -186,7 +186,7 @@ function orderDetail(o){
   const items=node('ul','item-list');
   for(const i of o.items||[]){const li=node('li');li.append(node('span','',i.name+' × '+i.qty),node('strong','',money(i.total)));items.append(li);}
   root.append(items,details(o,[['Customer','customer_name'],['Phone','phone'],['Address','address'],['Pincode','pincode'],['Delivery time','delivery_slot'],['Notes','notes'],['Subtotal','subtotal'],['Delivery fee','delivery_fee'],['Total','total'],['Status','status'],['Email alert','alert_status']]));
-  const chat=node('a','button light','Message customer on WhatsApp ↗');chat.href='https://wa.me/91'+o.phone;chat.target='_blank';chat.rel='noopener noreferrer';root.append(node('p'),chat);
+  const chat=node('a','button light','Message customer on WhatsApp ↗');chat.href='https://wa.me/'+'91'+o.phone;chat.target='_blank';chat.rel='noopener noreferrer';root.append(node('p'),chat);
  });
 }
 function renderProducts(data){
