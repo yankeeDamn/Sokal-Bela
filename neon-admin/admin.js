@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('login-form').addEventListener('submit',async event=>{
   event.preventDefault();const form=event.currentTarget,submit=form.querySelector('button[type=submit]');submit.disabled=true;
   try{
-   await api('/admin-auth',{method:'POST',body:JSON.stringify({action:'login',password:form.password.value})});
+   await api('/admin-auth',{method:'POST',body:JSON.stringify({action:'login',password:new FormData(form).get('password')})});
    form.reset();showApp();await load();
   }catch(e){$('login-help').textContent=e.message;}
   finally{submit.disabled=false;}
