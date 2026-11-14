@@ -1,6 +1,6 @@
 -- Sokal Bela Phase 5: additive, non-destructive operational tables.
 -- Apply to a TEST Neon branch first. Apply to production before releasing
--- order notifications/admin features; do not modify existing orders or stock.
+-- order notifications and admin features. Existing orders and stock are unchanged.
 BEGIN;
 CREATE TABLE IF NOT EXISTS order_alerts (
   order_id BIGINT PRIMARY KEY REFERENCES orders(id) ON DELETE CASCADE,
