@@ -11,7 +11,7 @@ const SKIP = new Set([
   'dist', 'src', 'api', 'backend', 'scripts', 'node_modules', '.git', '.github', '.vercel',
   'local-server.js', 'build.js', 'vercel.json', 'package.json', 'package-lock.json',
   'admin.html', 'admin.js', 'app.js', 'style.css', 'db-operations.js', 'notifications.js', 'razorpay-integration.js', 'lib',
-  '.vercelignore', '.gitignore', '.env', '.env.example', '.firebaserc', 'firebase.json',
+  'db', 'tests', '.vercelignore', '.gitignore', '.env', '.env.example', '.firebaserc', 'firebase.json',
   'firestore.rules', 'storage.rules', 'README.md', 'BUSINESS-SETUP.md'
 ]);
 

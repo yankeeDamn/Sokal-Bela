@@ -1,0 +1,35 @@
+/* Account, Morning Pass and payment screens. Builds on phase2-preview/style.css tokens. */
+.acct-chip{border:1px solid var(--line);background:#fff;color:var(--dark);border-radius:14px;padding:9px 14px;font-weight:700;white-space:nowrap}
+.acct-chip span{display:inline-block;max-width:9ch;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+.top-inner{flex-wrap:wrap}
+.tabs{flex-wrap:wrap}.tab{min-width:120px}
+.auth-card{max-width:460px;margin:0 auto}
+.auth-switch{margin:14px 0 6px}.small,small{font-size:.8rem;color:var(--muted)}
+.field small{font-weight:400}
+.subtabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px}
+.cards{display:grid;gap:14px}.cards.single{margin:10px 0}
+.card{border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:#fff}
+.card-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.card-head small{display:block}
+.card-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;border-top:1px dashed var(--line);margin-top:10px;padding-top:10px}
+.card-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.lines{list-style:none;margin:10px 0 0;padding:0}.lines li{display:flex;justify-content:space-between;gap:12px;padding:4px 0;color:var(--ink)}
+.badge{display:inline-block;border-radius:99px;padding:3px 10px;font-size:.72rem;font-weight:800;margin-left:4px;background:#eef2ef;color:#44564b}
+.badge.green{background:#dff3e3;color:#1e5a28}.badge.amber{background:#fdf0d2;color:#8a5200}.badge.red{background:#fde3e1;color:#a32922}.badge.blue{background:#e1ecfb;color:#1d4e9a}
+.pass-cta{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:var(--mint);border:1px solid #bcdcc2;border-radius:16px;padding:16px 18px;margin:18px 0}
+.pass-cta h2,.pass-cta p{margin:0 0 4px}
+.add-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:14px 0}.add-row .field:first-child{flex:1;min-width:220px}.add-row input{max-width:100px}
+.estimate{background:var(--mint);border-radius:12px;padding:12px 14px;color:var(--ink)}.estimate:empty{display:none}
+.inline-pause{display:inline-flex;gap:6px;align-items:center}.inline-pause input{border:1px solid #bfd5c3;border-radius:10px;padding:9px;min-height:44px}
+.button.danger{color:#a32922;border-color:#e3a8a4}
+.pay-method{border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:grid;gap:8px}.pay-method legend{font-weight:800;padding:0 6px}.pay-method label{display:flex;gap:8px;align-items:center}
+.error-text{color:#a32922}
+.success .hero-actions{justify-content:center}
+@media(max-width:560px){.top-note{display:none}.tab{min-width:0;flex:1 1 40%;max-width:none}.card-foot{flex-direction:column;align-items:flex-start}}
+@media(max-width:560px){
+ .top-inner{flex-wrap:nowrap;gap:8px;padding:8px 12px;min-height:56px}
+ .brand{font-size:1.1rem}.brand small{display:none}
+ .acct-chip,.cart-chip{padding:7px 10px;font-size:.88rem}
+ .tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:4px;padding:8px 10px;-webkit-overflow-scrolling:touch}
+ .tab{flex:0 0 auto;min-width:86px;max-width:none;padding:7px 10px;min-height:44px;font-size:.88rem}
+}

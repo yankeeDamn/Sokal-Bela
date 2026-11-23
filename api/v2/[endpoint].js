@@ -9,6 +9,10 @@ const handlers=Object.freeze({
  requests:require('../../lib/v2-handlers/requests'),
  subscriptions:require('../../lib/v2-handlers/subscriptions'),
  kitchen:require('../../lib/v2-handlers/kitchen'),
+ auth:require('../../lib/v2-handlers/auth'),
+ account:require('../../lib/v2-handlers/account'),
+ payments:require('../../lib/v2-handlers/payments'),
+ manage:require('../../lib/v2-handlers/manage'),
  admin:require('../../lib/v2-handlers/admin'),
  'admin-auth':require('../../lib/v2-handlers/admin-auth')
 });

@@ -48,6 +48,7 @@ jobs:
           node --check lib/v2-handlers/admin-auth.js
           node --check neon-admin/admin.js
           node --check tests/phase5-operations.test.cjs
+          for f in lib/auth-core.js lib/billing.js lib/cashfree.js lib/payments-core.js lib/v2-handlers/auth.js lib/v2-handlers/account.js lib/v2-handlers/payments.js lib/v2-handlers/manage.js api/cashfree-webhook.js js/account.js admin/admin.js tests/phase3.test.cjs; do node --check "$f"; done
           node --check tests/neon-phase2.test.cjs
           node --check tests/phase2-checkout-ui.test.cjs
       - name: Checkout browser-state regression test
@@ -58,8 +59,10 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f db/seed.sql
           psql -X -v ON_ERROR_STOP=1 -f db/phase2.sql
           psql -X -v ON_ERROR_STOP=1 -f db/phase5-operations.sql
+          psql -X -v ON_ERROR_STOP=1 -f db/phase3.sql
+          psql -X -v ON_ERROR_STOP=1 -f db/phase3.sql  # must be safe to run twice
       - name: Real PostgreSQL API and transaction tests
-        run: node --test --test-concurrency=1 tests/neon-phase2.test.cjs tests/phase5-operations.test.cjs
+        run: node --test --test-concurrency=1 tests/neon-phase2.test.cjs tests/phase5-operations.test.cjs tests/phase3.test.cjs
       - name: Existing storefront build and 390px Chrome smoke screenshot
         run: |
           npm run build
