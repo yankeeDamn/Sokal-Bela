@@ -84,6 +84,7 @@ function go(id){
   }
  }
  if(id==='cart'||id==='checkout')renderCart();
+ if(typeof onScreen==='function')onScreen(id);
  window.scrollTo({top:0,behavior:'auto'});
 }
 function renderProducts(){
@@ -111,8 +112,10 @@ function renderDairy(){
   '<div class="info"><h3>'+escapeHtml(p.name_en)+' <span lang="bn">'+escapeHtml(p.name_bn)+'</span></h3>'+
   '<p>'+escapeHtml(p.pack_size||p.category)+'</p><div class="price">'+money(p.price)+' / '+escapeHtml(p.unit)+'</div></div>'+
   '<div class="actions"><input type="number" min="1" max="50" value="1" data-qty="'+p.id+'" aria-label="Quantity for '+escapeHtml(p.name_en)+'">'+
-  '<button class="button primary" data-add="'+p.id+'">Add · যোগ</button></div></article>'
- ).join(''):'<p>No dairy products are active yet. Morning Pass requests open once the shop enables dairy stock and prices.</p>';
+  '<button class="button primary" data-add="'+p.id+'">Add · যোগ</button><button type="button" class="button outline" data-pass-add="'+p.id+'">+ Morning Pass</button></div></article>'
+ ).join(''):'<p>No dairy products are active yet. Please check back soon.</p>';
+
+ if(!$('sub-product'))return;
  $('sub-product').innerHTML=available.map(p=>'<option value="'+p.id+'">'+escapeHtml(p.name_en)+' · '+escapeHtml(p.pack_size||p.unit)+' · '+money(p.price)+'</option>').join('');
  $('subscription-submit').disabled=!settingsReady||!available.length;
 }
@@ -184,7 +187,7 @@ function renderCart(){
  $('progress-msg').textContent=!settingsReady?'Store settings are loading…':subtotal<shop.minOrder?'Add '+money(shop.minOrder-subtotal)+' for the minimum order.':
  subtotal<shop.freeDeliveryMin?'Minimum reached! Add '+money(shop.freeDeliveryMin-subtotal)+' for free delivery within '+shop.radiusKm+' km.':'Free delivery threshold reached (within '+shop.radiusKm+' km).';
  $('checkout-go').disabled=!settingsReady||!rows.length||!!missing.length||!!soldOut.length||subtotal<shop.minOrder;
- $('checkout-policy').textContent=settingsReady?'Minimum '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km. Cash or UPI on delivery.':'Loading store settings…';
+ $('checkout-policy').textContent=settingsReady?'Minimum '+money(shop.minOrder)+' · Free delivery '+money(shop.freeDeliveryMin)+'+ within '+shop.radiusKm+' km. Pay on delivery or online.':'Loading store settings…';
  // Checkout shows the same estimated charges as the cart. The server
  // recalculates from database prices/settings when the order is submitted.
  $('checkout-subtotal').textContent=money(subtotal);
@@ -234,7 +237,7 @@ async function checkout(event){
  $('order-number').textContent=data.orderNo;
  $('success-total').textContent='Total: '+money(data.total);
  const rows=lines.map(x=>x.product.name_en+' × '+x.qty).join('\n');
- $('send-whatsapp').href=wa('Sokal Bela order '+data.orderNo+'\n'+rows+'\nTotal: ₹'+data.total+'\nName: '+values.customerName+'\nPhone: '+values.phone+'\nAddress: '+values.address+'\nPincode: '+values.pincode+'\nDelivery time: '+values.deliverySlot+'\nNotes: '+(values.notes||'-')+'\nConfirm by WhatsApp, pay cash or UPI on delivery.');
+ $('send-whatsapp').href=wa('Sokal Bela order '+data.orderNo+'\n'+rows+'\nTotal: ₹'+data.total+'\nName: '+values.customerName+'\nPhone: '+values.phone+'\nAddress: '+values.address+'\nPincode: '+values.pincode+'\nDelivery time: '+values.deliverySlot+'\nNotes: '+(values.notes||'-')+(data.payment?'\nPayment: online via Cashfree.':'\nConfirm by WhatsApp, pay cash or UPI on delivery.'));
  // Show the saved order number first; then best-effort cleanup.
  go('success');
  try{
@@ -247,6 +250,8 @@ async function checkout(event){
   form.reset();
  }catch(e){console.warn('Order confirmed; cart cleanup failed');}
  $('send-whatsapp').focus();
+ if(data.payment&&typeof launchCashfree==='function')launchCashfree(data.payment).catch(e=>flash(e.message,true));
+ else if(data.paymentError&&typeof onPaymentError==='function')onPaymentError(data.paymentError);
 }
 async function lookup(event){
  event.preventDefault();const f=new FormData(event.currentTarget);
@@ -283,7 +288,7 @@ async function start(){
  $('search').addEventListener('input',renderProducts);
  $('bucket-form').addEventListener('submit',event=>{event.preventDefault();addToCart($('bucket-product').value,Number($('bucket-qty').value));});
  $('checkout-form').addEventListener('submit',checkout);
- $('subscription-form').addEventListener('submit',subscribe);
+ if($('subscription-form'))$('subscription-form').addEventListener('submit',subscribe);
  $('lookup-form').addEventListener('submit',lookup);
  $('request-form').addEventListener('submit',enquiry);
  try{
@@ -301,4 +306,4 @@ async function start(){
  try{await refreshDairy();}catch(e){$('dairy-grid').textContent='Could not load dairy: '+e.message;}
  try{await refreshKitchen();}catch(e){$('kitchen-grid').textContent='Could not load kitchen items: '+e.message;}
 }
-document.addEventListener('DOMContentLoaded',start);
+document.addEventListener('DOMContentLoaded',async()=>{await start();if(typeof initAccount==='function')initAccount();});

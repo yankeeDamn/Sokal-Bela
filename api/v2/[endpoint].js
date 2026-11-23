@@ -8,7 +8,11 @@ const handlers=Object.freeze({
  'order-lookup':require('../../lib/v2-handlers/order-lookup'),
  requests:require('../../lib/v2-handlers/requests'),
  subscriptions:require('../../lib/v2-handlers/subscriptions'),
- kitchen:require('../../lib/v2-handlers/kitchen')
+ kitchen:require('../../lib/v2-handlers/kitchen'),
+ auth:require('../../lib/v2-handlers/auth'),
+ account:require('../../lib/v2-handlers/account'),
+ payments:require('../../lib/v2-handlers/payments'),
+ admin:require('../../lib/v2-handlers/admin')
 });
 module.exports=async(req,res)=>{
  const endpoint=typeof req.query?.endpoint==='string'?req.query.endpoint:'';

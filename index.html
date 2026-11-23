@@ -2,17 +2,20 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1e5a28"><meta name="robots" content="index,follow">
 <title>Sokal Bela · Fresh Vegetables, Dairy & Delivery · Rampurhat</title>
-<link rel="stylesheet" href="/phase2-preview/style.css"><link rel="canonical" href="https://sokal-bela.vercel.app/"></head>
+<link rel="stylesheet" href="/phase2-preview/style.css"><link rel="stylesheet" href="/public/account.css"><link rel="canonical" href="https://sokal-bela.vercel.app/"></head>
 <body>
 <header class="top"><div class="top-inner">
   <button class="brand" type="button" data-go="vegetables">🥬 <span>Sokal Bela<small>সকাল বেলা · Rampurhat</small></span></button>
   <span class="top-note">Farm fresh · প্রতিদিন তাজা</span>
+  <button id="open-account" class="acct-chip" type="button" data-go="account" aria-label="Account">👤 <span id="account-label">Sign in</span></button>
   <button id="open-cart" class="cart-chip" type="button" data-go="cart">🛒 Cart <span id="badge">0</span></button>
 </div></header>
 <div class="delivery-banner" id="banner">Loading delivery information…</div>
 <nav class="tabs" aria-label="Shopping sections">
 <button type="button" class="tab active" data-go="vegetables">🥬 Vegetables<span lang="bn">শাকসবজি</span></button>
 <button type="button" class="tab" data-go="dairy">🥛 Dairy<span lang="bn">দুধ ও ঘি</span></button>
+<button type="button" class="tab" data-go="newspaper">📰 Newspaper<span lang="bn">খবরের কাগজ</span></button>
+<button type="button" class="tab" data-go="pass">🌅 Morning Pass<span lang="bn">সকালের পাস</span></button>
 <button type="button" class="tab" data-go="kitchen">🍳 Kitchen<span lang="bn">রান্নাঘর</span></button>
 </nav>
 <main id="main">
@@ -30,24 +33,18 @@
 <section id="dairy" class="screen panel"><h1>🥛 Dairy · দুধ, পনির ও ঘি</h1>
  <p>Fresh milk, paneer and ghee. Only products activated by the shop are shown.</p>
  <div id="dairy-grid" class="grid products" aria-live="polite"><p>Loading dairy products…</p></div>
- <h2>🌅 Morning Pass · সকালের ডেলিভারি</h2>
- <p>Request a recurring dairy delivery. We confirm the schedule, availability and pricing by phone or WhatsApp. No advance payment or automatic charges.</p>
- <form id="subscription-form" class="form-grid">
-  <label class="field wide">Dairy product<select name="productId" id="sub-product" required></select></label>
-  <label class="field">Quantity per delivery<input name="qty" type="number" min="1" max="50" value="1" required></label>
-  <label class="field">Frequency<select name="frequency" required><option value="daily">Every day</option><option value="mon_sat">Monday–Saturday</option><option value="weekly">Once a week</option></select></label>
-  <label class="field">Morning delivery slot<select name="slot" required><option value="06:00-08:00">6–8 AM</option><option value="07:00-09:00">7–9 AM</option><option value="08:00-10:00">8–10 AM</option></select></label>
-  <label class="field">Preferred start date<input name="startDate" type="date" required></label>
-  <label class="field">Full name<input name="customerName" maxlength="120" required autocomplete="name"></label>
-  <label class="field">Phone<input name="phone" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" required></label>
-  <label class="field wide">Delivery address<textarea name="address" maxlength="500" required></textarea></label>
-  <label class="field">Pincode<input name="pincode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="731224" required></label>
-  <label class="field wide">Notes (optional)<textarea name="notes" maxlength="500"></textarea></label>
-  <label class="trap" aria-hidden="true">Leave blank<input name="website" tabindex="-1" autocomplete="off"></label>
-  <button id="subscription-submit" class="button primary wide" type="submit" disabled>Request Morning Pass · আবেদন করুন</button>
- </form>
- <p id="subscription-result" role="status"></p>
+ <div class="pass-cta"><div><h2>🌅 Morning Pass · সকালের ডেলিভারি</h2>
+ <p>Get milk, ghee, paneer and your newspaper delivered every morning. Build one pass, pay online or on delivery, pause any time.</p></div>
+ <button type="button" class="button amber" data-go="pass">Build my Morning Pass</button></div>
 </section>
+<section id="newspaper" class="screen panel"><h1>📰 Newspaper · খবরের কাগজ</h1>
+ <p>Your paper at your door every morning with your milk. Choose papers, add them to a Morning Pass, and manage or pause the pass from your account.</p>
+ <div id="newspaper-grid" class="grid products" aria-live="polite"><p>Loading newspapers…</p></div>
+ <div class="pass-cta"><div><strong>Ready?</strong><p id="pass-draft-summary">Your pass is empty.</p></div><button type="button" class="button primary" data-go="pass">Open Morning Pass</button></div>
+</section>
+<section id="pass" class="screen panel"></section>
+<section id="account" class="screen panel"></section>
+<section id="pay-result" class="screen panel success"></section>
 <section id="kitchen" class="screen panel"><h1>🍳 Kitchen · রান্নাঘর</h1>
  <p>Explore useful kitchen accessories from Amazon and Flipkart. These links open the partner store; Sokal Bela does not sell or deliver these items directly.</p>
  <p class="notice">Affiliate disclosure: Sokal Bela may earn a commission from qualifying purchases, at no additional cost to you. Prices and availability are set by the partner store.</p>
@@ -57,7 +54,7 @@
  <div id="cart-lines"></div>
  <div class="progress"><label for="free-progress">Delivery progress · ডেলিভারি</label><progress id="free-progress" max="500" value="0"></progress><p id="progress-msg"></p></div>
  <div class="totals"><div><span>Subtotal</span><strong id="subtotal">₹0</strong></div><div><span>Delivery charge</span><strong id="delivery-fee">₹0</strong></div><div class="grand"><span>Total</span><strong id="grand-total">₹0</strong></div></div>
- <p class="notice">No online payment. Pay cash or UPI on delivery or at the shop. Below the free-delivery threshold, any applicable fee is shown at checkout.</p>
+ <p class="notice">Pay cash or UPI on delivery, or pay online at checkout when available. Below the free-delivery threshold, any applicable fee is shown at checkout.</p>
  <button type="button" id="checkout-go" class="button primary full" data-go="checkout">Proceed to Checkout</button>
 </section>
 <section id="checkout" class="screen panel"><button class="text-button" type="button" data-go="cart">← Back to cart</button><h1>🚚 Delivery Details · ডেলিভারি</h1><p id="checkout-policy"></p>
@@ -75,11 +72,14 @@
  <label class="field">Delivery time · সময়<input name="deliverySlot" placeholder="Today 5–7 PM" maxlength="100" required></label>
  <label class="field wide">Notes (optional)<textarea name="notes" maxlength="500" rows="2"></textarea></label>
  <label class="trap" aria-hidden="true">Leave blank<input name="website" tabindex="-1" autocomplete="off"></label>
- <div class="wide notice">We confirm availability and delivery by WhatsApp or phone. <strong>No online payment.</strong> Pay cash or UPI on delivery.</div>
+ <fieldset id="pay-method" class="wide pay-method"><legend>Payment · পেমেন্ট</legend>
+  <label><input type="radio" name="paymentMethod" value="cod" checked> Cash / UPI on delivery</label>
+  <label id="pay-online-label" hidden><input type="radio" name="paymentMethod" value="online"> Pay online now · UPI, cards, netbanking (secured by Cashfree)</label></fieldset>
+ <div id="checkout-account-note" class="wide notice"></div>
  <button type="submit" id="place-order" class="button primary wide">Confirm Order · অর্ডার করুন</button></form>
 </section>
 <section id="success" class="screen panel success"><div class="huge">✅</div><h1>Order request saved!</h1><p>Your order number:</p><div id="order-number" class="order-code"></div>
- <p id="success-total"></p><p>Send the prepared message to Sokal Bela so we can confirm your delivery.</p>
+ <p id="success-total"></p><p id="success-note">Send the prepared message to Sokal Bela so we can confirm your delivery.</p>
  <a id="send-whatsapp" class="button whats" href="#" target="_blank" rel="noopener noreferrer">Open WhatsApp confirmation</a>
  <button type="button" data-go="lookup" class="button outline">Track order</button></section>
 <section id="lookup" class="screen panel"><h1>📦 Check Your Order</h1><form id="lookup-form" class="form-grid">
@@ -99,6 +99,7 @@
 </main>
 <div id="flash" role="status" aria-live="polite" hidden></div>
 <a class="floating-whatsapp" id="floating-whatsapp" href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Sokal Bela">💬</a>
-<footer><div class="footer-inner"><div><strong>🥬 Sokal Bela · সকাল বেলা</strong><p>Rampurhat, Birbhum, West Bengal</p></div><div><button type="button" class="text-button" data-go="lookup">My order</button><p>Cash / UPI on delivery · No online checkout</p></div></div></footer>
+<footer><div class="footer-inner"><div><strong>🥬 Sokal Bela · সকাল বেলা</strong><p>Rampurhat, Birbhum, West Bengal</p></div><div><button type="button" class="text-button" data-go="lookup">My order</button><p>Cash / UPI on delivery · Secure online payment by Cashfree</p></div></div></footer>
 <script src="/phase2-preview/app.js" defer></script>
+<script src="/js/account.js" defer></script>
 </body></html>
