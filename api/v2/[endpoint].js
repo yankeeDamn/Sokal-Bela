@@ -13,6 +13,8 @@ const handlers=Object.freeze({
  account:require('../../lib/v2-handlers/account'),
  payments:require('../../lib/v2-handlers/payments'),
  admin:require('../../lib/v2-handlers/admin')
+ admin:require('../../lib/v2-handlers/admin'),
+ 'admin-auth':require('../../lib/v2-handlers/admin-auth')
 });
 module.exports=async(req,res)=>{
  const endpoint=typeof req.query?.endpoint==='string'?req.query.endpoint:'';

@@ -36,10 +36,10 @@ jobs:
           print(f'Phone-sized Chrome screenshot: {width}x{height}')
           PY
           "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=390,844 --virtual-time-budget=7000 --dump-dom http://127.0.0.1:8787/ > phase1-rendered-dom.html
-          grep -q 'id="kitchen-page"' phase1-rendered-dom.html
+          grep -q 'id="kitchen"' phase1-rendered-dom.html
           grep -q 'id="dairy-grid"' phase1-rendered-dom.html
           grep -q 'id="bucket-form"' phase1-rendered-dom.html
-          grep -q 'phase1-tabbar' phase1-rendered-dom.html
+          grep -q 'class="tabs"' phase1-rendered-dom.html
       - uses: actions/upload-artifact@v4
         if: always()
         with:

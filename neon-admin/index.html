@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#123e29">
+<title>Sokal Bela · Operations</title>
+<link rel="stylesheet" href="/neon-admin/style.css"></head>
+<body>
+<section id="login-screen" class="login-screen">
+  <div class="login-box">
+    <div class="logo large">🥬</div>
+    <p class="eyebrow">SOKAL BELA • STORE OPERATIONS</p>
+    <h1>Welcome back.</h1>
+    <p class="muted">Secure access to orders, stock, campaigns and customer requests.</p>
+    <form id="login-form">
+      <label for="admin-password">Admin password</label>
+      <input id="admin-password" name="password" type="password" minlength="12" autocomplete="current-password" required autofocus>
+      <button type="submit" class="button primary wide">Sign in securely</button>
+    </form>
+    <p id="login-help" class="hint">Checking admin configuration…</p>
+    <p class="hint">Customer shopping is available on <a href="/">the storefront</a>.</p>
+  </div>
+</section>
+<div id="app" class="shell" hidden>
+  <aside class="sidebar">
+    <a href="/" class="brand"><span class="brand-icon">🥬</span><span>Sokal Bela <small>Operations studio</small></span></a>
+    <p class="nav-heading">WORKSPACE</p>
+    <nav id="nav" aria-label="Admin sections">
+      <button data-view="overview" class="nav-link active">◫ <span>Overview</span></button>
+      <button data-view="orders" class="nav-link">▣ <span>Orders</span></button>
+      <button data-view="products" class="nav-link">▦ <span>Inventory</span></button>
+      <button data-view="subscriptions" class="nav-link">◉ <span>Morning Pass</span></button>
+      <button data-view="requests" class="nav-link">✉ <span>Enquiries</span></button>
+      <button data-view="kitchen" class="nav-link">♨ <span>Kitchen</span></button>
+      <button data-view="campaigns" class="nav-link">◈ <span>Campaigns & ads</span></button>
+      <button data-view="settings" class="nav-link">⚙ <span>Shop settings</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="dot"></span> Connected to Neon
+      <p>Admin changes update live store data.</p>
+    </div>
+  </aside>
+  <div class="main-area">
+    <header class="topbar">
+      <div><div class="eyebrow">SOKAL BELA CONTROL CENTRE</div><strong id="page-breadcrumb">Overview</strong></div>
+      <div class="top-actions"><a class="button light" href="/" target="_blank" rel="noopener">View store ↗</a><button class="button light" id="refresh" type="button">Refresh</button><button class="button outline" id="logout" type="button">Sign out</button></div>
+    </header>
+    <main class="content">
+      <div class="heading"><div><p class="eyebrow" id="section-label">STORE PERFORMANCE</p><h1 id="page-title">Good morning, Sokal Bela.</h1><p id="page-subtitle" class="muted">Your store at a glance.</p></div><div id="page-actions"></div></div>
+      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+      <div class="toolbar" id="list-tools" hidden>
+        <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search this section…" aria-label="Search records"></label>
+        <span id="record-count" class="muted"></span>
+      </div>
+      <div id="view" aria-live="polite"></div>
+    </main>
+  </div>
+</div>
+<dialog id="detail-dialog" aria-labelledby="dialog-title">
+ <div class="dialog-top"><h2 id="dialog-title">Details</h2><button type="button" id="close-dialog" class="icon-button" aria-label="Close details">✕</button></div>
+ <div id="dialog-body"></div>
+</dialog>
+<dialog id="campaign-dialog" aria-labelledby="campaign-dialog-title">
+ <div class="dialog-top"><h2 id="campaign-dialog-title">New campaign</h2><button type="button" id="close-campaign" class="icon-button" aria-label="Close campaign form">✕</button></div>
+ <form id="campaign-form" class="campaign-form">
+  <input type="hidden" name="id">
+  <label>Campaign name<input name="name" maxlength="120" required placeholder="e.g. Winter vegetable offer"></label>
+  <div class="form-grid">
+   <label>Channel<select name="channel"><option value="whatsapp">WhatsApp</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="google">Google Ads</option><option value="flyer">Flyers</option><option value="referral">Referrals</option><option value="other">Other</option></select></label>
+   <label>Status<select name="status"><option value="draft">Draft</option><option value="planned">Planned</option><option value="active">Active</option><option value="paused">Paused</option><option value="completed">Completed</option></select></label>
+  </div>
+  <label>Goal<input name="objective" maxlength="160" placeholder="e.g. Reach 100 local households"></label>
+  <div class="form-grid">
+   <label>Budget (₹)<input name="budget" type="number" min="0" max="99999999" step="0.01" value="0" required></label>
+   <label>Spent (₹)<input name="spend" type="number" min="0" max="99999999" step="0.01" value="0" required></label>
+   <label>Start<input name="start_date" type="date"></label>
+   <label>End<input name="end_date" type="date"></label>
+  </div>
+  <label>Store landing path<input name="landing_path" maxlength="300" placeholder="/" value="/" required><small>Use / or another path on your storefront, not an external URL.</small></label>
+  <label>Notes<textarea name="notes" maxlength="800" rows="3" placeholder="Audience, creative ideas, posting schedule…"></textarea></label>
+  <p class="hint">Campaigns are planning records and shareable tracking links. Ads are published separately in Google or Meta Ads Manager.</p>
+  <div class="dialog-actions"><button type="button" id="cancel-campaign" class="button light">Cancel</button><button type="submit" class="button primary">Save campaign</button></div>
+ </form>
+</dialog>
+<script src="/neon-admin/admin.js" defer></script>
+</body></html>
