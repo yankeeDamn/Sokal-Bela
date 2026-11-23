@@ -39,3 +39,8 @@ Customer builds a pass (milk, ghee, paneer, papers) → **Pending** → admin **
 - Online-order stock is reserved at checkout. Cancel unpaid/failed online orders in `/admin` to return the stock.
 - Cashfree values (`CASHFREE_*`) live only in Vercel environment variables.
 - Legacy Firebase files and APIs are untouched.
+
+## Two admin screens (after merging with PR #38)
+- `/neon-admin/` (from PR #38): single owner password, order email alerts, campaigns, enquiries, kitchen, settings. Needs `ADMIN_PASSWORD_HASH` and `JWT_SECRET`.
+- `/admin` (this PR): role-based staff console for customers, sign-in logs, payments, Morning Pass runs, orders and prices. Sign in with an account whose `users.role='admin'`. API: `/api/v2/manage`.
+Both work side by side and link to each other. Run `db/phase5-operations.sql` and then `db/phase3.sql`. Pick one later if you want a single admin.

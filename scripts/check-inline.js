@@ -8,13 +8,14 @@ for (const [, tag, code] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>
   if (/\bsrc\s*=/.test(tag) || /\btype\s*=\s*["']application\/ld\+json/.test(tag)) continue;
   if (code.trim()) { new vm.Script(code, { filename: 'index.html inline script #' + (++checked) }); }
 }
+const neonHome = html.includes('/phase2-preview/app.js') && html.includes('id="product-grid"');
 const checks = [
   [!html.includes('data-page="admin"'), 'Public navigation cannot link to the admin portal'],
   [!html.includes('id="admin-page"'), 'Public HTML cannot bundle admin page'],
   [!html.includes('admin123'), 'No demo credentials in the storefront'],
-  [html.includes('type="module" src="/config/contact.mjs"'), 'Shared contact configuration imported'],
-  [html.includes('signInWithEmailAndPassword') && !html.includes('auth-tab-phone'), 'Password login present without phone OTP'],
-  [html.includes('id="featured-grid"') && html.includes('id="baskets-grid"'), 'Featured produce and baskets present']
+  [neonHome ? html.includes('/phase2-preview/style.css') : html.includes('type="module" src="/config/contact.mjs"'), 'Storefront styling/contact configuration present'],
+  [neonHome ? !html.includes('signInWithEmailAndPassword') : html.includes('signInWithEmailAndPassword') && !html.includes('auth-tab-phone'), 'Storefront authentication is isolated from admin'],
+  [neonHome ? html.includes('id="product-grid"') && html.includes('id="baskets"') : html.includes('id="featured-grid"') && html.includes('id="baskets-grid"'), 'Produce and baskets present']
 ];
 for (const [ok, message] of checks) {
   if (!ok) throw new Error('Lint failed: ' + message);

@@ -41,8 +41,14 @@ jobs:
           node --check lib/neon-core.js
           for f in api/v2/*.js; do node --check "$f"; done
           node --check phase2-preview/app.js
-          for f in lib/*.js lib/v2-handlers/*.js api/cashfree-webhook.js js/account.js admin/admin.js; do node --check "$f"; done
-          node --check tests/phase3.test.cjs
+          node --check lib/order-alerts.js
+          node --check lib/neon-admin-auth.js
+          node --check lib/neon-admin-guard.js
+          node --check lib/v2-handlers/admin.js
+          node --check lib/v2-handlers/admin-auth.js
+          node --check neon-admin/admin.js
+          node --check tests/phase5-operations.test.cjs
+          for f in lib/auth-core.js lib/billing.js lib/cashfree.js lib/payments-core.js lib/v2-handlers/auth.js lib/v2-handlers/account.js lib/v2-handlers/payments.js lib/v2-handlers/manage.js api/cashfree-webhook.js js/account.js admin/admin.js tests/phase3.test.cjs; do node --check "$f"; done
           node --check tests/neon-phase2.test.cjs
           node --check tests/phase2-checkout-ui.test.cjs
       - name: Checkout browser-state regression test
@@ -52,16 +58,20 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f db/schema.sql
           psql -X -v ON_ERROR_STOP=1 -f db/seed.sql
           psql -X -v ON_ERROR_STOP=1 -f db/phase2.sql
+          psql -X -v ON_ERROR_STOP=1 -f db/phase5-operations.sql
           psql -X -v ON_ERROR_STOP=1 -f db/phase3.sql
           psql -X -v ON_ERROR_STOP=1 -f db/phase3.sql  # must be safe to run twice
       - name: Real PostgreSQL API and transaction tests
-        run: node --test --test-concurrency=1 tests/neon-phase2.test.cjs tests/phase3.test.cjs
+        run: node --test --test-concurrency=1 tests/neon-phase2.test.cjs tests/phase5-operations.test.cjs tests/phase3.test.cjs
       - name: Existing storefront build and 390px Chrome smoke screenshot
         run: |
           npm run build
           test -f dist/phase2-preview/index.html
           test -f dist/phase2-preview/app.js
           test -f dist/phase2-preview/style.css
+          test -f dist/neon-admin/index.html
+          test -f dist/neon-admin/admin.js
+          test -f dist/neon-admin/style.css
           python3 -m http.server 8787 --directory dist >/tmp/phase2-static.log 2>&1 &
           sleep 2
           CHROME="$(command -v google-chrome || command -v chromium)"

@@ -16,7 +16,7 @@ async function api(action, { method = 'GET', query = {}, body } = {}) {
   const qs = new URLSearchParams({ action, ...query }).toString();
   let res;
   try {
-    res = await fetch('/api/v2/admin?' + qs, { method, credentials: 'same-origin', headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+    res = await fetch('/api/v2/manage?' + qs, { method, credentials: 'same-origin', headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
   } catch { throw Error('Cannot reach the server. Check your connection.'); }
   const data = await res.json().catch(() => ({}));
   if (res.status === 401) { showLogin(); throw Error('Please sign in again.'); }
