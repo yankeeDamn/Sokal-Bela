@@ -51,9 +51,12 @@ function addToCart(id,qty){
  const p=byId(id),n=Number(qty);
  if(!p||p.stock<1)return flash('Product is not currently available.',true);
  if(!Number.isInteger(n)||n<1||n>50)return flash('Quantity must be 1 to 50.',true);
- const item=cart.find(x=>x.id===String(id)),newQty=Math.min(50,p.stock,(item?.qty||0)+n);
+ const item=cart.find(x=>x.id===String(id)),wanted=(item?.qty||0)+n,newQty=Math.min(50,p.stock,wanted);
  if(item)item.qty=newQty;else cart.push({id:String(id),qty:newQty});
- persist();flash('Added to basket · ঝুড়িতে যোগ হয়েছে');
+ persist();
+ // Never cap silently: tell the shopper when stock (or the 50 limit) is lower than requested.
+ if(newQty<wanted)flash((p.stock<wanted?'Only '+p.stock+' of '+p.name_en+' in stock':'Maximum 50 per item')+'. Your basket has '+newQty+'.',true);
+ else flash('Added to basket · ঝুড়িতে যোগ হয়েছে');
 }
 function setQty(id,qty){
  const item=cart.find(x=>x.id===String(id));
@@ -61,7 +64,9 @@ function setQty(id,qty){
  const n=Number(qty);
  if(!Number.isInteger(n))return;
  if(n<=0){cart=cart.filter(x=>x.id!==String(id));persist();return;}
- item.qty=Math.min(50,byId(id)?.stock||n,n);persist();
+ const cap=Math.min(50,byId(id)?.stock||n);
+ item.qty=Math.min(cap,n);persist();
+ if(n>cap)flash('Only '+cap+' available. Quantity set to '+cap+'.',true);
 }
 function go(id){
  if(id==='products'){go('vegetables');requestAnimationFrame(()=>$('products').scrollIntoView({behavior:'smooth'}));return;}
@@ -100,7 +105,7 @@ function renderProducts(){
   return '<article class="product"><div class="visual">'+picture+emoji+
    (p.stock<1?'<span class="stock-badge">Sold out</span>':p.stock<=5?'<span class="stock-badge">Only '+p.stock+' left</span>':'')+'</div>'+
    '<div class="info"><h3>'+escapeHtml(p.name_en)+' <span lang="bn">'+escapeHtml(p.name_bn)+'</span></h3><p>'+escapeHtml(p.category)+'</p><div class="price">'+money(p.price)+' / '+escapeHtml(p.unit)+'</div></div>'+
-   '<div class="actions"><input type="number" min="1" max="50" value="1" aria-label="Quantity for '+escapeHtml(p.name_en)+'" data-qty="'+p.id+'" '+(p.stock<1?'disabled':'')+'>'+
+   '<div class="actions"><input type="number" min="1" max="'+Math.max(1,Math.min(50,p.stock))+'" value="1" aria-label="Quantity for '+escapeHtml(p.name_en)+'" data-qty="'+p.id+'" '+(p.stock<1?'disabled':'')+'>'+
    '<button class="button primary" data-add="'+p.id+'" '+(p.stock<1?'disabled':'')+'>Add · যোগ</button></div></article>';
  }).join(''):'<p>No items are active yet. The owner must enter real prices and stock in Neon before enabling products.</p>';
  $('bucket-product').innerHTML=products.filter(p=>p.stock>0).map(p=>'<option value="'+p.id+'">'+escapeHtml(p.name_en)+' · '+money(p.price)+'</option>').join('');
